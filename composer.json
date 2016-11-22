@@ -1,0 +1,21 @@
+{
+	"name": "RobinDumontChaponet/TransitiveCore",
+	"description": "Description is coming",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Robin Dumont-Chaponet",
+			"email": "src@dumontchapo.net",
+			"homepage": "https://robin.dumontchapo.net",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": "^5.3.3 || ^7.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Transitive\\Core\\": "src/"
+		}
+	}
+}
