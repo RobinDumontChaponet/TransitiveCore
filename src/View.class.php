@@ -487,7 +487,7 @@ class View {
 		$this->data = $data;
 	}
 
-	public function getBody(string $key = null)
+	public function getBody(string $key = null):ViewRessource
     {
 		return $this->getContent($key);
     }
