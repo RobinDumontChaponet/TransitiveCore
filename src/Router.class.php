@@ -2,7 +2,7 @@
 
 namespace Transitive\Core;
 
-
+/*
 if(!is_file($this->request->getPresenterPath())) {
             http_response_code(404);
             $_SERVER['REDIRECT_STATUS'] = 404;
@@ -13,8 +13,7 @@ if(!is_file($this->request->getPresenterPath())) {
             else
                 $this->request->setViewPath(self::$viewIncludePath.'genericHttpErrorHandler.view.php');
 		}
-
-
+*/
 
 class Router
 {

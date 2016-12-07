@@ -108,27 +108,27 @@ class Binder
     {
 	    $this->setJSON($isJSON);
 
-		function &includePresenter(Binder &$binder):array
+		function &includePresenter(Binder &$binder):Presenter
 		{
-			$presenter = $self->getPresenter();
+			$presenter = $binder->getPresenter();
 // 			$data = array();
-			include $self->getPresenterPath();
+			include $binder->getPresenterPath();
 
 			return $presenter;
 		}
 		function includeView(Binder &$binder, Presenter &$presenter):bool
 		{
-			if($self->getViewPath() == null)
+			if($binder->getViewPath() == null)
 				return false;
 
-			$view = $self->getView();
+			$view = $binder->getView();
 
 			$view->setData($presenter->getData());
 			unset($presenter);
 
-			$view->setJSON($self->isJSON());
+// 			$view->setJSON($binder->isJSON());
 
-			include $self->getViewPath();
+			include $binder->getViewPath();
 
 			return true;
 		}
@@ -139,12 +139,46 @@ class Binder
     /**
      * @param string $key
      */
-    public function displayContent(string $key = null):void
+    public function getContent(string $key = null)
     {
-		if($this->JSON)
-			$this->getView()->displayJSONContent($key);
-		else
-			$this->getView()->displayHTMLContent($key);
+        return $this->getView()->getContent($key);
+    }
+
+    /**
+     * @param string $key
+     */
+    public function printContent(string $key = null):void
+    {
+        $this->getView()->printContent($key);
+    }
+
+    public function getHead():ViewRessource
+	{
+		return $this->getView()->getHead();
+	}
+
+    public function getDocument():ViewRessource
+	{
+		return $this->getView()->getDocument();
+	}
+	public function printDocument():void
+	{
+		$this->getView()->printDocument();
+	}
+
+	public function printHead():void
+	{
+		$this->getView()->printHead();
+	}
+
+	public function getBody()
+    {
+		return $this->getView()->getBody();
+    }
+
+    public function printBody():void
+    {
+		$this->getView()->printBody();
     }
 
     /**

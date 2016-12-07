@@ -2,20 +2,6 @@
 
 namespace Transitive\Core;
 
-/**
- * cacheBust function.
- *
- * @param string $src
- *
- * @return string
- */
-function cacheBust(string $src):string
-{
-	$path = pathinfo($src);
-
-	return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
-}
-
 class View {
 	/**
 	 * The view's title.
@@ -59,10 +45,25 @@ class View {
      */
     public $data;
 
+    /**
+	 * cacheBust function.
+	 *
+	 * @param string $src
+	 *
+	 * @return string
+	 */
+	public static function cacheBust(string $src):string
+	{
+		$path = pathinfo($src);
+
+		return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
+	}
+
     public function __construct()
     {
 	    $this->styles = array();
 	    $this->scripts = array();
+	    $this->metas = array();
 
 	    $this->content = 'No viewable content.';
     }
@@ -77,6 +78,15 @@ class View {
         return $this->title;
     }
 
+	/**
+	 * Print the view's title.
+	 *
+	 */
+	public function printTitle():void
+	{
+		echo '<title>', $this->getTitle(), '</title>';
+    }
+
     /**
      * Set the view's title.
      *
@@ -87,18 +97,45 @@ class View {
         $this->title = $title;
     }
 
-/*
-    private function _getContent():string
+	/**
+     * @return array
+     */
+    private function _getContent($content):string
     {
-        // TODO: implement here
+	    ob_start();
+		ob_clean();
+		$this->_printContent($content);
+
+		return ob_get_clean();
     }
-*/
+
+    /**
+     * @param string $key
+     */
+	public function getContent(string $key = null):ViewRessource
+	{
+		$content = array();
+
+		if($this->hasContent()) {
+            if(gettype($this->content) == 'array')
+                if(isset($key)) {
+                    if(isset($this->content[$key]))
+                        $content[$key] = $this->_getContent($this->content[$key]);
+                } else
+                    foreach($this->content as $key => $item)
+                        $content[$key] = $this->_getContent($item);
+            else
+                $content = $this->_getContent($this->content);
+
+			return new ViewRessource($content);
+        }
+	}
 
     /**
      * @param mixed $content
      */
-    private function _displayHTML($content):void
-    { // used by displayContent()
+    private function _printContent($content):void
+    { // used by printContent()
         switch(gettype($content)) {
             case 'string': case 'integer': case 'double':
                 echo $content;
@@ -118,76 +155,88 @@ class View {
     /**
      * @param string $key
      */
-    public function displayHTMLContent(string $key = null):void
-    {
-        if($this->hasContent()) {
+	public function printContent(string $key = null):void
+	{
+		if($this->hasContent()) {
             if(gettype($this->content) == 'array')
                 if(isset($key)) {
                     if(isset($this->content[$key]))
-                        $this->_displayHTML($this->content[$key]);
+                        $this->_printContent($this->content[$key]);
                 } else
                     foreach($this->content as $item)
-                        $this->_displayHTML($item);
+                        $this->_printContent($item);
             else
-                $this->_displayHTML($this->content);
+                $this->_printContent($this->content);
         }
-    }
+	}
 
-    /**
-     * @return array
-     */
-    private function _getContent():array
-    { // used for json outputs and __toString
-        $contentParts = array();
-        if($this->hasContent()) {
-            if(gettype($this->content) == 'array')
-                foreach($this->content as $key => $item) {
-                    ob_start();
-                    ob_clean();
-                    $this->_displayHTML($item);
-                    $contentParts[$key] = ob_get_clean();
-                }
-            else {
-                ob_start();
-                ob_clean();
-                $this->displayHTMLContent();
-                $contentParts['content'] = ob_get_clean();
-            }
-        }
+	public function getHead():ViewRessource
+ 	{
+		return new ViewRessource(array(
+            'metas' => $this->getMetas(),
+            'scripts' => $this->getScripts(),
+            'styles' => $this->getStyles(),
+            'title' => $this->getTitle()
+        ), 'asArray');
+	}
 
-        return $contentParts;
-    }
+	public function printHead():void
+	{
+		echo '<head><meta charset="UTF-8">',
+			$transit->printMetas(),
+			$this->printTitle(),
+			'<base href="',
+			(constant('SELF') == null) ? '/' : constant('SELF').'/',
+			'" /><!--[if IE]><link rel="shortcut icon" href="style/favicon-32.ico"><![endif]--><link rel="icon" href="style/favicon-96.png"><meta name="msapplication-TileColor" content="#FFF"><meta name="msapplication-TileImage" content="style/favicon-144.png"><link rel="apple-touch-icon" href="style/favicon-152.png"><link rel="stylesheet" type="text/css" href="style/reset.min.css" />',
+			$transit->printStyles(), '<!--[if lt IE 9]><script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->',
+			$transit->printScripts(),
+			'</head>';
+	}
+
+
+	public function getDocument(string $contentKey = null):ViewRessource
+ 	{
+		return new ViewRessource(array(
+            'metas'   => $this->getMetas(),
+            'scripts' => $this->getScripts(),
+            'styles'  => $this->getStyles(),
+            'title'   => $this->getTitle(),
+            'content' => $this->getContent($contentKey)
+        ), 'asJSON');
+	}
+	public function printDocument():void
+ 	{
+		echo $this->getDocument();
+	}
 
     /**
      * Print the view's content and header as JSON.
      */
+/*
     public function outputJSON():void
     {
         $array = array(
-            'metaTags' => $this->getMetaTags(),
+            'metas' => $this->getMetas(),
             'scripts' => $this->getScripts(),
-            'scriptLinks' => $this->scriptLinks,
-            'linkTags' => $this->getLinkTags(),
-            'styles' => $this->getStyle(),
-            'title' => $this->getTitle(),
+            'styles' => $this->getStyles(),
+            'title' => $this->getTitle()
         );
 
-        $content = $this->_getContent();
-        if(count($content) > 1)
-            $array['content'] = $content;
-        else
-            $array['content'] = $content['content'];
+		$array['content'] = $this->getContent();
 
         echo json_encode($array);
     }
+*/
 
     /**
      * Print the view's content as JSON.
      */
+/*
     public function displayJSONContent():void
     {
-        echo json_encode($this->_getContent());
+        echo json_encode($this->getContent());
     }
+*/
 
     /**
      * @return bool
@@ -197,25 +246,15 @@ class View {
         return isset($this->content);
     }
 
-/*
     public function __debugInfo()
     {
         return array(
-            'metaTags' => $this->metaTags,
-            'scriptTags' => $this->scriptTags,
-            'scriptLinks' => $this->scriptLinks,
-            'script' => $this->script,
-            'linkTags' => $this->linkTags,
-            'style' => $this->style,
+            'metas' => $this->metas,
+            'scripts' => $this->scripts,
+            'styles' => $this->styles,
             'title' => $this->title,
-            'data' => $this->data,
+            'data' => $this->getData()
         );
-    }
-*/
-
-    public function print():void
-    {
-        // TODO: implement here
     }
 
     public function __toString():string
@@ -229,7 +268,7 @@ class View {
     public function addRawMetaTag(string $rawTag):void
     {
         $this->metas[] = array(
-			'raw' => $rawTag,
+			'raw' => $rawTag
 		);
 
     }
@@ -240,9 +279,9 @@ class View {
      */
     public function addMetaTag(string $name, string $content = ''):void
     {
-        $this->scripts[] = array(
+        $this->metas[] = array(
 			'name' => $name,
-			'content' => $content,
+			'content' => $content
 		);
     }
 
@@ -269,7 +308,7 @@ class View {
 	{
 		$this->styles[] = array(
 			'type' => $type,
-			'content' => $content,
+			'content' => $content
 		);
 	}
 
@@ -281,7 +320,7 @@ class View {
 	{
 		$this->scripts[] = array(
 			'type' => $type,
-			'content' => $content,
+			'content' => $content
 		);
 	}
 
@@ -295,13 +334,13 @@ class View {
     public function linkStyleSheet(string $href, string $type = 'text/css', bool $defer = false, bool $cacheBust = true, string $rel = 'stylesheet'):void
     {
 	    if($cacheBust)
-			$href = cacheBust($href);
+			$href = self::cacheBust($href);
 
 		$this->styles[] = array(
 			'href' => $href,
 			'type' => $type,
 			'defer' => $defer,
-			'rel' => $rel,
+			'rel' => $rel
 		);
     }
 
@@ -314,12 +353,12 @@ class View {
     public function linkScript(string $href, string $type = 'text/javascript', bool $defer = false, bool $cacheBust = true):void
     {
 	    if($cacheBust)
-			$href = cacheBust($href);
+			$href = self::cacheBust($href);
 
         $this->scripts[] = array(
 			'href' => $href,
 			'type' => $type,
-			'defer' => $defer,
+			'defer' => $defer
 		);
     }
 
@@ -329,7 +368,7 @@ class View {
     public function addRawStyleTag(string $rawTag):void
     {
 		$this->styles[] = array(
-			'raw' => $rawTag,
+			'raw' => $rawTag
 		);
     }
 
@@ -339,7 +378,7 @@ class View {
 	public function addRawScriptTag(string $rawTag):void
     {
 		$this->scripts[] = array(
-			'raw' => $rawTag,
+			'raw' => $rawTag
 		);
     }
 
@@ -359,8 +398,13 @@ class View {
      */
     public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = true):bool
     {
+	    if(!file_exists($filepath)) {
+			throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+			return false;
+		}
+
         if($cacheBust)
-			$filepath = cacheBust($filepath);
+			$filepath = self::cacheBust($filepath);
 
 		$this->addStyle(get_include_contents($filepath), $type);
     }
@@ -374,25 +418,27 @@ class View {
 	 */
 	public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = true):bool
 	{
+		if(!file_exists($filepath)) {
+			throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+			return false;
+		}
+
 		if($cacheBust)
-			$filepath = cacheBust($filepath);
+			$filepath = self::cacheBust($filepath);
 
 		$this->addScript(get_include_contents($filepath), $type);
-	}
 
-    private function _getHeader():string
-    {
-        // TODO: implement here
-    }
+		return true;
+	}
 
     public function printStyles():void
     {
         if(isset($this->styles))
             foreach($this->styles as $style)
             	if(isset($style['content']))
-	                echo '<style type="'.$style['type'].'">'.$style['content'].'</script>';
+	                echo '<style type="'.$style['type'].'">'.$style['content'].'</style>';
 				elseif(isset($style['href']))
-					echo '<link rel="'.$style['rel'].'" type="'.$style['type'].'" href="'.$style['href'].'"'.(($script['defer']) ? ' defer async' : '').' />';
+					echo '<link rel="'.$style['rel'].'" type="'.$style['type'].'" href="'.$style['href'].'"'.(($style['defer']) ? ' defer async' : '').' />';
 				elseif(isset($style['raw']))
 	                echo $style['raw'];
     }
@@ -425,25 +471,10 @@ class View {
         return $this->styles;
     }
 
-    public function removeStyleTag():bool
-    {
-        // TODO: implement here
-    }
-
-    public function removeScriptTag():bool
-    {
-        // TODO: implement here
-    }
-
-    public function removeImported():bool
-    {
-        // TODO: implement here
-    }
-
 	/**
 	 * @return array
 	 */
-	public function getData():array
+	public function &getData():array
 	{
 		return $this->data;
 	}
@@ -455,4 +486,14 @@ class View {
 	{
 		$this->data = $data;
 	}
+
+	public function getBody(string $key = null)
+    {
+		return $this->getContent($key);
+    }
+
+    public function printBody(string $key = null):void
+    {
+		$this->printContent($key);
+    }
 }

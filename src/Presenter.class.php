@@ -14,6 +14,14 @@ class Presenter {
 	}
 
 	/**
+	 *
+	 */
+	public function &getData():array
+	{
+		return $this->data;
+	}
+
+	/**
 	 * @param array $data
 	 */
 	public function setData(array &$data):void
@@ -21,11 +29,23 @@ class Presenter {
 		$this->data = $data;
 	}
 
+	/**
+	 * @param array $data
+	 */
+	public function addData($key, $value=null):void
+	{
+		$this->data[$key] = $value;
+	}
+	public function add($key, $value=null):void
+	{
+		$this->addData($key, $value);
+	}
+
 	// pretty useless for now…
 	public function __debugInfo()
 	{
 		return array(
-			'data' => $this->data,
+			'data' => $this->data
 		);
 	}
 }
