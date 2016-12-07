@@ -28,12 +28,12 @@ class ViewRessource {
 		$this->setDefault($defaultTransformer);
 	}
 
-	private function &getValue()
+	private function getValue()
 	{
 		return $this->value;
 	}
 
-	private function setValue(&$value):void
+	private function setValue($value):void
 	{
 		$this->value = $value;
 	}
@@ -70,30 +70,32 @@ class ViewRessource {
 	{
 		return json_encode($this->getValue());
 	}
-	public function asXMLElement():\SimpleXMLElement
+	public function asXMLElement(string $root = 'root'):\SimpleXMLElement
 	{
-		$xml = new \SimpleXMLElement('<root/>');
-		self::_arrayToXML($this->getValue(), $xml);
+		$xml = new \SimpleXMLElement('<'.$root.'/>');
+		self::_arrayToXML($this->asArray(), $xml);
 
 		return $xml;
 	}
-	public function asXML():string
+	public function asXML(string $root = 'root'):string
 	{
-		return ($xml = $this->asXMLElement()->asXML())?$xml:'';
+		return ($xml = $this->asXMLElement($root)->asXML())?$xml:'';
 	}
 	public function asArray():array
 	{
-		if(is_array($this->getValue()))
-			return $this->getValue();
-		else
-			return array($this->getValue());
+		return (array)$this->getValue();
 	}
-/*
-	public function asString($param):string
+	public function asString():string
 	{
-		return '';
+		$value = $this->asArray();
+		$str = '';
+
+		array_walk_recursive($value, function($value, $key) use (&$str) {
+			$str.= $value;
+		});
+
+		return $str;
 	}
-*/
 	public function asYAML():string
 	{
 		if(!function_exists('yaml_emit'))
