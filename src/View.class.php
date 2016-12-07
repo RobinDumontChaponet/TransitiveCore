@@ -102,11 +102,24 @@ class View {
      */
     private function _getContent($content):string
     {
-	    ob_start();
-		ob_clean();
-		$this->_printContent($content);
+	    switch(gettype($content)) {
+            case 'string': case 'integer': case 'double':
+                return $content;
+            break;
+            case 'object':
+                if(get_class($content) == 'Closure') {
+                	ob_start();
+					ob_clean();
+                    $content($this->data);
 
-		return ob_get_clean();
+					return ob_get_clean();
+                } elseif(isset($content->content))
+                    return $content->content;
+            break;
+            default:
+                echo 'wrong view content type';
+        }
+        echo PHP_EOL;
     }
 
     /**
@@ -117,7 +130,7 @@ class View {
 		$content = array();
 
 		if($this->hasContent()) {
-            if(gettype($this->content) == 'array')
+            if(is_array($this->content))
                 if(isset($key)) {
                     if(isset($this->content[$key]))
                         $content[$key] = $this->_getContent($this->content[$key]);
@@ -132,42 +145,11 @@ class View {
 	}
 
     /**
-     * @param mixed $content
-     */
-    private function _printContent($content):void
-    { // used by printContent()
-        switch(gettype($content)) {
-            case 'string': case 'integer': case 'double':
-                echo $content;
-            break;
-            case 'object':
-                if(get_class($content) == 'Closure')
-                    $content($this->data);
-                elseif(isset($content->content))
-                    echo $content->content;
-            break;
-            default:
-                echo 'wrong view content type';
-        }
-        echo PHP_EOL;
-    }
-
-    /**
      * @param string $key
      */
 	public function printContent(string $key = null):void
 	{
-		if($this->hasContent()) {
-            if(gettype($this->content) == 'array')
-                if(isset($key)) {
-                    if(isset($this->content[$key]))
-                        $this->_printContent($this->content[$key]);
-                } else
-                    foreach($this->content as $item)
-                        $this->_printContent($item);
-            else
-                $this->_printContent($this->content);
-        }
+		echo $this->getContent($key)->asString();
 	}
 
 	public function getHead():ViewRessource
@@ -197,11 +179,8 @@ class View {
 	public function getDocument(string $contentKey = null):ViewRessource
  	{
 		return new ViewRessource(array(
-            'metas'   => $this->getMetas(),
-            'scripts' => $this->getScripts(),
-            'styles'  => $this->getStyles(),
-            'title'   => $this->getTitle(),
-            'content' => $this->getContent($contentKey)
+            'head'    => $this->getHead()->asArray,
+            'content' => $this->getContent($contentKey)->asArray
         ), 'asJSON');
 	}
 	public function printDocument():void
