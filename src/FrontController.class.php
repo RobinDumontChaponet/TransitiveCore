@@ -269,7 +269,12 @@ class FrontController {
 
     public function __toString():string
     {
-        // TODO: implement here
+	    ob_start();
+		ob_clean();
+		$this->print();
+
+		return ob_get_clean();
+
     }
 
     public function print($contentType = null):void
