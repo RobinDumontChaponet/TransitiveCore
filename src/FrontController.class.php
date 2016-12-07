@@ -282,7 +282,7 @@ class FrontController {
 				echo $this->getDocument();
 			break;
 			case 'application/vnd.transitive.document+xml':
-				echo $this->getDocument()->asXML;
+				echo $this->getDocument()->asXML('document');
 			break;
 			case 'application/vnd.transitive.document+yaml':
 				echo $this->getDocument()->asYAML;
@@ -292,7 +292,7 @@ class FrontController {
 				echo $this->getHead()->asJson;
 			break;
 			case 'application/vnd.transitive.head+xml':
-				echo $this->getHead()->asXML;
+				echo $this->getHead()->asXML('head');
 			break;
 			case 'application/vnd.transitive.head+yaml':
 				echo $this->getHead()->asYAML;
@@ -302,7 +302,7 @@ class FrontController {
 				echo $this->getContent()->asJson;
 			break;
 			case 'application/vnd.transitive.content+xml':
-				echo $this->getContent()->asXML;
+				echo $this->getContent()->asXML('content');
 			break;
 			case 'application/vnd.transitive.content+yaml':
 				echo $this->getContent()->asYAML;
