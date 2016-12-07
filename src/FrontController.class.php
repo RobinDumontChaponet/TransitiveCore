@@ -65,6 +65,14 @@ class FrontController {
 
 	private $contentType;
 
+	public static $mimeTypes = array(
+		'application/xhtml+xml', 'text/html',
+		'application/json',
+		'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
+		'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
+		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.content+yaml'
+	);
+
 	public function __construct(string $queryURL=null)
 	{
 		$queryURL = (!empty($queryURL)) ? $queryURL : 'index';
@@ -136,14 +144,12 @@ class FrontController {
 			echo 'transitive.document';
 */
 
+		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
 
+		if(!empty($this->contentType)) {
+			header('Content-Type: '.$this->contentType);
 
-		$this->contentType = getBestSupportedMimeType(array('application/xhtml+xml', 'text/html', 'application/json', 'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml'));
-
-		if(!empty($contentType)) {
-			header('Content-Type: '.$contentType);
-
-			if($contentType=='application/vnd.transitive.document+json' || $contentType=='application/json') {
+			if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
 				header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
 				header('Cache-Control: public, max-age=60');
 			}
@@ -280,6 +286,26 @@ class FrontController {
 			break;
 			case 'application/vnd.transitive.document+yaml':
 				echo $this->getDocument()->asYAML;
+			break;
+
+			case 'application/vnd.transitive.head+json':
+				echo $this->getHead()->asJson;
+			break;
+			case 'application/vnd.transitive.head+xml':
+				echo $this->getHead()->asXML;
+			break;
+			case 'application/vnd.transitive.head+yaml':
+				echo $this->getHead()->asYAML;
+			break;
+
+			case 'application/vnd.transitive.content+json':
+				echo $this->getContent()->asJson;
+			break;
+			case 'application/vnd.transitive.content+xml':
+				echo $this->getContent()->asXML;
+			break;
+			case 'application/vnd.transitive.content+yaml':
+				echo $this->getContent()->asYAML;
 			break;
 			case 'application/json':
 				echo '{"case":"json"}';
