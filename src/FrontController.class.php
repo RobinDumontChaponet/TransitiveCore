@@ -52,14 +52,20 @@ function getBestSupportedMimeType($mimeTypes = null) {
 
 class FrontController {
 	/**
-	 * @var Request
-	 */
-	private $binder;
+     * @var Presenter
+     */
+    private $presenter;
+
+    /**
+     * @var View
+     */
+    private $view;
 
 	/**
 	 * @var array Router
 	 */
 	private $routers;
+	private $route;
 
 	public $layout;
 
@@ -70,13 +76,14 @@ class FrontController {
 		'application/json',
 		'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
 		'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
-		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.content+yaml'
+		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml'
 	);
 
 	public function __construct(string $queryURL=null)
 	{
-		$queryURL = (!empty($queryURL)) ? $queryURL : 'index';
-		$this->binder = new Binder(ROOT_PATH.'/presenters/'.$queryURL, ROOT_PATH.'/views/'.$queryURL);
+		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+
+// 		$this->route = new Route('index', ROOT_PATH.'/presenters/index', ROOT_PATH.'/views/index');
 
 		$this->layout = function () { ?>
 
@@ -105,74 +112,124 @@ class FrontController {
 	}
 
     /**
-     * @return Binder
+     * @return Presenter
      */
-    public function getBinder():Binder
+    public function getPresenter():Presenter
     {
-        return $this->binder;
+		return $this->presenter;
     }
 
     /**
-     * @param Binder $binder
+     * @return View
      */
-    public function setBinder(Binder $binder):void
+    public function getView():View
     {
-        $this->binder = $binder;
+		return $this->view;
     }
 
     /**
-     * @param bool $isJSON
      */
-    public function execute(bool $isJSON = false):void
+    public function execute(string $queryURL=null):bool
     {
-/*  // @ IN Router/Route
-		if(!is_file($this->binder->getPresenterPath())) {
-            http_response_code(404);
-            $_SERVER['REDIRECT_STATUS'] = 404;
+	    $queryURL = (!empty($queryURL)) ? $queryURL : 'index';
 
-            $this->binder->setPresenterPath('genericHttpErrorHandler.presenter.php');
-            if(!is_file(self::$viewIncludePath.'genericHttpErrorHandler.view.php'))
-                $this->binder->setViewPath('');
-            else
-                $this->binder->setViewPath(self::$viewIncludePath.'genericHttpErrorHandler.view.php');
+	    function includePresenter(FrontController &$binder, string $path):void
+		{
+			$presenter = $binder->getPresenter();
+// 			$data = array();
+			include $path.'.presenter.php';
 		}
-*  IN Router/Route */
-/*
-		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
-			echo 'ajaxed';
-		if(!empty($_SERVER['HTTP_ACCEPT']) && strtolower($_SERVER['HTTP_ACCEPT']) == 'application/vnd.transitive.document+json')
-			echo 'transitive.document';
-*/
+		function includeView(FrontController &$binder, string $path):void
+		{
+			if($path === null)
+				return;
 
-		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+			$view = $binder->getView();
 
-		if(!empty($this->contentType)) {
-			header('Content-Type: '.$this->contentType);
+			if(is_file($path.'.view.php'))
+				include $path.'.view.php';
+		}
+		function noContent() {
+			http_response_code(204);
+            $_SERVER['REDIRECT_STATUS'] = 404;
+		}
+		function notFound() {
+			http_response_code(404);
+            $_SERVER['REDIRECT_STATUS'] = 404;
+		}
 
-			if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
-				header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
-				header('Cache-Control: public, max-age=60');
+		if(!isset($this->routers)) {
+			notFound();
+
+			echo 'No router.';
+			throw new \Exception('No routeR.');
+
+            return false;
+		} else {
+			foreach($this->routers as $router) {
+				if(($testRoute = $router->execute($queryURL))!==false)
+					$this->route = $testRoute;
 			}
+			if(!isset($this->route)) {
+				notFound();
+
+				echo 'No route.';
+				throw new \Exception('No route.');
+
+	            return false;
+			}
+
+			$presenter = $this->route->getPresenter();
+			$view = $this->route->getView();
+
+			if(is_string($presenter)) {
+				if(!is_file($presenter.'.presenter.php')) {
+					notFound();
+
+					$presenter = ROOT_PATH.'/presenters/genericHttpErrorHandler';
+					if(!is_file($presenter.'.presenter.php'))
+						$view = '';
+					else
+						$view = ROOT_PATH.'/views/genericHttpErrorHandler';
+				}
+
+				$this->presenter = new Presenter();
+				includePresenter($this, $presenter);
+			} elseif(get_class($presenter)=='Presenter')
+				$this->presenter = $presenter;
+
+			if(is_string($view)) {
+				$this->view = new View();
+				includeView($this, $view);
+			} elseif(get_class($view)=='View')
+				$this->view = $view;
+
+			$this->view->setData($this->presenter->getData());
+
+
+			if(!empty($this->contentType)) {
+				header('Content-Type: '.$this->contentType);
+
+				if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
+					header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+					header('Cache-Control: public, max-age=60');
+				}
+			}
+
+			header('Vary: X-Requested-With,Content-Type');
+
+			if(!$this->getView()->hasContent()) {
+	            noContent();
+
+	            return false;
+			}
+			return true;
 		}
-
-
-		header('Vary: X-Requested-With,Content-Type');
-
-		if(!$this->binder->getView()->hasContent()) {
-            http_response_code(204);
-            $_SERVER['REDIRECT_STATUS'] = 404;
-		}
-		$this->binder->execute($isJSON);
-
-/*
-		if($this->binder->isJSON() && !headers_sent())
-			header('Content-Type: application/json');
-*/
     }
 
     public function printMetas():void
     {
-        $this->binder->getView()->printMetas();
+        $this->view->printMetas();
     }
 
     /**
@@ -184,7 +241,7 @@ class FrontController {
      */
     public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''):string
     {
-        $title = $this->binder->getView()->getTitle();
+        $title = $this->view->getTitle();
 
         if(!empty($title))
             return $prefix.$separator.$title.$endSeparator;
@@ -201,18 +258,18 @@ class FrontController {
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''):void
     {
         echo '<title>';
-        echo $this->getTitle($prefix, $separator, $endSeparator);
+        echo $this->view->getTitle($prefix, $separator, $endSeparator);
         echo '</title>';
     }
 
     public function printStyles():void
     {
-        $this->binder->getView()->printStyles();
+        $this->view->printStyles();
     }
 
     public function printScripts():void
     {
-        $this->binder->getView()->printScripts();
+        $this->view->printScripts();
     }
 
 	/**
@@ -220,7 +277,7 @@ class FrontController {
      */
     public function getContent(string $key = null)
     {
-        return $this->binder->getContent($key);
+        return $this->view->getContent($key);
     }
 
     /**
@@ -228,35 +285,35 @@ class FrontController {
      */
     public function printContent(string $key = null):void
     {
-        $this->binder->printContent($key);
+        $this->view->printContent($key);
     }
 
 	public function getHead():ViewRessource
     {
-		return $this->binder->getHead();
+		return $this->view->getHead();
     }
 
     public function printHead():void
     {
-		$this->binder->printHead();
+		$this->view->printHead();
     }
 
     public function getBody()
     {
-		return $this->binder->getBody();
+		return $this->view->getBody();
     }
     public function printBody():void
     {
-		$this->binder->printBody();
+		$this->view->printBody();
     }
 
 	public function getDocument()
 	{
-		return $this->binder->getDocument();
+		return $this->view->getDocument();
 	}
     public function printDocument():void
     {
-		$this->binder->printDocument();
+		$this->view->printDocument();
     }
 
 
@@ -290,27 +347,27 @@ class FrontController {
 				echo $this->getDocument()->asXML('document');
 			break;
 			case 'application/vnd.transitive.document+yaml':
-				echo $this->getDocument()->asYAML;
+				echo $this->getDocument()->asYAML();
 			break;
 
 			case 'application/vnd.transitive.head+json':
-				echo $this->getHead()->asJson;
+				echo $this->getHead()->asJson();
 			break;
 			case 'application/vnd.transitive.head+xml':
 				echo $this->getHead()->asXML('head');
 			break;
 			case 'application/vnd.transitive.head+yaml':
-				echo $this->getHead()->asYAML;
+				echo $this->getHead()->asYAML();
 			break;
 
 			case 'application/vnd.transitive.content+json':
-				echo $this->getContent()->asJson;
+				echo $this->getContent()->asJson();
 			break;
 			case 'application/vnd.transitive.content+xml':
 				echo $this->getContent()->asXML('content');
 			break;
 			case 'application/vnd.transitive.content+yaml':
-				echo $this->getContent()->asYAML;
+				echo $this->getContent()->asYAML();
 			break;
 			case 'application/json':
 				echo '{"case":"json"}';
