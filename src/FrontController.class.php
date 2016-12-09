@@ -71,6 +71,9 @@ class FrontController {
 
 	private $contentType;
 
+	public $obClean;
+	private $obContent;
+
 	public static $mimeTypes = array(
 		'application/xhtml+xml', 'text/html',
 		'application/json',
@@ -79,11 +82,12 @@ class FrontController {
 		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml'
 	);
 
-	public function __construct(string $queryURL=null)
+	public function __construct()
 	{
 		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
 
-// 		$this->route = new Route('index', ROOT_PATH.'/presenters/index', ROOT_PATH.'/views/index');
+		$this->obClean = true;
+		$this->obContent = '';
 
 		$this->layout = function () { ?>
 
@@ -111,6 +115,11 @@ class FrontController {
 <?php  };
 	}
 
+	public function getObContent():string
+    {
+		return $this->obContent;
+    }
+
     /**
      * @return Presenter
      */
@@ -133,13 +142,21 @@ class FrontController {
     {
 	    $queryURL = (!empty($queryURL)) ? $queryURL : 'index';
 
-	    function includePresenter(FrontController &$binder, string $path):void
+	    function includePresenter(FrontController &$binder, string $path)
 		{
 			$presenter = $binder->getPresenter();
 // 			$data = array();
-			include $path.'.presenter.php';
+
+			if($binder->obClean) {
+				ob_start();
+				ob_clean();
+
+				include $path.'.presenter.php';
+				return ob_get_clean();
+			} else
+				include $path.'.presenter.php';
 		}
-		function includeView(FrontController &$binder, string $path):void
+		function includeView(FrontController &$binder, string $path)
 		{
 			if($path === null)
 				return;
@@ -147,7 +164,14 @@ class FrontController {
 			$view = $binder->getView();
 
 			if(is_file($path.'.view.php'))
-				include $path.'.view.php';
+				if($binder->obClean) {
+					ob_start();
+					ob_clean();
+
+					include $path.'.view.php';
+					return ob_get_clean();
+				} else
+					include $path.'.view.php';
 		}
 		function noContent() {
 			http_response_code(204);
@@ -194,13 +218,13 @@ class FrontController {
 				}
 
 				$this->presenter = new Presenter();
-				includePresenter($this, $presenter);
+				$this->obContent.= includePresenter($this, $presenter);
 			} elseif(get_class($presenter)=='Presenter')
 				$this->presenter = $presenter;
 
 			if(is_string($view)) {
 				$this->view = new View();
-				includeView($this, $view);
+				$this->obContent.= includeView($this, $view);
 			} elseif(get_class($view)=='View')
 				$this->view = $view;
 
