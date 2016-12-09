@@ -13,9 +13,6 @@ class Presenter {
 		$this->data = array();
 	}
 
-	/**
-	 *
-	 */
 	public function &getData():array
 	{
 		return $this->data;
@@ -32,11 +29,11 @@ class Presenter {
 	/**
 	 * @param array $data
 	 */
-	public function addData($key, $value=null):void
+	public function addData($key, $value = null):void
 	{
 		$this->data[$key] = $value;
 	}
-	public function add($key, $value=null):void
+	public function add($key, $value = null):void
 	{
 		$this->addData($key, $value);
 	}
@@ -45,7 +42,7 @@ class Presenter {
 	public function __debugInfo()
 	{
 		return array(
-			'data' => $this->data
+			'data' => $this->data,
 		);
 	}
 }

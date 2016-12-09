@@ -45,7 +45,7 @@ class View {
      */
     public $data;
 
-    /**
+	/**
 	 * cacheBust function.
 	 *
 	 * @param string $src
@@ -61,11 +61,11 @@ class View {
 
     public function __construct()
     {
-	    $this->styles  = array();
+	    $this->styles = array();
 	    $this->scripts = array();
-	    $this->metas   = array();
+	    $this->metas = array();
 
-		$this->title   = '';
+		$this->title = '';
 	    $this->content = 'No viewable content.';
     }
 
@@ -81,7 +81,6 @@ class View {
 
 	/**
 	 * Print the view's title.
-	 *
 	 */
 	public function printTitle():void
 	{
@@ -98,7 +97,7 @@ class View {
         $this->title = $title;
     }
 
-	/**
+    /**
      * @return array
      */
     private function _getContent($content):string
@@ -123,9 +122,9 @@ class View {
         echo PHP_EOL;
     }
 
-    /**
-     * @param string $key
-     */
+	/**
+	 * @param string $key
+	 */
 	public function getContent(string $key = null):ViewRessource
 	{
 		$content = array();
@@ -145,9 +144,9 @@ class View {
         }
 	}
 
-    /**
-     * @param string $key
-     */
+	/**
+	 * @param string $key
+	 */
 	public function printContent(string $key = null):void
 	{
 		echo $this->getContent($key)->asString();
@@ -159,7 +158,7 @@ class View {
             'metas' => $this->getMetas(),
             'scripts' => $this->getScripts(),
             'styles' => $this->getStyles(),
-            'title' => $this->getTitle()
+            'title' => $this->getTitle(),
         ), 'asArray');
 	}
 
@@ -176,12 +175,11 @@ class View {
 			'</head>';
 	}
 
-
 	public function getDocument(string $contentKey = null):ViewRessource
  	{
 		return new ViewRessource(array(
-            'head'    => $this->getHead()->asArray,
-            'content' => $this->getContent($contentKey)->asArray
+            'head' => $this->getHead()->asArray,
+            'content' => $this->getContent($contentKey)->asArray,
         ), 'asJSON');
 	}
 	public function printDocument():void
@@ -233,7 +231,7 @@ class View {
             'scripts' => $this->scripts,
             'styles' => $this->styles,
             'title' => $this->title,
-            'data' => $this->getData()
+            'data' => $this->getData(),
         );
     }
 
@@ -248,7 +246,7 @@ class View {
     public function addRawMetaTag(string $rawTag):void
     {
         $this->metas[] = array(
-			'raw' => $rawTag
+			'raw' => $rawTag,
 		);
 
     }
@@ -261,7 +259,7 @@ class View {
     {
         $this->metas[] = array(
 			'name' => $name,
-			'content' => $content
+			'content' => $content,
 		);
     }
 
@@ -288,7 +286,7 @@ class View {
 	{
 		$this->styles[] = array(
 			'type' => $type,
-			'content' => $content
+			'content' => $content,
 		);
 	}
 
@@ -300,7 +298,7 @@ class View {
 	{
 		$this->scripts[] = array(
 			'type' => $type,
-			'content' => $content
+			'content' => $content,
 		);
 	}
 
@@ -320,7 +318,7 @@ class View {
 			'href' => $href,
 			'type' => $type,
 			'defer' => $defer,
-			'rel' => $rel
+			'rel' => $rel,
 		);
     }
 
@@ -338,7 +336,7 @@ class View {
         $this->scripts[] = array(
 			'href' => $href,
 			'type' => $type,
-			'defer' => $defer
+			'defer' => $defer,
 		);
     }
 
@@ -348,7 +346,7 @@ class View {
     public function addRawStyleTag(string $rawTag):void
     {
 		$this->styles[] = array(
-			'raw' => $rawTag
+			'raw' => $rawTag,
 		);
     }
 
@@ -358,7 +356,7 @@ class View {
 	public function addRawScriptTag(string $rawTag):void
     {
 		$this->scripts[] = array(
-			'raw' => $rawTag
+			'raw' => $rawTag,
 		);
     }
 
@@ -380,6 +378,7 @@ class View {
     {
 	    if(!file_exists($filepath)) {
 			throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+
 			return false;
 		}
 
@@ -393,13 +392,14 @@ class View {
 	 * @param string $filepath
 	 * @param string $type
 	 * @param bool $cacheBust
- *
+	 *
 	 * @return bool
 	 */
 	public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = true):bool
 	{
 		if(!file_exists($filepath)) {
 			throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+
 			return false;
 		}
 

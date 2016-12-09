@@ -17,7 +17,7 @@ if (!function_exists('http_response_code')) {
 
 function getBestSupportedMimeType($mimeTypes = null) {
     // Values will be stored in this array
-    $AcceptTypes = Array ();
+    $AcceptTypes = array();
 
     // Accept header is case insensitive, and whitespace isn’t important
     $accept = strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT']));
@@ -40,7 +40,7 @@ function getBestSupportedMimeType($mimeTypes = null) {
     // if no parameter was passed, just return parsed data
     if (!$mimeTypes) return $AcceptTypes;
 
-    $mimeTypes = array_map('strtolower', (array)$mimeTypes);
+    $mimeTypes = array_map('strtolower', (array) $mimeTypes);
 
     // let’s check our supported types:
     foreach ($AcceptTypes as $mime => $q) {
@@ -51,7 +51,7 @@ function getBestSupportedMimeType($mimeTypes = null) {
 }
 
 class FrontController {
-	/**
+    /**
      * @var Presenter
      */
     private $presenter;
@@ -79,7 +79,7 @@ class FrontController {
 		'application/json',
 		'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
 		'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
-		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml'
+		'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
 	);
 
 	public function __construct()
@@ -136,9 +136,7 @@ class FrontController {
 		return $this->view;
     }
 
-    /**
-     */
-    public function execute(string $queryURL=null):bool
+    public function execute(string $queryURL = null):bool
     {
 	    $queryURL = (!empty($queryURL)) ? $queryURL : 'index';
 
@@ -152,6 +150,7 @@ class FrontController {
 				ob_clean();
 
 				include $path.'.presenter.php';
+
 				return ob_get_clean();
 			} else
 				include $path.'.presenter.php';
@@ -169,6 +168,7 @@ class FrontController {
 					ob_clean();
 
 					include $path.'.view.php';
+
 					return ob_get_clean();
 				} else
 					include $path.'.view.php';
@@ -191,7 +191,7 @@ class FrontController {
             return false;
 		} else {
 			foreach($this->routers as $router) {
-				if(($testRoute = $router->execute($queryURL))!==false)
+				if(($testRoute = $router->execute($queryURL)) !== false)
 					$this->route = $testRoute;
 			}
 			if(!isset($this->route)) {
@@ -218,18 +218,17 @@ class FrontController {
 				}
 
 				$this->presenter = new Presenter();
-				$this->obContent.= includePresenter($this, $presenter);
-			} elseif(get_class($presenter)=='Presenter')
+				$this->obContent .= includePresenter($this, $presenter);
+			} elseif(get_class($presenter) == 'Presenter')
 				$this->presenter = $presenter;
 
 			if(is_string($view)) {
 				$this->view = new View();
-				$this->obContent.= includeView($this, $view);
-			} elseif(get_class($view)=='View')
+				$this->obContent .= includeView($this, $view);
+			} elseif(get_class($view) == 'View')
 				$this->view = $view;
 
 			$this->view->setData($this->presenter->getData());
-
 
 			if(!empty($this->contentType)) {
 				header('Content-Type: '.$this->contentType);
@@ -247,6 +246,7 @@ class FrontController {
 
 	            return false;
 			}
+
 			return true;
 		}
     }
@@ -296,7 +296,7 @@ class FrontController {
         $this->view->printScripts();
     }
 
-	/**
+    /**
      * @param string $key
      */
     public function getContent(string $key = null)
@@ -340,7 +340,6 @@ class FrontController {
 		$this->view->printDocument();
     }
 
-
 /*
     public function __debugInfo():void
     {
@@ -360,7 +359,7 @@ class FrontController {
 
     public function print($contentType = null):void
     {
-	    if($contentType==null)
+	    if($contentType == null)
 	    	$contentType = $this->contentType;
 
 		switch($contentType) {

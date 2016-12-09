@@ -53,7 +53,7 @@ class ViewRessource {
 
 	public function __debugInfo()
 	{
-		return (array)$this->getValue();
+		return (array) $this->getValue();
 	}
 
 	public function __get($name)
@@ -64,7 +64,7 @@ class ViewRessource {
 
 	public function asObject():\stdClass
 	{
-		return (object)$this->getValue();
+		return (object) $this->getValue();
 	}
 	public function asJSON():string
 	{
@@ -79,19 +79,19 @@ class ViewRessource {
 	}
 	public function asXML(string $root = 'root'):string
 	{
-		return ($xml = $this->asXMLElement($root)->asXML())?$xml:'';
+		return ($xml = $this->asXMLElement($root)->asXML()) ? $xml : '';
 	}
 	public function asArray():array
 	{
-		return (array)$this->getValue();
+		return (array) $this->getValue();
 	}
 	public function asString():string
 	{
 		$value = $this->asArray();
 		$str = '';
 
-		array_walk_recursive($value, function($value, $key) use (&$str) {
-			$str.= $value;
+		array_walk_recursive($value, function ($value, $key) use (&$str) {
+			$str .= $value;
 		});
 
 		return $str;
