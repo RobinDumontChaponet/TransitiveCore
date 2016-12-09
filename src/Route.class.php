@@ -2,10 +2,19 @@
 
 namespace Transitive\Core;
 
-class Route
-{
-    public function __construct()
+class Route {
+    public function __construct($query, $presenter, $view = null, $user = null, $auth = null)
     {
+		$this->query = $query;
+		$this->presenter = $presenter;
+
+		if(isset($view))
+			$this->view = $view;
+		elseif(is_string($this->presenter))
+			$this->view = $this->presenter;
+
+		$this->user = $user;
+		$this->auth = $auth;
     }
 
     /**
@@ -16,12 +25,12 @@ class Route
     /**
      * @var void
      */
-    public $presenterPath;
+    public $presenter;
 
     /**
      * @var void
      */
-    public $viewPath;
+    public $view;
 
     /**
      * @var void
@@ -33,4 +42,19 @@ class Route
      */
     public $auth;
 
+	/**
+     * @return Presenter
+     */
+    public function getPresenter()
+    {
+		return $this->presenter;
+    }
+
+    /**
+     * @return View
+     */
+    public function getView()
+    {
+		return $this->view;
+    }
 }

@@ -15,23 +15,19 @@ if(!is_file($this->request->getPresenterPath())) {
 		}
 */
 
-class Router
-{
+class Router {
     /**
      * @var array Route
      */
     public $routes;
 
-    /**
-     * @var string constant
-     */
-    public $type;
-
-    public function __construct() {}
+    public function __construct(array $routes) {
+		$this->setRoutes($routes);
+    }
 
     public function getRoutes():array
     {
-        // TODO: implement here
+        return $this->routes;
     }
 
     /**
@@ -39,7 +35,7 @@ class Router
      */
     public function setRoutes(array $routes):void
     {
-        // TODO: implement here
+        $this->routes = $routes;
     }
 
     /**
@@ -47,7 +43,7 @@ class Router
      */
     public function addRoute(Route $route):void
     {
-        // TODO: implement here
+        $this->routes[] = $route;
     }
 
     public function removeRoute(Route $route):bool
@@ -55,16 +51,9 @@ class Router
         // TODO: implement here
     }
 
-    public function getType():string
+    public function execute($query)
     {
-        // TODO: implement here
-    }
-
-    /**
-     * @param string $type (constant in fact)
-     */
-    public function setType(string $type):void
-    {
-        // TODO: implement here
+		if(isset($this->routes[$query]))
+		    return $this->routes[$query];
     }
 }
