@@ -61,10 +61,11 @@ class View {
 
     public function __construct()
     {
-	    $this->styles = array();
+	    $this->styles  = array();
 	    $this->scripts = array();
-	    $this->metas = array();
+	    $this->metas   = array();
 
+		$this->title   = '';
 	    $this->content = 'No viewable content.';
     }
 
