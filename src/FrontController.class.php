@@ -149,11 +149,11 @@ class FrontController {
 				ob_start();
 				ob_clean();
 
-				include $path.'.presenter.php';
+				include $path;
 
 				return ob_get_clean();
 			} else
-				include $path.'.presenter.php';
+				include $path;
 		}
 		function includeView(FrontController &$binder, string $path)
 		{
@@ -162,16 +162,16 @@ class FrontController {
 
 			$view = $binder->getView();
 
-			if(is_file($path.'.view.php'))
+			if(is_file($path))
 				if($binder->obClean) {
 					ob_start();
 					ob_clean();
 
-					include $path.'.view.php';
+					include $path;
 
 					return ob_get_clean();
 				} else
-					include $path.'.view.php';
+					include $path;
 		}
 		function noContent() {
 			http_response_code(204);
@@ -207,11 +207,11 @@ class FrontController {
 			$view = $this->route->getView();
 
 			if(is_string($presenter)) {
-				if(!is_file($presenter.'.presenter.php')) {
+				if(!is_file($presenter)) {
 					notFound();
 
 					$presenter = ROOT_PATH.'/presenters/genericHttpErrorHandler';
-					if(!is_file($presenter.'.presenter.php'))
+					if(!is_file($presenter))
 						$view = '';
 					else
 						$view = ROOT_PATH.'/views/genericHttpErrorHandler';
