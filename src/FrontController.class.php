@@ -102,7 +102,6 @@ class FrontController {
 <?php $this->printTitle('Default layout') ?>
 <base href="<?php echo (constant('SELF') == null) ? '/' : constant('SELF').'/'; ?>" />
 <?php $this->printStyles() ?>
-<!--[if lt IE 9]><script type="text/javascript" src="script/html5shiv.min.js"></script><![endif]-->
 <?php $this->printScripts() ?>
 </head>
 <body>
