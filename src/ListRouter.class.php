@@ -15,7 +15,7 @@ if(!is_file($this->request->getPresenterPath())) {
 		}
 */
 
-class Router {
+class ListRouter implements Router {
     /**
      * @var array Route
      */
