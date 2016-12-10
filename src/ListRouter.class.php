@@ -51,7 +51,7 @@ class ListRouter implements Router {
         // TODO: implement here
     }
 
-    public function execute($query)
+    public function execute(string $query):?Route
     {
 		if(isset($this->routes[$query]))
 		    return $this->routes[$query];
