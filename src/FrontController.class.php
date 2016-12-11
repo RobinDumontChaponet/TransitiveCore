@@ -138,7 +138,7 @@ class FrontController
     {
         $queryURL = (!empty($queryURL)) ? $queryURL : 'index';
 
-        function includePresenter(FrontController &$binder, string $path)
+        function includePresenter(FrontController &$binder, string $path, Route $route)
         {
             $presenter = $binder->getPresenter();
 // 			$data = array();
@@ -202,31 +202,26 @@ class FrontController
                 return false;
             }
 
-            $presenter = $this->route->getPresenter();
-            $view = $this->route->getView();
-
-            if(is_string($presenter)) {
-                if(!is_file($presenter)) {
+            if(is_string($this->route->presenter)) {
+                if(!is_file($this->route->presenter)) {
                     notFound();
 
-                    $presenter = ROOT_PATH.'/presenters/genericHttpErrorHandler';
-                    if(!is_file($presenter))
-                        $view = '';
-                    else
-                        $view = ROOT_PATH.'/views/genericHttpErrorHandler';
+                    $this->route->presenter = ROOT_PATH.'/presenters/genericHttpErrorHandler.presenter.php';
+                    if(!is_file($this->route->presenter))
+                        $this->route->view = '';
                 }
 
                 $this->presenter = new Presenter();
-                $this->obContent .= includePresenter($this, $presenter);
-            } elseif(get_class($presenter) == 'Presenter')
-                $this->presenter = $presenter;
+                $this->obContent.= includePresenter($this, $this->route->presenter, $this->route);
+            } elseif(get_class($this->route->view) == 'Presenter')
+                $this->presenter = $this->route->presenter;
 
-            if(is_string($view)) {
+            if(is_string($this->route->view)) {
                 $this->view = new View();
                 $this->view->setData($this->presenter->getData());
-                $this->obContent .= includeView($this, $view);
-            } elseif(get_class($view) == 'View') {
-                $this->view = $view;
+                $this->obContent.= includeView($this, $this->route->view);
+            } elseif(get_class($this->route->view) == 'View') {
+                $this->view = $this->route->view;
                 $this->view->setData($this->presenter->getData());
             }
 
