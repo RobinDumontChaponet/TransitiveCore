@@ -2,20 +2,7 @@
 
 namespace Transitive\Core;
 
-/*
-if(!is_file($this->request->getPresenterPath())) {
-            http_response_code(404);
-            $_SERVER['REDIRECT_STATUS'] = 404;
-
-            $this->request->setPresenterPath('genericHttpErrorHandler.presenter.php');
-            if(!is_file(self::$viewIncludePath.'genericHttpErrorHandler.view.php'))
-                $this->request->setViewPath('');
-            else
-                $this->request->setViewPath(self::$viewIncludePath.'genericHttpErrorHandler.view.php');
-        }
-*/
-
-class ListRouter implements Router
+class ListRegexRouter implements Router
 {
     /**
      * @var array Route
@@ -65,11 +52,16 @@ class ListRouter implements Router
     {
         $pattern = rtrim($pattern, '/');
 
-        if(isset($this->routes[$pattern]))
-            if(!is_array($this->routes[$pattern]))
-                return $this->routes[$pattern];
-            elseif(isset($this->routes[$pattern][$method]))
-                return $this->routes[$pattern][$method];
+        foreach ($this->routes as $key => $route)
+            if (preg_match('@'.$key.'@', $pattern, $matches)) {
+                unset($matches[key($matches)]);
+                $_GET += $matches;
+
+                if(!is_array($route))
+                    return $route;
+                elseif(isset($route[$method]))
+                    return $route[$method];
+            }
 
         return null;
     }
