@@ -60,6 +60,13 @@ class View
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
+	private static function _getIncludeContents ($include): string
+    {
+	    ob_start();
+		include($include);
+	    return ob_get_clean();
+    }
+
     public function __construct()
     {
         $this->styles = array();
@@ -384,7 +391,7 @@ class View
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
 
-        $this->addStyle(get_include_contents($filepath), $type);
+        $this->addStyle(self::_getIncludeContents($filepath), $type);
     }
 
     /**
@@ -404,7 +411,7 @@ class View
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
 
-        $this->addScript(get_include_contents($filepath), $type);
+        $this->addScript(self::_getIncludeContents($filepath), $type);
 
         return true;
     }
