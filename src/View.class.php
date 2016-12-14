@@ -392,6 +392,8 @@ class View
             $filepath = self::cacheBust($filepath);
 
         $this->addStyle(self::_getIncludeContents($filepath), $type);
+
+        return true;
     }
 
     /**
