@@ -405,6 +405,24 @@ class FrontController
         }
     }
 
+    public function redirect($url, $delay = 0) {
+        if(!headers_sent() && $delay <= 0) {
+            header('Location: '.$url);
+            return true;
+        } else {
+            $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+            return false;
+        }
+    }
+
+    public function goBack() {
+        if(isset($_SESSION['referrer'])) {
+            $this->redirect($_SESSION['referrer']);
+            return true;
+		} else
+			return false;
+    }
+
     /**
      * @return array
      */
