@@ -381,7 +381,7 @@ class View
      *
      * @return bool
      */
-    public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = true): bool
+    public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = false): bool
     {
         if(!file_exists($filepath)) {
             throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
@@ -403,7 +403,7 @@ class View
      *
      * @return bool
      */
-    public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = true): bool
+    public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = false): bool
     {
         if(!file_exists($filepath)) {
             throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
