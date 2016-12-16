@@ -276,7 +276,14 @@ class FrontController
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
         echo '<title>';
+        if(!empty($prefix)) {
+	        echo $prefix;
+	        if(!empty($separator))
+	        	echo $separator;
+        }
         echo $this->view->getTitle($prefix, $separator, $endSeparator);
+        if(!empty($endSeparator))
+        	echo $endSeparator;
         echo '</title>';
     }
 
