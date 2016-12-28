@@ -134,10 +134,8 @@ class FrontController
         return $this->view;
     }
 
-    public function execute(string $queryURL = null): bool
+    public function execute(string $queryURL = ''): bool
     {
-        $queryURL = (!empty($queryURL)) ? $queryURL : 'index';
-
         function includePresenter(FrontController &$binder, string $path, Route $route)
         {
             $presenter = $binder->getPresenter();
