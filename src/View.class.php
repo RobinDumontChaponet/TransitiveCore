@@ -60,11 +60,12 @@ class View
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-	private static function _getIncludeContents ($include): string
+    private static function _getIncludeContents($include): string
     {
-	    ob_start();
-		include($include);
-	    return ob_get_clean();
+        ob_start();
+        include $include;
+
+        return ob_get_clean();
     }
 
     public function __construct()

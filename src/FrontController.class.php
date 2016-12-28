@@ -210,14 +210,14 @@ class FrontController
                 }
 
                 $this->presenter = new Presenter();
-                $this->obContent.= includePresenter($this, $this->route->presenter, $this->route);
+                $this->obContent .= includePresenter($this, $this->route->presenter, $this->route);
             } elseif(get_class($this->route->view) == 'Presenter')
                 $this->presenter = $this->route->presenter;
 
             if(is_string($this->route->view)) {
                 $this->view = new View();
                 $this->view->setData($this->presenter->getData());
-                $this->obContent.= includeView($this, $this->route->view);
+                $this->obContent .= includeView($this, $this->route->view);
             } elseif(get_class($this->route->view) == 'View') {
                 $this->view = $this->route->view;
                 $this->view->setData($this->presenter->getData());
@@ -275,13 +275,13 @@ class FrontController
     {
         echo '<title>';
         if(!empty($prefix)) {
-	        echo $prefix;
-	        if(!empty($separator))
-	        	echo $separator;
+            echo $prefix;
+            if(!empty($separator))
+                echo $separator;
         }
         echo $this->view->getTitle($prefix, $separator, $endSeparator);
         if(!empty($endSeparator))
-        	echo $endSeparator;
+            echo $endSeparator;
         echo '</title>';
     }
 
@@ -413,9 +413,11 @@ class FrontController
     public function redirect($url, $delay = 0) {
         if(!headers_sent() && $delay <= 0) {
             header('Location: '.$url);
+
             return true;
         } else {
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+
             return false;
         }
     }
@@ -423,9 +425,10 @@ class FrontController
     public function goBack() {
         if(isset($_SESSION['referrer'])) {
             $this->redirect($_SESSION['referrer']);
+
             return true;
-		} else
-			return false;
+        } else
+            return false;
     }
 
     /**
