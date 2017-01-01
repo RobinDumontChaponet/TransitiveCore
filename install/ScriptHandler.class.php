@@ -13,8 +13,10 @@ class ScriptHandler
 	        if ($file != '.' && $file != '..' ) {
 	            if (is_dir($source.'/'.$file))
 	                self::_copyDirectory($source.'/'.$file, $dest.'/'.$file);
-	            else
-	                copy($source . '/' . $file, $dest . '/' . $file);
+	            elseif(!file_exists($dest.'/'.$file)) {
+	                copy($source.'/'.$file, $dest.'/'.$file);
+	                echo ' copying: ', $dest.'/'.$file, PHP_EOL;
+				}
 	        }
 	    }
 	    closedir($dir);
@@ -30,14 +32,12 @@ class ScriptHandler
 			}  else
 				$source = $from.'/'.$dest;
 
-			if(!file_exists($dest)) {
-				if(is_file($source))
-					copy($source, $dest);
-				elseif(is_dir($source))
-					self::_copyDirectory($source, $dest);
-
+			if(is_file($source) && !file_exists($dest)) {
+				copy($source, $dest);
 				echo ' copying: ', $dest, PHP_EOL;
-			}
+			} elseif(is_dir($source))
+				self::_copyDirectory($source, $dest);
+
 		}
 	}
 
