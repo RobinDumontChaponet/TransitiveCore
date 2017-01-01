@@ -4,13 +4,15 @@ namespace Transitive\Core\Install;
 
 use Composer\Script\Event;
 
-function copyDirectory(string $source, string $dest) {
+class ScriptHandler
+{
+	private static function _copyDirectory(string $source, string $dest) {
     $dir = opendir($source);
     @mkdir($dest);
     while(false !== ($file = readdir($dir))) {
         if ($file != '.' && $file != '..' ) {
             if (is_dir($source.'/'.$file))
-                copyDir($source.'/'.$file, $dest.'/'.$file);
+                self::_copyDirectory($source.'/'.$file, $dest.'/'.$file);
             else
                 copy($source . '/' . $file, $dest . '/' . $file);
         }
@@ -18,7 +20,7 @@ function copyDirectory(string $source, string $dest) {
     closedir($dir);
 }
 
-function setFiles(array $files, $from = '') {
+	public static function setFiles(array $files, $from = '') {
 	$from = dirname(dirname(__FILE__)).'/'.$from;
 
 	foreach($files as $dest) {
@@ -32,19 +34,18 @@ function setFiles(array $files, $from = '') {
 			if(is_file($source))
 				copy($source, $dest);
 			elseif(is_dir($source))
-				copyDirectory($source, $dest);
+				self::_copyDirectory($source, $dest);
 
 			echo ' copying: ', $dest, PHP_EOL;
 		}
 	}
 }
 
-class ScriptHandler
-{
+
     public static function setup(Event $event)
     {
 	    @mkdir('config');
-		setFiles([
+		self::setFiles([
 			'config/default.php',
 			'presenters',
 			'views'
@@ -52,7 +53,7 @@ class ScriptHandler
 
 		if(!file_exists('www') && !file_exists('public_html')) {
 			@mkdir('htdocs');
-			setFiles(['htdocs/index.php']);
+			slef::setFiles(['htdocs/index.php']);
 		}
     }
 }
