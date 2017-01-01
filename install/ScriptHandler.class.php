@@ -53,7 +53,7 @@ class ScriptHandler
 
 		if(!file_exists('www') && !file_exists('public_html')) {
 			@mkdir('htdocs');
-			slef::setFiles(['htdocs/index.php']);
+			self::setFiles(['htdocs/index.php']);
 		}
     }
 }
