@@ -11,11 +11,15 @@
 		}
 	],
 	"require": {
-		"php": "^7.0"
+		"php": "^7.1"
 	},
 	"autoload": {
 		"psr-4": {
 			"Transitive\\Core\\": "src/"
-		}
+		},
+		"classmap": ["install/ScriptHandler.class.php"]
+	},
+	"scripts": {
+		"post-create-project-cmd": "Transitive\\Core\\Install\\ScriptHandler::setup"
 	}
 }
