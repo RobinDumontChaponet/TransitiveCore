@@ -20,6 +20,6 @@
 		"classmap": ["install/ScriptHandler.class.php"]
 	},
 	"scripts": {
-		"post-create-project-cmd": "Transitive\\Core\\Install\\ScriptHandler::setup"
+		"post-install-cmd": "Transitive\\Core\\Install\\ScriptHandler::setup"
 	}
 }
