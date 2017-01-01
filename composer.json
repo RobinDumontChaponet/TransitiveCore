@@ -18,5 +18,8 @@
 			"Transitive\\Core\\": "src/"
 		},
 		"classmap": ["install/ScriptHandler.class.php"]
+	},
+	"scripts": {
+		"post-install-cmd": "Transitive\\Core\\Install\\ScriptHandler::setup"
 	}
 }
