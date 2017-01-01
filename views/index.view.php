@@ -1,6 +1,6 @@
 <?php
 
-$view->setTitle('Transitive');
+$view->setTitle('Transitive ?');
 $view->addStyle('body {background:lightgrey}');
 
 $view->content = function ($data) {
