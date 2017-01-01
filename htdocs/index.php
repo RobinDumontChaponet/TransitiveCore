@@ -4,11 +4,10 @@ namespace Transitive;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use Transitive\Core\FrontController as FrontController;
+set_include_path(__DIR__.'/../config');
+require 'default.php';
 
-require 'config/default.php';
-
-$transit = new FrontController();
+$transit = new Core\FrontController();
 
 $transit->addRouter(new Core\PathRouter(PRESENTERS, VIEWS));
 
