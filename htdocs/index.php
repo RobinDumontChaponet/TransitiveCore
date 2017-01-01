@@ -25,7 +25,7 @@ $transit->layout = function ($transit) {
 <head>
 <meta charset="UTF-8">
 <?php $transit->printMetas() ?>
-<?php $transit->printTitle('TITLE') ?>
+<?php $transit->printTitle('{{projectName}}') ?>
 <base href="<?php echo (constant('SELF') == null) ? '/' : constant('SELF').'/'; ?>" />
 <?php $transit->printStyles() ?>
 <?php $transit->printScripts() ?>
