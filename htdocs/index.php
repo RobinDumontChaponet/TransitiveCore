@@ -5,7 +5,6 @@ namespace Transitive;
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Transitive\Core\FrontController as FrontController;
-use Transitive\Core\Route as Route;
 
 require 'config/default.php';
 
