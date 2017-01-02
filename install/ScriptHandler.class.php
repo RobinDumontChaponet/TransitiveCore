@@ -15,7 +15,7 @@ class ScriptHandler
                     self::_copyDirectory($source.'/'.$file, $dest.'/'.$file);
                 elseif(!file_exists($dest.'/'.$file)) {
                     copy($source.'/'.$file, $dest.'/'.$file);
-                    echo ' copying: ', $dest.'/'.$file, PHP_EOL;
+                    echo ' + copying: ', $dest.'/'.$file, PHP_EOL;
                 }
             }
         }
@@ -34,7 +34,7 @@ class ScriptHandler
 
             if(is_file($source) && !file_exists($dest)) {
                 copy($source, $dest);
-                echo ' copying: ', $dest, PHP_EOL;
+                echo ' + copying: ', $dest, PHP_EOL;
             } elseif(is_dir($source))
                 self::_copyDirectory($source, $dest);
         }
