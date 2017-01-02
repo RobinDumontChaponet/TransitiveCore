@@ -17,12 +17,10 @@ if (!function_exists('http_response_code')) {
 
 function getBestSupportedMimeType($mimeTypes = null) {
     // Values will be stored in this array
-    $AcceptTypes = array();
+    $acceptTypes = array();
 
-    // Accept header is case insensitive, and whitespace isn’t important
-    $accept = strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT']));
     // divide it into parts in the place of a ","
-    $accept = explode(',', $accept);
+    $accept = explode(',', strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT'])));
     foreach ($accept as $a) {
         // the default quality is 1.
         $q = 1;
@@ -33,17 +31,17 @@ function getBestSupportedMimeType($mimeTypes = null) {
         }
         // mime-type $a is accepted with the quality $q
         // WARNING: $q == 0 means, that mime-type isn’t supported!
-        $AcceptTypes[$a] = $q;
+        $acceptTypes[$a] = $q;
     }
-    arsort($AcceptTypes);
+    arsort($acceptTypes);
 
     // if no parameter was passed, just return parsed data
-    if (!$mimeTypes) return $AcceptTypes;
+    if (!$mimeTypes) return $acceptTypes;
 
     $mimeTypes = array_map('strtolower', (array) $mimeTypes);
 
     // let’s check our supported types:
-    foreach ($AcceptTypes as $mime => $q) {
+    foreach ($acceptTypes as $mime => $q) {
        if ($q && in_array($mime, $mimeTypes)) return $mime;
     }
     // no mime-type found
@@ -74,6 +72,9 @@ class FrontController
 
     public $obClean;
     private $obContent;
+
+    public static $defaultPresenters;
+    public static $defaultViews;
 
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
@@ -204,7 +205,11 @@ class FrontController
                 if(!is_file($this->route->presenter)) {
                     notFound();
 
-                    $this->route->presenter = ROOT_PATH.'/presenters/genericHttpErrorHandler.presenter.php';
+                    if(defined('PRESENTERS') && is_file(PRESENTERS.'genericHttpErrorHandler.presenter.php'))
+                        $this->route->presenter = PRESENTERS.'genericHttpErrorHandler.presenter.php';
+                    else
+                        $this->route->presenter = self::$defaultPresenters.'genericHttpErrorHandler.presenter.php';
+
                     if(!is_file($this->route->presenter))
                         $this->route->view = '';
                 }
@@ -460,3 +465,6 @@ class FrontController
         // TODO: implement here
     }
 }
+
+FrontController::$defaultPresenters = dirname(__dir__).'/presenters/';
+FrontController::$defaultViews = dirname(__dir__).'/views/';

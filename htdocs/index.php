@@ -14,7 +14,7 @@ $transit->addRouter(new Core\PathRouter(PRESENTERS, VIEWS));
 $transit->execute(@$_GET['request'] ?? 'index');
 
 $transit->layout = function ($transit) {
-    global $timed; ?>
+?>
 
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
@@ -39,7 +39,6 @@ $transit->layout = function ($transit) {
 </html>
 
 <?php
-
 };
 
 $transit->print();

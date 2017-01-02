@@ -66,6 +66,6 @@ class PathRouter implements Router
                 return false;
         }
 
-        return '/'.implode('/', $path);
+        return implode('/', $path);
     }
 }

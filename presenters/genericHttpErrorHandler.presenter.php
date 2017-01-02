@@ -1,3 +1,3 @@
 <?php
 
-$route->view = VIEWS.'genericHttpErrorHandler.view.php';
+$route->view = Transitive\Core\FrontController::$defaultViews.'genericHttpErrorHandler.view.php';
