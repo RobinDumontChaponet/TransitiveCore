@@ -11,6 +11,9 @@ class PathRouter implements Router
     private $viewsPath;
     private $separator;
 
+    private $presenterSuffix = '.presenter.php';
+    private $viewSuffix = '.view.php';
+
     public $method;
 
     public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all')
@@ -27,8 +30,8 @@ class PathRouter implements Router
         if($this->method != $method || empty($pattern))
             return null;
 
-        $presenterPattern = $pattern.'.presenter.php';
-        $viewPattern = $pattern.'.view.php';
+        $presenterPattern = $pattern.$this->presenterSuffix;
+        $viewPattern = $pattern.$this->viewSuffix;
 
 /*
         $realPresenter = realpath($this->presentersPath . dirname($presenterPattern) .'/');
@@ -67,5 +70,12 @@ class PathRouter implements Router
         }
 
         return implode('/', $path);
+    }
+
+    public function getRoutes() {
+		return array_map(function ($pattern) {
+				return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
+			}
+		, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
     }
 }
