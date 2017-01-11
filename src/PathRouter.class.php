@@ -72,10 +72,10 @@ class PathRouter implements Router
         return implode('/', $path);
     }
 
-    public function getRoutes() {
-		return array_map(function ($pattern) {
-				return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
-			}
-		, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
+    public function getRoutes(): array
+    {
+        return array_map(function ($pattern) {
+                return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
+            }, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
     }
 }
