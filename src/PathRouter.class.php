@@ -75,7 +75,7 @@ class PathRouter implements Router
     public function getRoutes(): array
     {
         return array_map(function ($pattern) {
-                return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
-            }, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
+            return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
+        }, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
     }
 }

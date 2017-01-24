@@ -190,8 +190,10 @@ class FrontController
             return false;
         } else {
             foreach($this->routers as $router) {
-                if(($testRoute = $router->execute($queryURL)) !== false)
+                if(($testRoute = $router->execute($queryURL)) !== null) {
                     $this->route = $testRoute;
+                    break;
+                }
             }
             if(!isset($this->route)) {
                 notFound();
@@ -278,7 +280,7 @@ class FrontController
      */
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
-	    $title = $this->view->getTitle();
+        $title = $this->view->getTitle();
 
         echo '<title>';
         if(!empty($prefix)) {
