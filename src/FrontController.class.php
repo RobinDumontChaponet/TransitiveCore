@@ -419,16 +419,20 @@ class FrontController
         }
     }
 
-    public function redirect($url, $delay = 0) {
-        if(!headers_sent() && $delay <= 0) {
-            header('Location: '.$url);
-
-            return true;
-        } else {
+    public function redirect($url, $delay = 0, $code = 303) {
+        if(isset($this->view))
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
 
-            return false;
+        if(!headers_sent()) {
+            if($delay <= 0)
+                header('Location: '.$url, true, $code);
+            else
+                header('Refresh:'.$delay.'; url='.$url, true, $code);
+
+            return true;
         }
+
+        return false;
     }
 
     public function goBack() {
