@@ -424,6 +424,9 @@ class FrontController
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
 
         if(!headers_sent()) {
+	        http_response_code($code);
+            $_SERVER['REDIRECT_STATUS'] = $code;
+
             if($delay <= 0)
                 header('Location: '.$url, true, $code);
             else
