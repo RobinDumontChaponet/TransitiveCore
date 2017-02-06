@@ -33,19 +33,6 @@ class PathRouter implements Router
         $presenterPattern = $pattern.$this->presenterSuffix;
         $viewPattern = $pattern.$this->viewSuffix;
 
-/*
-        $realPresenter = realpath($this->presentersPath . dirname($presenterPattern) .'/');
-        $realView = realpath($this->viewsPath . dirname($viewPattern) .'/');
-
-        var_dump($this->presentersPath, basename($presenterPattern), $realPresenter, $realView);
-
-        var_dump($realPresenter.'/'.basename($presenterPattern), strpos($realPresenter, $this->presentersPath));
-
-        if(strpos($realPresenter, $this->presentersPath) === 0 && strpos($realView, $this->viewsPath) === 0)
-            return new Route($realPresenter.'/'.basename($presenterPattern), $realView.'/'.basename($viewPattern));
-        else
-            return null;
-*/
         $realPresenter = self::_real($presenterPattern, $this->separator);
         $realView = self::_real($viewPattern, $this->separator);
 
@@ -74,8 +61,14 @@ class PathRouter implements Router
 
     public function getRoutes(): array
     {
-        return array_map(function ($pattern) {
-            return preg_replace('/'.$this->presenterSuffix.'$/', '', $pattern);
-        }, array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')));
+        $array = array();
+
+        foreach(array_diff(scandir($this->presentersPath), array('..', '.', '.DS_Store')) as $pattern) {
+            $pattern = substr($pattern, 0, strpos($pattern, $this->presenterSuffix));
+
+            $array[$pattern] = $this->execute($pattern);
+        }
+
+        return $array;
     }
 }
