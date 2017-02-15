@@ -1,6 +1,6 @@
 {
 	"name": "transitive/core",
-	"description": "Description is coming",
+	"description": "Very simple MVP (Model - View - Presenter) PHP framework.",
 	"license": "MIT",
 	"authors": [
 		{
