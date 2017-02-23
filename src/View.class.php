@@ -185,10 +185,7 @@ class View
         echo '<head><meta charset="UTF-8">',
             $transit->printMetas(),
             $this->printTitle(),
-            '<base href="',
-            (constant('SELF') == null) ? '/' : constant('SELF').'/',
-            '" /><!--[if IE]><link rel="shortcut icon" href="style/favicon-32.ico"><![endif]--><link rel="icon" href="style/favicon-96.png"><meta name="msapplication-TileColor" content="#FFF"><meta name="msapplication-TileImage" content="style/favicon-144.png"><link rel="apple-touch-icon" href="style/favicon-152.png"><link rel="stylesheet" type="text/css" href="style/reset.min.css" />',
-            $transit->printStyles(), '<!--[if lt IE 9]><script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->',
+            $transit->printStyles(),
             $transit->printScripts(),
             '</head>';
     }
@@ -205,35 +202,6 @@ class View
     {
         echo $this->getDocument();
     }
-
-    /**
-     * Print the view's content and header as JSON.
-     */
-/*
-    public function outputJSON():void
-    {
-        $array = array(
-            'metas' => $this->getMetas(),
-            'scripts' => $this->getScripts(),
-            'styles' => $this->getStyles(),
-            'title' => $this->getTitle()
-        );
-
-        $array['content'] = $this->getContent();
-
-        echo json_encode($array);
-    }
-*/
-
-    /**
-     * Print the view's content as JSON.
-     */
-/*
-    public function displayJSONContent():void
-    {
-        echo json_encode($this->getContent());
-    }
-*/
 
     /**
      * @return bool
@@ -380,13 +348,6 @@ class View
             'raw' => $rawTag,
         );
     }
-
-/*
-    public function import(string $href, string $type='text/css', bool $cacheBust=true, bool $defer=false, string $rel='stylesheet'):bool
-    {
-
-    }
-*/
 
     /**
      * @param string $filepath
