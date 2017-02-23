@@ -48,6 +48,51 @@ function getBestSupportedMimeType($mimeTypes = null) {
     return null;
 }
 
+function includePresenter(FrontController &$binder, string $path, Route $route)
+{
+    $presenter = $binder->getPresenter();
+// 			$data = array();
+
+    if($binder->obClean) {
+        ob_start();
+        ob_clean();
+
+        include $path;
+
+        return ob_get_clean();
+    } else
+        include $path;
+}
+
+function includeView(FrontController &$binder, string $path)
+{
+    if($path === null)
+        return;
+
+    $view = $binder->getView();
+
+    if(is_file($path))
+        if($binder->obClean) {
+            ob_start();
+            ob_clean();
+
+            include $path;
+
+            return ob_get_clean();
+        } else
+            include $path;
+}
+
+function noContent() {
+    http_response_code(204);
+    $_SERVER['REDIRECT_STATUS'] = 404;
+}
+
+function notFound() {
+    http_response_code(404);
+    $_SERVER['REDIRECT_STATUS'] = 404;
+}
+
 class FrontController
 {
     /**
@@ -78,7 +123,7 @@ class FrontController
 
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
-        'application/json',
+        'application/json', 'application/xml',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
@@ -137,51 +182,6 @@ class FrontController
 
     public function execute(string $queryURL = ''): bool
     {
-        function includePresenter(FrontController &$binder, string $path, Route $route)
-        {
-            $presenter = $binder->getPresenter();
-// 			$data = array();
-
-            if($binder->obClean) {
-                ob_start();
-                ob_clean();
-
-                include $path;
-
-                return ob_get_clean();
-            } else
-                include $path;
-        }
-
-        function includeView(FrontController &$binder, string $path)
-        {
-            if($path === null)
-                return;
-
-            $view = $binder->getView();
-
-            if(is_file($path))
-                if($binder->obClean) {
-                    ob_start();
-                    ob_clean();
-
-                    include $path;
-
-                    return ob_get_clean();
-                } else
-                    include $path;
-        }
-
-        function noContent() {
-            http_response_code(204);
-            $_SERVER['REDIRECT_STATUS'] = 404;
-        }
-
-        function notFound() {
-            http_response_code(404);
-            $_SERVER['REDIRECT_STATUS'] = 404;
-        }
-
         if(!isset($this->routers)) {
             notFound();
 
@@ -402,7 +402,16 @@ class FrontController
                 echo $this->getContent()->asYAML();
             break;
             case 'application/json':
-                echo '{"case":"json"}';
+				if($this->view->hasContent('api'))
+					echo $this->getContent('api')->asJson();
+				elseif(http_response_code() != 404)
+					noContent();
+            break;
+            case 'application/xml':
+				if($this->view->hasContent('api'))
+					echo $this->getContent('api')->asXML();
+				elseif(http_response_code() != 404)
+					noContent();
             break;
             default:
                 switch(gettype($layout = $this->layout)) {

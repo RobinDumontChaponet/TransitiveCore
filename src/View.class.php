@@ -107,9 +107,9 @@ class View
     }
 
     /**
-     * @return array
+     * @return
      */
-    private function _getContent($content): string
+    private function _getContent($content)
     {
         switch(gettype($content)) {
             case 'string': case 'integer': case 'double':
@@ -119,9 +119,14 @@ class View
                 if(get_class($content) == 'Closure') {
                     ob_start();
                     ob_clean();
-                    $content($this->data);
+                    $returned = $content($this->data);
 
-                    return ob_get_clean();
+                    $output = ob_get_clean();
+
+                    if(isset($returned))
+                    	return $returned;
+                    else
+                    	return $output;
                 } elseif(isset($content->content))
                     return $content->content;
             break;
@@ -133,23 +138,24 @@ class View
     /**
      * @param string $key
      */
-    public function getContent(string $key = null): ViewRessource
+    public function getContent(string $key = null): ?ViewRessource
     {
-        $content = array();
+        $content = null;
 
-        if($this->hasContent()) {
-            if(is_array($this->content))
-                if(isset($key)) {
-                    if(isset($this->content[$key]))
-                        $content[$key] = $this->_getContent($this->content[$key]);
-                } else
+        if($this->hasContent($key)) {
+			if(is_array($this->content))
+                if(isset($key))
+					$content = $this->_getContent($this->content[$key]);
+				else {
+					$content = array();
                     foreach($this->content as $key => $item)
                         $content[$key] = $this->_getContent($item);
+                }
             else
                 $content = $this->_getContent($this->content);
-
-            return new ViewRessource($content);
         }
+
+		return new ViewRessource($content);
     }
 
     /**
@@ -157,6 +163,10 @@ class View
      */
     public function printContent(string $key = null): void
     {
+		if(!isset($key))
+			if($this->hasContent('html'))
+				$key = 'html';
+
         echo $this->getContent($key)->asString();
     }
 
@@ -228,9 +238,12 @@ class View
     /**
      * @return bool
      */
-    public function hasContent(): bool
+    public function hasContent(string $key = null): bool
     {
-        return isset($this->content);
+	    if(isset($key))
+			return is_array($this->content) && isset($this->content[$key]);
+		else
+	        return isset($this->content);
     }
 
     public function __debugInfo()
