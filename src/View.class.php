@@ -227,7 +227,7 @@ class View
 
     public function __toString(): string
     {
-        // TODO: implement here
+		return $this->getContent();
     }
 
     /**
