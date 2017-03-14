@@ -304,6 +304,14 @@ class FrontController
         $this->view->printScripts();
     }
 
+	/**
+     * @param string $key
+     */
+    public function hasContent(string $key = null)
+    {
+        return $this->view->hasContent($key);
+    }
+
     /**
      * @param string $key
      */
@@ -402,13 +410,13 @@ class FrontController
                 echo $this->getContent()->asYAML();
             break;
             case 'application/json':
-				if($this->view->hasContent('api'))
+				if($this->hasContent('api'))
 					echo $this->getContent('api')->asJson();
 				elseif(http_response_code() != 404)
 					noContent();
             break;
             case 'application/xml':
-				if($this->view->hasContent('api'))
+				if($this->hasContent('api'))
 					echo $this->getContent('api')->asXML();
 				elseif(http_response_code() != 404)
 					noContent();
