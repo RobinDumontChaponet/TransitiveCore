@@ -183,10 +183,10 @@ class View
     public function printHead(): void
     {
         echo '<head><meta charset="UTF-8">',
-            $transit->printMetas(),
+           	$this->printMetas(),
             $this->printTitle(),
-            $transit->printStyles(),
-            $transit->printScripts(),
+            $this->printStyles(),
+            $this->printScripts(),
             '</head>';
     }
 
