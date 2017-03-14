@@ -138,7 +138,7 @@ class View
     /**
      * @param string $key
      */
-    public function getContent(string $key = null): ?ViewRessource
+    public function getContent(string $key = null): ViewRessource
     {
         $content = null;
 

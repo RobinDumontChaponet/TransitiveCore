@@ -51,7 +51,6 @@ function getBestSupportedMimeType($mimeTypes = null) {
 function includePresenter(FrontController &$binder, string $path, Route $route)
 {
     $presenter = $binder->getPresenter();
-// 			$data = array();
 
     if($binder->obClean) {
         ob_start();
@@ -83,12 +82,14 @@ function includeView(FrontController &$binder, string $path)
             include $path;
 }
 
-function noContent() {
+function noContent() : void
+{
     http_response_code(204);
     $_SERVER['REDIRECT_STATUS'] = 404;
 }
 
-function notFound() {
+function notFound(): void
+{
     http_response_code(404);
     $_SERVER['REDIRECT_STATUS'] = 404;
 }
@@ -307,7 +308,7 @@ class FrontController
 	/**
      * @param string $key
      */
-    public function hasContent(string $key = null)
+    public function hasContent(string $key = null) : bool
     {
         return $this->view->hasContent($key);
     }
