@@ -181,7 +181,7 @@ class FrontController
         return $this->view;
     }
 
-    public function execute(string $queryURL = ''): bool
+    public function execute(string $queryURL = 'genericHttpErrorHandler'): bool
     {
         if(!isset($this->routers)) {
             notFound();

@@ -11,7 +11,7 @@ $transit = new Core\FrontController();
 
 $transit->addRouter(new Core\PathRouter(PRESENTERS, VIEWS));
 
-$transit->execute(@$_GET['request'] ?? 'index');
+$transit->execute(@$_GET['request']);
 
 $transit->layout = function ($transit) {
 ?>
