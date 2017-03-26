@@ -42,7 +42,6 @@ class ScriptHandler
 
     public static function setup(Event $event)
     {
-        @mkdir('config');
         self::setFiles([
             'presenters',
             'views',
