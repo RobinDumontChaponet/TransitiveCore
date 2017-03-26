@@ -119,8 +119,9 @@ class FrontController
     public $obClean;
     private $obContent;
 
-    public static $defaultPresenters;
-    public static $defaultViews;
+    private $httpErrorRoute;
+
+    public static $defaultHttpErrorRoute;
 
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
@@ -137,6 +138,8 @@ class FrontController
         $this->obClean = true;
         $this->obContent = '';
 
+        $this->httpErrorRoute = new Route('presenters/genericHttpErrorHandler.presenter.php', 'views/genericHttpErrorHandler.view.php');
+
         $this->layout = function () { ?>
 
 <!DOCTYPE html>
@@ -148,7 +151,6 @@ class FrontController
 <meta charset="UTF-8">
 <?php $this->printMetas() ?>
 <?php $this->printTitle('Default layout') ?>
-<base href="<?php echo (constant('SELF') == null) ? '/' : constant('SELF').'/'; ?>" />
 <?php $this->printStyles() ?>
 <?php $this->printScripts() ?>
 </head>
@@ -181,6 +183,42 @@ class FrontController
         return $this->view;
     }
 
+    private function _getRoute(string $query): ?Route
+    {
+	    foreach($this->routers as $router)
+			if(($testRoute = $router->execute($query)) !== null)
+				return $testRoute;
+
+		throw new RoutingException('No route.');
+    }
+
+    private function _follow(Route &$route): bool
+    {
+        if(is_string($route->presenter)) {
+            if(!is_file($route->presenter)) {
+                notFound();
+				$this->route->view = '';
+
+				return false;
+            }
+
+            $this->presenter = new Presenter();
+            $this->obContent .= includePresenter($this, $route->presenter, $route);
+        } elseif(get_class($route->presenter) == 'Presenter')
+            $this->presenter = $route->presenter;
+
+        if(is_string($route->view)) {
+            $this->view = new View();
+            $this->view->setData($this->presenter->getData());
+            $this->obContent .= includeView($this, $route->view);
+        } elseif(get_class($route->view) == 'View') {
+            $this->view = $route->view;
+            $this->view->setData($this->presenter->getData());
+        }
+
+        return true;
+    }
+
     public function execute(string $queryURL = null): bool
     {
 	    if(empty($queryURL))
@@ -189,50 +227,18 @@ class FrontController
         if(!isset($this->routers)) {
             notFound();
 
-            echo 'No router.';
-            throw new \Exception('No routeR.');
-            return false;
+            throw new RoutingException('No routeR.');
         } else {
-            foreach($this->routers as $router) {
-                if(($testRoute = $router->execute($queryURL)) !== null) {
-                    $this->route = $testRoute;
-                    break;
-                }
-            }
-            if(!isset($this->route)) {
-                notFound();
+			try {
+	            $this->route = $this->_getRoute($queryURL);
 
-                echo 'No route.';
-                throw new \Exception('No route.');
-                return false;
-            }
-
-            if(is_string($this->route->presenter)) {
-                if(!is_file($this->route->presenter)) {
-                    notFound();
-
-                    if(defined('PRESENTERS') && is_file(PRESENTERS.'genericHttpErrorHandler.presenter.php'))
-                        $this->route->presenter = PRESENTERS.'genericHttpErrorHandler.presenter.php';
-                    else
-                        $this->route->presenter = self::$defaultPresenters.'genericHttpErrorHandler.presenter.php';
-
-                    if(!is_file($this->route->presenter))
-                        $this->route->view = '';
-                }
-
-                $this->presenter = new Presenter();
-                $this->obContent .= includePresenter($this, $this->route->presenter, $this->route);
-            } elseif(get_class($this->route->view) == 'Presenter')
-                $this->presenter = $this->route->presenter;
-
-            if(is_string($this->route->view)) {
-                $this->view = new View();
-                $this->view->setData($this->presenter->getData());
-                $this->obContent .= includeView($this, $this->route->view);
-            } elseif(get_class($this->route->view) == 'View') {
-                $this->view = $this->route->view;
-                $this->view->setData($this->presenter->getData());
-            }
+	            if(!$this->_follow($this->route))
+	            	if(!$this->_follow($this->httpErrorRoute))
+	            		$this->_follow(self::$defaultHttpErrorRoute);
+	        } catch(RoutingException $e) {
+				notFound();
+				throw $e;
+	        }
 
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
@@ -498,5 +504,4 @@ class FrontController
     }
 }
 
-FrontController::$defaultPresenters = dirname(__dir__).'/presenters/';
-FrontController::$defaultViews = dirname(__dir__).'/views/';
+FrontController::$defaultHttpErrorRoute = new Route(dirname(__dir__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__dir__).'/views/genericHttpErrorHandler.view.php');

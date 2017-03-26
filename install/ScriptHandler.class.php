@@ -44,7 +44,6 @@ class ScriptHandler
     {
         @mkdir('config');
         self::setFiles([
-            'config/default.php',
             'presenters',
             'views',
         ]);
