@@ -6,7 +6,8 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $transit = new Core\FrontController();
 
-$transit->addRouter(new Core\PathRouter(PRESENTERS, VIEWS));
+$root = dirname(dirname(__FILE__));
+$transit->addRouter(new Core\PathRouter($root.'/presenters/', $root.'/views/'));
 
 $transit->execute(@$_GET['request']);
 
@@ -22,7 +23,6 @@ $transit->layout = function ($transit) {
 <meta charset="UTF-8">
 <?php $transit->printMetas() ?>
 <?php $transit->printTitle('{{projectName}}') ?>
-<base href="<?php echo (constant('SELF') == null) ? '/' : constant('SELF').'/'; ?>" />
 <?php $transit->printStyles() ?>
 <?php $transit->printScripts() ?>
 </head>
