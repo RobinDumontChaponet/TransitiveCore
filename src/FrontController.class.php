@@ -82,7 +82,7 @@ function includeView(FrontController &$binder, string $path)
             include $path;
 }
 
-function noContent() : void
+function noContent(): void
 {
     http_response_code(204);
     $_SERVER['REDIRECT_STATUS'] = 404;
@@ -185,11 +185,11 @@ class FrontController
 
     private function _getRoute(string $query): ?Route
     {
-	    foreach($this->routers as $router)
-			if(($testRoute = $router->execute($query)) !== null)
-				return $testRoute;
+        foreach($this->routers as $router)
+            if(($testRoute = $router->execute($query)) !== null)
+                return $testRoute;
 
-		throw new RoutingException('No route.');
+        throw new RoutingException('No route.');
     }
 
     private function _follow(Route &$route): bool
@@ -197,9 +197,9 @@ class FrontController
         if(is_string($route->presenter)) {
             if(!is_file($route->presenter)) {
                 notFound();
-				$this->route->view = '';
+                $this->route->view = '';
 
-				return false;
+                return false;
             }
 
             $this->presenter = new Presenter();
@@ -221,24 +221,24 @@ class FrontController
 
     public function execute(string $queryURL = null): bool
     {
-	    if(empty($queryURL))
-	    	$queryURL = 'genericHttpErrorHandler';
+        if(empty($queryURL))
+            $queryURL = 'genericHttpErrorHandler';
 
         if(!isset($this->routers)) {
             notFound();
 
             throw new RoutingException('No routeR.');
         } else {
-			try {
-	            $this->route = $this->_getRoute($queryURL);
+            try {
+                $this->route = $this->_getRoute($queryURL);
 
-	            if(!$this->_follow($this->route))
-	            	if(!$this->_follow($this->httpErrorRoute))
-	            		$this->_follow(self::$defaultHttpErrorRoute);
-	        } catch(RoutingException $e) {
-				notFound();
-				throw $e;
-	        }
+                if(!$this->_follow($this->route))
+                    if(!$this->_follow($this->httpErrorRoute))
+                        $this->_follow(self::$defaultHttpErrorRoute);
+            } catch(RoutingException $e) {
+                notFound();
+                throw $e;
+            }
 
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
@@ -314,10 +314,10 @@ class FrontController
         $this->view->printScripts();
     }
 
-	/**
+    /**
      * @param string $key
      */
-    public function hasContent(string $key = null) : bool
+    public function hasContent(string $key = null): bool
     {
         return $this->view->hasContent($key);
     }
@@ -420,16 +420,16 @@ class FrontController
                 echo $this->getContent()->asYAML();
             break;
             case 'application/json':
-				if($this->hasContent('api'))
-					echo $this->getContent('api')->asJson();
-				elseif(http_response_code() != 404)
-					noContent();
+                if($this->hasContent('api'))
+                    echo $this->getContent('api')->asJson();
+                elseif(http_response_code() != 404)
+                    noContent();
             break;
             case 'application/xml':
-				if($this->hasContent('api'))
-					echo $this->getContent('api')->asXML();
-				elseif(http_response_code() != 404)
-					noContent();
+                if($this->hasContent('api'))
+                    echo $this->getContent('api')->asXML();
+                elseif(http_response_code() != 404)
+                    noContent();
             break;
             default:
                 switch(gettype($layout = $this->layout)) {

@@ -124,9 +124,9 @@ class View
                     $output = ob_get_clean();
 
                     if(isset($returned))
-                    	return $returned;
+                        return $returned;
                     else
-                    	return $output;
+                        return $output;
                 } elseif(isset($content->content))
                     return $content->content;
             break;
@@ -143,11 +143,11 @@ class View
         $content = null;
 
         if($this->hasContent($key)) {
-			if(is_array($this->content))
+            if(is_array($this->content))
                 if(isset($key))
-					$content = $this->_getContent($this->content[$key]);
-				else {
-					$content = array();
+                    $content = $this->_getContent($this->content[$key]);
+                else {
+                    $content = array();
                     foreach($this->content as $key => $item)
                         $content[$key] = $this->_getContent($item);
                 }
@@ -155,7 +155,7 @@ class View
                 $content = $this->_getContent($this->content);
         }
 
-		return new ViewRessource($content);
+        return new ViewRessource($content);
     }
 
     /**
@@ -163,9 +163,9 @@ class View
      */
     public function printContent(string $key = null): void
     {
-		if(!isset($key))
-			if($this->hasContent('html'))
-				$key = 'html';
+        if(!isset($key))
+            if($this->hasContent('html'))
+                $key = 'html';
 
         echo $this->getContent($key)->asString();
     }
@@ -183,11 +183,11 @@ class View
     public function printHead(): void
     {
         echo '<head><meta charset="UTF-8">',
-           	$this->printMetas(),
-            $this->printTitle(),
-            $this->printStyles(),
-            $this->printScripts(),
-            '</head>';
+              $this->printMetas(),
+              $this->printTitle(),
+              $this->printStyles(),
+              $this->printScripts(),
+              '</head>';
     }
 
     public function getDocument(string $contentKey = null): ViewRessource
@@ -208,10 +208,10 @@ class View
      */
     public function hasContent(string $key = null): bool
     {
-	    if(isset($key))
-			return is_array($this->content) && isset($this->content[$key]);
-		else
-	        return isset($this->content);
+        if(isset($key))
+            return is_array($this->content) && isset($this->content[$key]);
+        else
+            return isset($this->content);
     }
 
     public function __debugInfo()
@@ -227,7 +227,7 @@ class View
 
     public function __toString(): string
     {
-		return $this->getContent();
+        return $this->getContent();
     }
 
     /**
