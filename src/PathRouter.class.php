@@ -19,7 +19,9 @@ class PathRouter implements Router
     public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all')
     {
         $this->presentersPath = $presentersPath;
+		$this->presentersPath.= (substr($presentersPath, -1)!='/')?'/':'';
         $this->viewsPath = $viewsPath ?? $presentersPath;
+        $this->viewsPath.= (substr($viewsPath, -1)!='/')?'/':'';
 
         $this->method = $method;
         $this->separator = $separator;
