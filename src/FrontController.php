@@ -138,7 +138,8 @@ class FrontController
         $this->obClean = true;
         $this->obContent = '';
 
-        $this->httpErrorRoute = new Route('presenters/genericHttpErrorHandler.presenter.php', 'views/genericHttpErrorHandler.view.php');
+		$cwd = dirname(getcwd()).'/';
+        $this->httpErrorRoute = new Route($cwd.'presenters/genericHttpErrorHandler.presenter.php', $cwd.'views/genericHttpErrorHandler.view.php');
 
         $this->layout = function () { ?>
 
@@ -161,6 +162,15 @@ class FrontController
 
 <?php  };
 }
+
+	public function getHttpErrorRoute(): ?Route
+	{
+		return $this->httpErrorRoute;
+	}
+	public function setHttpErrorRoute(Route $httpErrorRoute = null): void
+	{
+		$this->httpErrorRoute = $httpErrorRoute;
+	}
 
     public function getObContent(): string
     {
