@@ -6,9 +6,9 @@ $view->linkStylesheet('style/genericHttpErrorHandler.css');
 $view->content = function ($data) {
 ?>
 
-<div id="content">
+<main role="main" id="main">
 	<img src="https://http.cat/<?= http_response_code() ?>" alt="<?= http_response_code() ?>" title="<?= Transitive\Utils\HttpRequest::http_response_message() ?>" />
-</div>
+</main>
 
 <?php
 
