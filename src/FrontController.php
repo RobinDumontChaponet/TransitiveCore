@@ -126,6 +126,7 @@ class FrontController
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
+        'application/vnd.transitive.content+xhtml', 'application/vnd.transitive.content+html',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
@@ -418,6 +419,10 @@ class FrontController
             break;
             case 'application/vnd.transitive.head+yaml':
                 echo $this->getHead()->asYAML();
+            break;
+
+            case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
+                echo $this->getContent();
             break;
 
             case 'application/vnd.transitive.content+json':
