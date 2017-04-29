@@ -127,7 +127,7 @@ class FrontController
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
         'application/vnd.transitive.content+xhtml', 'application/vnd.transitive.content+html',
-		'application/vnd.transitive.content+css', 'application/vnd.transitive.content+javascript',
+        'application/vnd.transitive.content+css', 'application/vnd.transitive.content+javascript',
         'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
@@ -140,7 +140,7 @@ class FrontController
         $this->obClean = true;
         $this->obContent = '';
 
-		$cwd = dirname(getcwd()).'/';
+        $cwd = dirname(getcwd()).'/';
         $this->httpErrorRoute = new Route($cwd.'presenters/genericHttpErrorHandler.presenter.php', $cwd.'views/genericHttpErrorHandler.view.php');
 
         $this->layout = function () { ?>
@@ -165,14 +165,15 @@ class FrontController
 <?php  };
 }
 
-	public function getHttpErrorRoute(): ?Route
-	{
-		return $this->httpErrorRoute;
-	}
-	public function setHttpErrorRoute(Route $httpErrorRoute = null): void
-	{
-		$this->httpErrorRoute = $httpErrorRoute;
-	}
+    public function getHttpErrorRoute(): ?Route
+    {
+        return $this->httpErrorRoute;
+    }
+
+    public function setHttpErrorRoute(Route $httpErrorRoute = null): void
+    {
+        $this->httpErrorRoute = $httpErrorRoute;
+    }
 
     public function getObContent(): string
     {
@@ -426,7 +427,7 @@ class FrontController
                 echo $this->getContent();
             break;
 
-			case 'application/vnd.transitive.content+css':
+            case 'application/vnd.transitive.content+css':
                 echo $this->view->getStylesContent();
             break;
             case 'application/vnd.transitive.content+javascript':
@@ -527,4 +528,4 @@ class FrontController
     }
 }
 
-FrontController::$defaultHttpErrorRoute = new Route(dirname(__dir__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__dir__).'/views/genericHttpErrorHandler.view.php');
+FrontController::$defaultHttpErrorRoute = new Route(dirname(__DIR__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__DIR__).'/views/genericHttpErrorHandler.view.php');

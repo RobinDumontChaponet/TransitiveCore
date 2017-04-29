@@ -407,14 +407,14 @@ class View
 
     public function getStylesContent(): string
     {
-	    $content = '';
+        $content = '';
 
         if(isset($this->styles))
             foreach($this->styles as $style)
                 if(isset($style['content']))
-                	$content.= $style['content']. PHP_EOL;
+                    $content .= $style['content'].PHP_EOL;
 
-		return $content;
+        return $content;
     }
 
     public function printScripts(): void
@@ -431,14 +431,14 @@ class View
 
     public function getScriptsContent(): string
     {
-	    $content = '';
+        $content = '';
 
         if(isset($this->scripts))
             foreach($this->scripts as $script)
                 if(isset($script['content']))
-                    $content.= $script['content'];
+                    $content .= $script['content'];
 
-		return $content;
+        return $content;
     }
 
     /**
