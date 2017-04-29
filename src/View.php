@@ -405,6 +405,18 @@ class View
                     echo $style['raw'];
     }
 
+    public function getStylesContent(): string
+    {
+	    $content = '';
+
+        if(isset($this->styles))
+            foreach($this->styles as $style)
+                if(isset($style['content']))
+                	$content.= $style['content']. PHP_EOL;
+
+		return $content;
+    }
+
     public function printScripts(): void
     {
         if(isset($this->scripts))
@@ -415,6 +427,18 @@ class View
                     echo '<script type="'.$script['type'].'" src="'.$script['href'].'"'.(($script['defer']) ? ' defer async' : '').'></script>';
                 elseif(isset($script['raw']))
                     echo $script['raw'];
+    }
+
+    public function getScriptsContent(): string
+    {
+	    $content = '';
+
+        if(isset($this->scripts))
+            foreach($this->scripts as $script)
+                if(isset($script['content']))
+                    $content.= $script['content'];
+
+		return $content;
     }
 
     /**

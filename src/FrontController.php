@@ -127,9 +127,10 @@ class FrontController
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
         'application/vnd.transitive.content+xhtml', 'application/vnd.transitive.content+html',
-        'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
-        'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
+		'application/vnd.transitive.content+css', 'application/vnd.transitive.content+javascript',
         'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
+        'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
+        'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
     );
 
     public function __construct()
@@ -423,6 +424,13 @@ class FrontController
 
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
                 echo $this->getContent();
+            break;
+
+			case 'application/vnd.transitive.content+css':
+                echo $this->view->getStylesContent();
+            break;
+            case 'application/vnd.transitive.content+javascript':
+                echo $this->view->getScriptsContent();
             break;
 
             case 'application/vnd.transitive.content+json':
