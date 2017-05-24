@@ -165,19 +165,19 @@ class FrontController
 <?php  };
 }
 
-	public function getContentType(): string
+    public function getContentType(): string
     {
         return $this->contentType;
     }
 
     public function isAPI(): string
     {
-        return $this->getContentType()=='application/json' || $this->getContentType()=='application/xml';
+        return $this->getContentType() == 'application/json' || $this->getContentType() == 'application/xml';
     }
 
     public function getRequestMethod(): string
     {
-	    return $_SERVER['REQUEST_METHOD'];
+        return $_SERVER['REQUEST_METHOD'];
     }
 
     public function getHttpErrorRoute(): ?Route

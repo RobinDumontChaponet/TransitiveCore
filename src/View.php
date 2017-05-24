@@ -10,35 +10,30 @@ class View
      * @var string
      */
     public $title;
-
     /**
      * styles.
      *
      * @var array
      */
     public $styles;
-
     /**
      * scripts.
      *
      * @var array
      */
     public $scripts;
-
     /**
      * metas.
      *
      * @var array
      */
     public $metas;
-
     /**
      * content.
      *
      * @var mixed
      */
     public $content;
-
     /**
      * data.
      *
@@ -73,7 +68,6 @@ class View
         $this->styles = array();
         $this->scripts = array();
         $this->metas = array();
-
         $this->title = '';
         $this->content = 'No viewable content.';
     }
@@ -120,9 +114,7 @@ class View
                     ob_start();
                     ob_clean();
                     $returned = $content($this->data);
-
                     $output = ob_get_clean();
-
                     if(isset($returned))
                         return $returned;
                     else
@@ -141,7 +133,6 @@ class View
     public function getContent(string $key = null): ViewRessource
     {
         $content = null;
-
         if($this->hasContent($key)) {
             if(is_array($this->content))
                 if(isset($key))
@@ -166,7 +157,6 @@ class View
         if(!isset($key))
             if($this->hasContent('html'))
                 $key = 'html';
-
         echo $this->getContent($key)->asString();
     }
 
@@ -264,7 +254,10 @@ class View
     {
         if(isset($this->metas))
             foreach($this->metas as $meta)
-                echo '<meta name="'.$meta['name'].'" content="'.$meta['content'].'">';
+                if(isset($meta['name']))
+                    echo '<meta name="'.$meta['name'].'" content="'.$meta['content'].'">';
+                else
+                    echo $meta['raw'];
     }
 
     /**
@@ -302,7 +295,6 @@ class View
     {
         if($cacheBust)
             $href = self::cacheBust($href);
-
         $this->styles[] = array(
             'href' => $href,
             'type' => $type,
@@ -321,7 +313,6 @@ class View
     {
         if($cacheBust)
             $href = self::cacheBust($href);
-
         $this->scripts[] = array(
             'href' => $href,
             'type' => $type,
@@ -362,10 +353,8 @@ class View
             throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
             return false;
         }
-
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
-
         $this->addStyle(self::_getIncludeContents($filepath), $type);
 
         return true;
@@ -384,10 +373,8 @@ class View
             throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
             return false;
         }
-
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
-
         $this->addScript(self::_getIncludeContents($filepath), $type);
 
         return true;
@@ -408,7 +395,6 @@ class View
     public function getStylesContent(): string
     {
         $content = '';
-
         if(isset($this->styles))
             foreach($this->styles as $style)
                 if(isset($style['content']))
@@ -432,7 +418,6 @@ class View
     public function getScriptsContent(): string
     {
         $content = '';
-
         if(isset($this->scripts))
             foreach($this->scripts as $script)
                 if(isset($script['content']))
