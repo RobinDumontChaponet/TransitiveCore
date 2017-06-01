@@ -119,6 +119,8 @@ class FrontController
     public $obClean;
     private $obContent;
 
+    private $executed = false;
+
     private $httpErrorRoute;
 
     public static $defaultHttpErrorRoute;
@@ -235,20 +237,24 @@ class FrontController
         } elseif(get_class($route->presenter) == 'Presenter')
             $this->presenter = $route->presenter;
 
-        if(is_string($route->view)) {
-            $this->view = new View();
-            $this->view->setData($this->presenter->getData());
-            $this->obContent .= includeView($this, $route->view);
-        } elseif(get_class($route->view) == 'View') {
-            $this->view = $route->view;
-            $this->view->setData($this->presenter->getData());
-        }
+		if(!$this->executed) {
+	        if(is_string($route->view)) {
+	            $this->view = new View();
+	            $this->view->setData($this->presenter->getData());
+	            $this->obContent .= includeView($this, $route->view);
+	        } elseif(get_class($route->view) == 'View') {
+	            $this->view = $route->view;
+	            $this->view->setData($this->presenter->getData());
+	        }
+		}
 
         return true;
     }
 
     public function execute(string $queryURL = null): bool
     {
+	    $this->executed;
+
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
 
@@ -263,6 +269,8 @@ class FrontController
                 if(!$this->_follow($this->route))
                     if(!$this->_follow($this->httpErrorRoute))
                         $this->_follow(self::$defaultHttpErrorRoute);
+
+				$this->executed = true;
             } catch(RoutingException $e) {
                 notFound();
                 throw $e;
