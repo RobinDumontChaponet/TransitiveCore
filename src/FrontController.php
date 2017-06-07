@@ -205,10 +205,18 @@ class FrontController
         return $this->presenter;
     }
 
+	/**
+     * @return bool
+     */
+    public function hasView(): bool
+    {
+        return isset($this->view);
+    }
+
     /**
      * @return View
      */
-    public function getView(): View
+    public function getView(): ?View
     {
         return $this->view;
     }
@@ -287,7 +295,7 @@ class FrontController
 
             header('Vary: X-Requested-With,Content-Type');
 
-            if(!$this->getView()->hasContent()) {
+            if($this->hasView() && !$this->getView()->hasContent()) {
                 noContent();
 
                 return false;
@@ -496,6 +504,10 @@ class FrontController
     public function redirect($url, $delay = 0, $code = 303) {
         if(isset($this->view))
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+		else {
+			$this->executed = true;
+			$this->view = new View();
+		}
 
         if(!headers_sent()) {
             http_response_code($code);
