@@ -167,7 +167,7 @@ class FrontController
 <?php  };
 }
 
-    public function getContentType(): string
+    public function getContentType(): ?string
     {
         return $this->contentType;
     }
