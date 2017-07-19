@@ -205,7 +205,7 @@ class FrontController
         return $this->presenter;
     }
 
-	/**
+    /**
      * @return bool
      */
     public function hasView(): bool
@@ -245,23 +245,23 @@ class FrontController
         } elseif(get_class($route->presenter) == 'Presenter')
             $this->presenter = $route->presenter;
 
-		if(!$this->executed) {
-	        if(is_string($route->view)) {
-	            $this->view = new View();
-	            $this->view->setData($this->presenter->getData());
-	            $this->obContent .= includeView($this, $route->view);
-	        } elseif(get_class($route->view) == 'View') {
-	            $this->view = $route->view;
-	            $this->view->setData($this->presenter->getData());
-	        }
-		}
+        if(!$this->executed) {
+            if(is_string($route->view)) {
+                $this->view = new View();
+                $this->view->setData($this->presenter->getData());
+                $this->obContent .= includeView($this, $route->view);
+            } elseif(get_class($route->view) == 'View') {
+                $this->view = $route->view;
+                $this->view->setData($this->presenter->getData());
+            }
+        }
 
         return true;
     }
 
     public function execute(string $queryURL = null): bool
     {
-	    $this->executed;
+        $this->executed;
 
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
@@ -278,7 +278,7 @@ class FrontController
                     if(!$this->_follow($this->httpErrorRoute))
                         $this->_follow(self::$defaultHttpErrorRoute);
 
-				$this->executed = true;
+                $this->executed = true;
             } catch(RoutingException $e) {
                 notFound();
                 throw $e;
@@ -504,10 +504,10 @@ class FrontController
     public function redirect($url, $delay = 0, $code = 303) {
         if(isset($this->view))
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
-		else {
-			$this->executed = true;
-			$this->view = new View();
-		}
+        else {
+            $this->executed = true;
+            $this->view = new View();
+        }
 
         if(!headers_sent()) {
             http_response_code($code);

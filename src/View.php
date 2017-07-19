@@ -50,10 +50,11 @@ class View
      */
     public static function cacheBust(string $src): string
     {
-	    if(!file_exists($src))
-	    	return $src;
+        if(!file_exists($src))
+            return $src;
 
         $path = pathinfo($src);
+
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
