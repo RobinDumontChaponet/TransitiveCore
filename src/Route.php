@@ -18,12 +18,12 @@ class Route
     }
 
     /**
-     * @var void
+     * @var Presenter | string | null
      */
     public $presenter;
 
     /**
-     * @var void
+     * @var View | string | null
      */
     public $view;
 
@@ -38,7 +38,7 @@ class Route
     public $auth;
 
     /**
-     * @return Presenter
+     * @return Presenter | string
      */
     public function getPresenter()
     {
@@ -46,7 +46,7 @@ class Route
     }
 
     /**
-     * @return View
+     * @return View | string
      */
     public function getView()
     {
