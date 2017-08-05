@@ -4,7 +4,7 @@ namespace Transitive\Core;
 
 class Route
 {
-    public function __construct(Presenter $presenter, View $view = null, $user = null, $auth = null)
+    public function __construct($presenter, $view = null, $user = null, $auth = null)
     {
         $this->presenter = $presenter;
 
