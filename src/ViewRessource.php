@@ -90,14 +90,16 @@ class ViewRessource
         return (array) $this->getValue();
     }
 
-    public function asString(): string
+    public function asString(string $glue = ''): string
     {
         $value = $this->asArray();
         $str = '';
 
-        array_walk_recursive($value, function ($value, $key) use (&$str) {
-            $str .= $value;
+        array_walk_recursive($value, function ($value, $key) use (&$str, $glue) {
+            $str .= $value.$glue;
         });
+
+        $str = substr($str, 0, 0-strlen($glue));
 
         return $str;
     }

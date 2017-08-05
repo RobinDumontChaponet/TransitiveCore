@@ -4,7 +4,7 @@ namespace Transitive\Core;
 
 class Route
 {
-    public function __construct($presenter, $view = null, $user = null, $auth = null)
+    public function __construct(Presenter $presenter, View $view = null, $user = null, $auth = null)
     {
         $this->presenter = $presenter;
 
@@ -18,7 +18,7 @@ class Route
     }
 
     /**
-     * @var Presenter | string | null
+     * @var Presenter | string
      */
     public $presenter;
 
@@ -46,7 +46,7 @@ class Route
     }
 
     /**
-     * @return View | string
+     * @return View | string | null
      */
     public function getView()
     {
