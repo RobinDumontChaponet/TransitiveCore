@@ -17,7 +17,7 @@ class BasicView implements View
      */
     public $content;
     /**
-     * data pushed from the presenter
+     * data pushed from the presenter.
      *
      * @var array
      */
@@ -172,7 +172,7 @@ class BasicView implements View
         return array(
             'title' => $this->getTitle(),
             'content' => $this->getContent(),
-            'data' => $this->getData()
+            'data' => $this->getData(),
         );
     }
 
@@ -180,7 +180,6 @@ class BasicView implements View
     {
         return $this->getContent();
     }
-
 
     /**
      * @return array

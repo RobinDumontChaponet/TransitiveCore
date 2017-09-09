@@ -10,7 +10,7 @@ interface View
 
     public function getContent(string $key = null): ViewRessource;
 
-	public function getHead(): ViewRessource;
+    public function getHead(): ViewRessource;
 
-	public function __toString();
+    public function __toString();
 }

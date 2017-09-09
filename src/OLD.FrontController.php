@@ -2,6 +2,19 @@
 
 namespace Transitive\Core;
 
+if (!function_exists('http_response_code')) {
+    function http_response_code($newcode = null) {
+        static $code = 200;
+        if($newcode !== null) {
+            header('X-PHP-Response-Code: '.$newcode, true, $newcode);
+            if(!headers_sent())
+                $code = $newcode;
+        }
+
+        return $code;
+    }
+}
+
 function getBestSupportedMimeType($mimeTypes = null) {
     // Values will be stored in this array
     $acceptTypes = array();
@@ -35,7 +48,7 @@ function getBestSupportedMimeType($mimeTypes = null) {
     return null;
 }
 
-function includePresenter(Binder &$binder, string $path, Route $route)
+function includePresenter(FrontController &$binder, string $path, Route $route)
 {
     $presenter = $binder->getPresenter();
 
@@ -50,7 +63,7 @@ function includePresenter(Binder &$binder, string $path, Route $route)
         include $path;
 }
 
-function includeView(Binder &$binder, string $path)
+function includeView(FrontController &$binder, string $path)
 {
     if($path === null)
         return;
@@ -79,7 +92,7 @@ function notFound(): void
     throw ControllerException('Not found', 404);
 }
 
-class Binder
+class FrontController
 {
     /**
      * @var Presenter
@@ -106,6 +119,10 @@ class Binder
 
     private $executed = false;
 
+    private $httpErrorRoute;
+
+    public static $defaultHttpErrorRoute;
+
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
@@ -124,6 +141,7 @@ class Binder
         $this->obContent = '';
 
         $cwd = dirname(getcwd()).'/';
+        $this->httpErrorRoute = new Route($cwd.'presenters/genericHttpErrorHandler.presenter.php', $cwd.'views/genericHttpErrorHandler.view.php');
 
         $this->layout = function () { ?>
 
@@ -539,4 +557,4 @@ class Binder
     }
 }
 
-Binder::$defaultHttpErrorRoute = new Route(dirname(__DIR__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__DIR__).'/views/genericHttpErrorHandler.view.php');
+FrontController::$defaultHttpErrorRoute = new Route(dirname(__DIR__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__DIR__).'/views/genericHttpErrorHandler.view.php');

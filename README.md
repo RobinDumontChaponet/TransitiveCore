@@ -1,6 +1,6 @@
 # TransitiveCore
 
-	Doing some heavy work lately to modularize code, repo might not be up-to-date.
+> Doing some heavy work lately to modularize code, repo might not be up-to-date.
 
 
 Very simple MVP (Model - View - Presenter) PHP framework.

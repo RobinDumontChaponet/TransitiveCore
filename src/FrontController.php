@@ -2,19 +2,6 @@
 
 namespace Transitive\Core;
 
-if (!function_exists('http_response_code')) {
-    function http_response_code($newcode = null) {
-        static $code = 200;
-        if($newcode !== null) {
-            header('X-PHP-Response-Code: '.$newcode, true, $newcode);
-            if(!headers_sent())
-                $code = $newcode;
-        }
-
-        return $code;
-    }
-}
-
 function getBestSupportedMimeType($mimeTypes = null) {
     // Values will be stored in this array
     $acceptTypes = array();
@@ -48,61 +35,9 @@ function getBestSupportedMimeType($mimeTypes = null) {
     return null;
 }
 
-function includePresenter(FrontController &$binder, string $path, Route $route)
-{
-    $presenter = $binder->getPresenter();
-
-    if($binder->obClean) {
-        ob_start();
-        ob_clean();
-
-        include $path;
-
-        return ob_get_clean();
-    } else
-        include $path;
-}
-
-function includeView(FrontController &$binder, string $path)
-{
-    if($path === null)
-        return;
-
-    $view = $binder->getView();
-
-    if(is_file($path))
-        if($binder->obClean) {
-            ob_start();
-            ob_clean();
-
-            include $path;
-
-            return ob_get_clean();
-        } else
-            include $path;
-}
-
-function noContent(): void
-{
-    throw ControllerException('No content', 204);
-}
-
-function notFound(): void
-{
-    throw ControllerException('Not found', 404);
-}
-
 class FrontController
 {
-    /**
-     * @var Presenter
-     */
-    private $presenter;
-
-    /**
-     * @var View
-     */
-    private $view;
+    public $test = 0;
 
     /**
      * @var array Router
@@ -118,10 +53,6 @@ class FrontController
     private $obContent;
 
     private $executed = false;
-
-    private $httpErrorRoute;
-
-    public static $defaultHttpErrorRoute;
 
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
@@ -141,7 +72,6 @@ class FrontController
         $this->obContent = '';
 
         $cwd = dirname(getcwd()).'/';
-        $this->httpErrorRoute = new Route($cwd.'presenters/genericHttpErrorHandler.presenter.php', $cwd.'views/genericHttpErrorHandler.view.php');
 
         $this->layout = function () { ?>
 
@@ -180,16 +110,6 @@ class FrontController
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public function getHttpErrorRoute(): ?Route
-    {
-        return $this->httpErrorRoute;
-    }
-
-    public function setHttpErrorRoute(Route $httpErrorRoute = null): void
-    {
-        $this->httpErrorRoute = $httpErrorRoute;
-    }
-
     public function getObContent(): string
     {
         return $this->obContent;
@@ -200,7 +120,7 @@ class FrontController
      */
     public function getPresenter(): Presenter
     {
-        return $this->presenter;
+        return $this->route->getPresenter();
     }
 
     /**
@@ -216,7 +136,7 @@ class FrontController
      */
     public function getView(): ?View
     {
-        return $this->view;
+        return $this->route->getView();
     }
 
     private function _getRoute(string $query): ?Route
@@ -228,35 +148,6 @@ class FrontController
         throw new RoutingException('No route.');
     }
 
-    private function _follow(Route &$route): bool
-    {
-        if(is_string($route->presenter)) {
-            if(!is_file($route->presenter)) {
-                notFound();
-                $this->route->view = '';
-
-                return false;
-            }
-
-            $this->presenter = new Presenter();
-            $this->obContent .= includePresenter($this, $route->presenter, $route);
-        } elseif(get_class($route->presenter) == 'Presenter')
-            $this->presenter = $route->presenter;
-
-        if(!$this->executed) {
-            if(is_string($route->view)) {
-                $this->view = new View();
-                $this->view->setData($this->presenter->getData());
-                $this->obContent .= includeView($this, $route->view);
-            } elseif(get_class($route->view) == 'View') {
-                $this->view = $route->view;
-                $this->view->setData($this->presenter->getData());
-            }
-        }
-
-        return true;
-    }
-
     public function execute(string $queryURL = null): bool
     {
         $this->executed;
@@ -264,23 +155,26 @@ class FrontController
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
 
-        if(!isset($this->routers)) {
-            notFound();
-
+        if(!isset($this->routers))
             throw new RoutingException('No routeR.');
-        } else {
+        else {
+            $this->route = $this->_getRoute($queryURL);
+
             try {
-                $this->route = $this->_getRoute($queryURL);
-
-                if(!$this->_follow($this->route))
-                    if(!$this->_follow($this->httpErrorRoute))
-                        $this->_follow(self::$defaultHttpErrorRoute);
-
-                $this->executed = true;
+                $this->obContent = $this->route->execute($this);
             } catch(RoutingException $e) {
-                notFound();
+                try {
+                    $this->obContent = $this->httpErrorRoute->execute($this);
+                } catch (RoutingException $e) {
+                    $this->obContent = self::$defaultHttpErrorRoute->execute($this);
+                    throw $e;
+                }
+
                 throw $e;
             }
+            $this->executed = true;
+
+            ++$this->test;
 
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
@@ -294,8 +188,7 @@ class FrontController
             header('Vary: X-Requested-With,Content-Type');
 
             if($this->hasView() && !$this->getView()->hasContent()) {
-                noContent();
-
+                throw RoutingException('No content', 204);
                 return false;
             }
 
@@ -556,5 +449,3 @@ class FrontController
         // TODO: implement here
     }
 }
-
-FrontController::$defaultHttpErrorRoute = new Route(dirname(__DIR__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__DIR__).'/views/genericHttpErrorHandler.view.php');

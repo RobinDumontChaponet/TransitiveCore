@@ -4,7 +4,68 @@ namespace Transitive\Core;
 
 class Route
 {
-    public function __construct($presenter, $view = null, $user = null, $auth = null)
+    private static function includePresenter(Binder &$binder, string $path, Route $route)
+    {
+        $presenter = $binder->getPresenter();
+        if($binder->obClean) {
+            ob_start();
+            ob_clean();
+        }
+        include $path;
+
+        if($binder->obClean)
+            return ob_get_clean();
+    }
+
+    private static function includeView(Binder &$binder, string $path)
+    {
+        if($path === null)
+            return;
+
+        $view = $binder->getView();
+        if(is_file($path)) {
+            if($binder->obClean) {
+                ob_start();
+                ob_clean();
+            }
+            include $path;
+
+            if($binder->obClean)
+                return ob_get_clean();
+        }
+    }
+
+    private function execute(Binder $binder)
+    {
+        $obContent = '';
+
+        if(is_string($this->presenter)) {
+            if(!is_file($this->presenter)) {
+                $this->view = '';
+                throw RoutingException('Not found', 404);
+            }
+
+            $this->presenter = new Presenter();
+            $obContent .= includePresenter($binder, $this->presenter, $this);
+        } elseif(is_object($this->presenter))
+            if(get_class($this->presenter) != 'Presenter')
+                throw new RoutingException('Wrong type for presenter');
+        if(!$this->executed) {
+            if(is_string($route->view)) {
+                $this->view = new View();
+                $this->view->setData($this->presenter->getData());
+                $obContent .= includeView($binder, $this->view);
+            } elseif(is_object($this->view))
+                if(get_class($this->view) != 'View')
+                    throw new RoutingException('Wrong type for presenter');
+                else
+                    $this->view->setData($this->presenter->getData());
+        }
+
+        return $obContent;
+    }
+
+    public function __construct($presenter, $view = null)
     {
         $this->presenter = $presenter;
 
@@ -12,9 +73,6 @@ class Route
             $this->view = $view;
         elseif(is_string($this->presenter))
             $this->view = $this->presenter;
-
-        $this->user = $user;
-        $this->auth = $auth;
     }
 
     /**
@@ -26,16 +84,6 @@ class Route
      * @var View | string | null
      */
     public $view;
-
-    /**
-     * @var void
-     */
-    public $user;
-
-    /**
-     * @var void
-     */
-    public $auth;
 
     /**
      * @return Presenter | string

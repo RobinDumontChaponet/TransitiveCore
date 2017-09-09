@@ -2,7 +2,7 @@
 
 namespace Transitive\Core;
 
-class HtmlView extends BasicView implements View
+class WebView extends BasicView implements View
 {
     /**
      * The view's title.
@@ -99,22 +99,17 @@ class HtmlView extends BasicView implements View
         ), 'asArray');
     }
 
-	public function getHead(): string
+    public function getHead(): string
     {
-	    return '<head><meta charset="UTF-8">'
-	    	   .$this->getHeadValue()->asString()
-			   .'</head>';
+        return '<head><meta charset="UTF-8">'
+               .$this->getHeadValue()->asString()
+               .'</head>';
     }
-
-
-
 
     public function printDocument(): void
     {
         echo $this->getDocument();
     }
-
-
 
     public function __debugInfo()
     {
@@ -160,16 +155,16 @@ class HtmlView extends BasicView implements View
 
     public function getMetas(): string
     {
-	    $str = '';
+        $str = '';
 
         if(isset($this->metas))
             foreach($this->metas as $meta)
                 if(isset($meta['name']))
-                    $str.= '<meta name="'.$meta['name'].'" content="'.$meta['content'].'">';
+                    $str .= '<meta name="'.$meta['name'].'" content="'.$meta['content'].'">';
                 else
-                    $str.= $meta['raw'];
+                    $str .= $meta['raw'];
 
-		return $str;
+        return $str;
     }
 
     /**
@@ -294,18 +289,18 @@ class HtmlView extends BasicView implements View
 
     public function getStyles(): string
     {
-	    $str = '';
+        $str = '';
 
         if(isset($this->styles))
             foreach($this->styles as $style)
                 if(isset($style['content']))
-                    $str.= '<style type="'.$style['type'].'">'.$style['content'].'</style>';
+                    $str .= '<style type="'.$style['type'].'">'.$style['content'].'</style>';
                 elseif(isset($style['href']))
-                    $str.= '<link rel="'.$style['rel'].'" type="'.$style['type'].'" href="'.$style['href'].'"'.(($style['defer']) ? ' defer async' : '').' />';
+                    $str .= '<link rel="'.$style['rel'].'" type="'.$style['type'].'" href="'.$style['href'].'"'.(($style['defer']) ? ' defer async' : '').' />';
                 elseif(isset($style['raw']))
-                    $str.= $style['raw'];
+                    $str .= $style['raw'];
 
-		return $str;
+        return $str;
     }
 
     public function getStylesContent(): string

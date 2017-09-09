@@ -99,7 +99,7 @@ class ViewRessource
             $str .= $value.$glue;
         });
 
-        $str = substr($str, 0, 0-strlen($glue));
+        $str = substr($str, 0, 0 - strlen($glue));
 
         return $str;
     }
