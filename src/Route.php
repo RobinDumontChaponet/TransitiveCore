@@ -4,63 +4,62 @@ namespace Transitive\Core;
 
 class Route
 {
-    private static function includePresenter(Binder &$binder, string $path, Route $route)
+    private static function includePresenter(Route $route, bool $obClean = false)
     {
-        $presenter = $binder->getPresenter();
-        if($binder->obClean) {
-            ob_start();
-            ob_clean();
-        }
-        include $path;
+        $presenter = $route->getPresenter();
+        if(is_string($presenter) && is_file($presenter)) {
+	        if($obClean) {
+	            ob_start();
+				ob_clean();
+			}
+			include $presenter;
+		}
 
-        if($binder->obClean)
+        if($obClean)
             return ob_get_clean();
     }
 
-    private static function includeView(Binder &$binder, string $path)
+    private static function includeView(Route $route, bool $obClean = false)
     {
-        if($path === null)
-            return;
-
-        $view = $binder->getView();
-        if(is_file($path)) {
-            if($binder->obClean) {
+        $view = $route->getView();
+        if(is_string($view) && is_file($view)) {
+            if($obClean) {
                 ob_start();
                 ob_clean();
             }
-            include $path;
-
-            if($binder->obClean)
-                return ob_get_clean();
+            include $view;
         }
+
+        if($obClean)
+            return ob_get_clean();
     }
 
-    private function execute(Binder $binder)
+    public function execute(FrontController $binder)
     {
         $obContent = '';
 
         if(is_string($this->presenter)) {
             if(!is_file($this->presenter)) {
                 $this->view = '';
-                throw RoutingException('Not found', 404);
+                throw new RoutingException('Not found', 404);
             }
 
             $this->presenter = new Presenter();
-            $obContent .= includePresenter($binder, $this->presenter, $this);
+            $obContent .= self::includePresenter($this, $binder->obClean);
         } elseif(is_object($this->presenter))
             if(get_class($this->presenter) != 'Presenter')
                 throw new RoutingException('Wrong type for presenter');
-        if(!$this->executed) {
-            if(is_string($route->view)) {
-                $this->view = new View();
+//         if(!$this->executed) {
+            if(is_string($this->view)) {
+                $this->view = new BasicView();
                 $this->view->setData($this->presenter->getData());
-                $obContent .= includeView($binder, $this->view);
+                $obContent .= self::includeView($this, $binder->obClean);
             } elseif(is_object($this->view))
                 if(get_class($this->view) != 'View')
                     throw new RoutingException('Wrong type for presenter');
                 else
                     $this->view->setData($this->presenter->getData());
-        }
+//         }
 
         return $obContent;
     }

@@ -77,7 +77,7 @@ class BasicView implements View
      *
      * @param string $title
      */
-    public function setTitle(string $title = ''): void
+    public function setTitle(string $title = null): void
     {
         $this->title = $title;
     }
@@ -143,7 +143,7 @@ class BasicView implements View
         return $this->getHeadValue()->asString();
     }
 
-    public function getDocumentValue(string $contentKey = null): ViewRessource
+    public function getDocument(string $contentKey = null): ViewRessource
     {
         return new ViewRessource(array(
             'head' => $this->getHead()->asArray,
@@ -151,7 +151,7 @@ class BasicView implements View
         ), 'asJSON');
     }
 
-    public function getDocument(): string
+    public function getDocumentValue(): string
     {
         return $this->getDocument()->__toString();
     }
@@ -175,6 +175,19 @@ class BasicView implements View
             'data' => $this->getData(),
         );
     }
+
+
+
+
+
+
+    public function printContent(string $key = null): void
+    {
+        echo $this->getContent($key)->asString();
+    }
+
+
+
 
     public function __toString(): string
     {

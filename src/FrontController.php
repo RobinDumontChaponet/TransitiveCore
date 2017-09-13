@@ -1,11 +1,8 @@
 <?php
-
 namespace Transitive\Core;
-
 function getBestSupportedMimeType($mimeTypes = null) {
     // Values will be stored in this array
     $acceptTypes = array();
-
     // divide it into parts in the place of a ","
     $accept = explode(',', strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT'])));
     foreach ($accept as $a) {
@@ -21,12 +18,9 @@ function getBestSupportedMimeType($mimeTypes = null) {
         $acceptTypes[$a] = $q;
     }
     arsort($acceptTypes);
-
     // if no parameter was passed, just return parsed data
     if (!$mimeTypes) return $acceptTypes;
-
     $mimeTypes = array_map('strtolower', (array) $mimeTypes);
-
     // let’s check our supported types:
     foreach ($acceptTypes as $mime => $q) {
        if ($q && in_array($mime, $mimeTypes)) return $mime;
@@ -34,26 +28,19 @@ function getBestSupportedMimeType($mimeTypes = null) {
     // no mime-type found
     return null;
 }
-
 class FrontController
 {
     public $test = 0;
-
     /**
      * @var array Router
      */
     private $routers;
     private $route;
-
     public $layout;
-
     private $contentType;
-
     public $obClean;
     private $obContent;
-
     private $executed = false;
-
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
@@ -63,18 +50,13 @@ class FrontController
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
     );
-
     public function __construct()
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
-
         $this->obClean = true;
         $this->obContent = '';
-
         $cwd = dirname(getcwd()).'/';
-
         $this->layout = function () { ?>
-
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
 <!--[if IE 7]>   <html class="lt-ie9 lt-ie8" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
@@ -91,30 +73,24 @@ class FrontController
 <?php $this->printContent(); ?>
 </body>
 </html>
-
 <?php  };
 }
-
     public function getContentType(): ?string
     {
         return $this->contentType;
     }
-
     public function isAPI(): string
     {
         return $this->getContentType() == 'application/json' || $this->getContentType() == 'application/xml';
     }
-
     public function getRequestMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
-
     public function getObContent(): string
     {
         return $this->obContent;
     }
-
     /**
      * @return Presenter
      */
@@ -122,7 +98,6 @@ class FrontController
     {
         return $this->route->getPresenter();
     }
-
     /**
      * @return bool
      */
@@ -130,7 +105,6 @@ class FrontController
     {
         return isset($this->view);
     }
-
     /**
      * @return View
      */
@@ -138,30 +112,24 @@ class FrontController
     {
         return $this->route->getView();
     }
-
     private function _getRoute(string $query): ?Route
     {
         foreach($this->routers as $router)
             if(($testRoute = $router->execute($query)) !== null)
                 return $testRoute;
-
         throw new RoutingException('No route.');
     }
-
     public function execute(string $queryURL = null): bool
     {
-        $this->executed;
-
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
-
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
             $this->route = $this->_getRoute($queryURL);
-
-            try {
+//             try {
                 $this->obContent = $this->route->execute($this);
+/*
             } catch(RoutingException $e) {
                 try {
                     $this->obContent = $this->httpErrorRoute->execute($this);
@@ -169,38 +137,33 @@ class FrontController
                     $this->obContent = self::$defaultHttpErrorRoute->execute($this);
                     throw $e;
                 }
-
                 throw $e;
             }
+*/
             $this->executed = true;
-
             ++$this->test;
-
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
-
                 if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
                     header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
                     header('Cache-Control: public, max-age=60');
                 }
             }
-
             header('Vary: X-Requested-With,Content-Type');
-
             if($this->hasView() && !$this->getView()->hasContent()) {
                 throw RoutingException('No content', 204);
                 return false;
             }
-
             return true;
         }
     }
-
+/*
     public function printMetas(): void
     {
-        $this->view->printMetas();
+	    if(isset($this->route->view))
+	        $this->route->view->printMetas();
     }
-
+*/
     /**
      * @param string $prefix
      * @param string $separator
@@ -211,13 +174,10 @@ class FrontController
     public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
     {
         $title = $this->view->getTitle();
-
         if(!empty($title))
             return $prefix.$separator.$title.$endSeparator;
-
         return $prefix;
     }
-
     /**
      * @param string $prefix
      * @param string $separator
@@ -225,8 +185,7 @@ class FrontController
      */
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
-        $title = $this->view->getTitle();
-
+        $title = (isset($this->route->view))? $this->route->view->getTitle() : '';
         echo '<title>';
         if(!empty($prefix)) {
             echo $prefix;
@@ -238,17 +197,20 @@ class FrontController
             echo $endSeparator;
         echo '</title>';
     }
-
+/*
     public function printStyles(): void
     {
-        $this->view->printStyles();
+		if(isset($this->route->view))
+	        $this->route->view->printStyles();
     }
-
+*/
+/*
     public function printScripts(): void
     {
-        $this->view->printScripts();
+	    if(isset($this->route->view))
+	        $this->route->view->printScripts();
     }
-
+*/
     /**
      * @param string $key
      */
@@ -256,7 +218,6 @@ class FrontController
     {
         return $this->view->hasContent($key);
     }
-
     /**
      * @param string $key
      */
@@ -264,66 +225,55 @@ class FrontController
     {
         return $this->view->getContent($key);
     }
-
     /**
      * @param string $key
      */
     public function printContent(string $key = null): void
     {
-        $this->view->printContent($key);
+	    if(isset($this->route->view))
+        	$this->route->view->printContent($key);
     }
-
     public function getHead(): ViewRessource
     {
         return $this->view->getHead();
     }
-
     public function printHead(): void
     {
         $this->view->printHead();
     }
-
     public function getBody()
     {
         return $this->view->getBody();
     }
-
     public function printBody(): void
     {
         $this->view->printBody();
     }
-
     public function getDocument()
     {
         return $this->view->getDocument();
     }
-
     public function printDocument(): void
     {
         $this->view->printDocument();
     }
-
 /*
     public function __debugInfo():void
     {
         // TODO: implement here
     }
 */
-
     public function __toString(): string
     {
         ob_start();
         ob_clean();
         $this->print();
-
         return ob_get_clean();
     }
-
     public function print($contentType = null): void
     {
         if($contentType == null)
             $contentType = $this->contentType;
-
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
                 echo $this->getDocument();
@@ -334,7 +284,6 @@ class FrontController
             case 'application/vnd.transitive.document+yaml':
                 echo $this->getDocument()->asYAML();
             break;
-
             case 'application/vnd.transitive.head+json':
                 echo $this->getHead()->asJson();
             break;
@@ -344,18 +293,15 @@ class FrontController
             case 'application/vnd.transitive.head+yaml':
                 echo $this->getHead()->asYAML();
             break;
-
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
                 echo $this->getContent();
             break;
-
             case 'application/vnd.transitive.content+css':
                 echo $this->view->getStylesContent();
             break;
             case 'application/vnd.transitive.content+javascript':
                 echo $this->view->getScriptsContent();
             break;
-
             case 'application/vnd.transitive.content+json':
                 echo $this->getContent()->asJson();
             break;
@@ -387,7 +333,6 @@ class FrontController
                 }
         }
     }
-
     public function redirect($url, $delay = 0, $code = 303) {
         if(isset($this->view))
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
@@ -395,31 +340,24 @@ class FrontController
             $this->executed = true;
             $this->view = new View();
         }
-
         if(!headers_sent()) {
             http_response_code($code);
             $_SERVER['REDIRECT_STATUS'] = $code;
-
             if($delay <= 0)
                 header('Location: '.$url, true, $code);
             else
                 header('Refresh:'.$delay.'; url='.$url, true, $code);
-
             return true;
         }
-
         return false;
     }
-
     public function goBack() {
         if(isset($_SESSION['referrer'])) {
             $this->redirect($_SESSION['referrer']);
-
             return true;
         } else
             return false;
     }
-
     /**
      * @return array
      */
@@ -427,7 +365,6 @@ class FrontController
     {
         return $this->routers;
     }
-
     /**
      * @param array $routers
      */
@@ -435,7 +372,6 @@ class FrontController
     {
         $this->routers = $routers;
     }
-
     /**
      * @param Router $router
      */
@@ -443,7 +379,6 @@ class FrontController
     {
         $this->routers[] = $router;
     }
-
     public function removeRouter(Router $router): bool
     {
         // TODO: implement here
