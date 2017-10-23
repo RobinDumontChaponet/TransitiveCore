@@ -47,7 +47,8 @@ class WebView extends BasicView implements View
         $this->scripts = array();
         $this->metas = array();
         $this->title = '';
-        $this->content = 'No viewable content.';
+//         $this->content = 'No viewable content.';
+        $this->content = null;
     }
 
     /**
@@ -73,7 +74,7 @@ class WebView extends BasicView implements View
      *
      * @param string $title
      */
-    public function setTitle(string $title = ''): void
+    public function setTitle(string $title = null): void
     {
         $this->title = $title;
     }
@@ -94,7 +95,7 @@ class WebView extends BasicView implements View
         return new ViewRessource(array(
             'metas' => $this->getMetas(),
             'title' => $this->getTitle(),
-            'scripts' => $this->getScripts(),
+            'scripts' => $this->getScriptsValue(),
             'styles' => $this->getStyles(),
         ), 'asArray');
     }
@@ -257,7 +258,7 @@ class WebView extends BasicView implements View
     public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = false): bool
     {
         if(!file_exists($filepath)) {
-            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, ressource doesn\'t exists');
             return false;
         }
         if($cacheBust)
@@ -277,7 +278,7 @@ class WebView extends BasicView implements View
     public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = false): bool
     {
         if(!file_exists($filepath)) {
-            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, doesn\'t exists');
+            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, ressource doesn\'t exists');
             return false;
         }
         if($cacheBust)

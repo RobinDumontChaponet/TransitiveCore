@@ -4,31 +4,41 @@ namespace Transitive\Core;
 
 class Route
 {
-    private static function includePresenter(Route $route, bool $obClean = false)
+    private static function includePresenter(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
     {
-        $presenter = $route->getPresenter();
-        if(is_string($presenter) && is_file($presenter)) {
-	        if($obClean) {
-	            ob_start();
-				ob_clean();
-			}
-			include $presenter;
+		$inc = function($exposedVariables) use($_prefix) {
+			extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
+			unset($exposedVariables);
+
+			include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
+		};
+
+		if($obClean) {
+            ob_start();
+			ob_clean();
 		}
+
+		$inc(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables);
 
         if($obClean)
             return ob_get_clean();
     }
 
-    private static function includeView(Route $route, bool $obClean = false)
+    private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
     {
-        $view = $route->getView();
-        if(is_string($view) && is_file($view)) {
-            if($obClean) {
-                ob_start();
-                ob_clean();
-            }
-            include $view;
-        }
+		$inc = function($exposedVariables) use($_prefix) {
+			extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
+			unset($exposedVariables);
+
+			include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
+		};
+
+        if($obClean) {
+            ob_start();
+			ob_clean();
+		}
+
+		$inc(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables);
 
         if($obClean)
             return ob_get_clean();
@@ -38,28 +48,40 @@ class Route
     {
         $obContent = '';
 
-        if(is_string($this->presenter)) {
-            if(!is_file($this->presenter)) {
-                $this->view = '';
-                throw new RoutingException('Not found', 404);
-            }
+		// Presenter
+		$presenter = $this->getPresenter();
 
-            $this->presenter = new Presenter();
-            $obContent .= self::includePresenter($this, $binder->obClean);
-        } elseif(is_object($this->presenter))
-            if(get_class($this->presenter) != 'Presenter')
-                throw new RoutingException('Wrong type for presenter');
-//         if(!$this->executed) {
-            if(is_string($this->view)) {
-                $this->view = new BasicView();
-                $this->view->setData($this->presenter->getData());
-                $obContent .= self::includeView($this, $binder->obClean);
-            } elseif(is_object($this->view))
-                if(get_class($this->view) != 'View')
-                    throw new RoutingException('Wrong type for presenter');
-                else
-                    $this->view->setData($this->presenter->getData());
-//         }
+        if(is_string($presenter)) {
+        	if(is_file($presenter)) {
+		        $presenter = new Presenter();
+
+		        $obContent .= self::includePresenter($this->getPresenter(), ['binder'=>$binder, 'presenter'=>$presenter], '', $binder->obClean);
+
+				$this->setPresenter($presenter);
+			} else {
+                $this->setView();
+                throw new RoutingException('Presenter not found', 404);
+            }
+        }
+
+
+		// View
+		$view = $this->getView();
+
+        if(is_string($view)) {
+	        if(is_file($view)) {
+	     	   $view = new WebView();
+
+		 	   $obContent .= self::includeView($this->getView(), ['view'=>$view], '', $binder->obClean);
+
+		 	   $this->setView($view);
+		 	} else {
+                throw new RoutingException('View not found', 404);
+            }
+        }
+
+	    if(is_object($this->view))
+			$this->view->setData($this->presenter->getData());
 
         return $obContent;
     }
@@ -67,11 +89,7 @@ class Route
     public function __construct($presenter, $view = null)
     {
         $this->presenter = $presenter;
-
-        if(isset($view))
-            $this->view = $view;
-        elseif(is_string($this->presenter))
-            $this->view = $this->presenter;
+		$this->view = $view;
     }
 
     /**
@@ -92,11 +110,21 @@ class Route
         return $this->presenter;
     }
 
+    public function setPresenter(Presenter $presenter)
+    {
+        return $this->presenter = $presenter;
+    }
+
     /**
      * @return View | string | null
      */
     public function getView()
     {
         return $this->view;
+    }
+
+	public function setView(View $view = null)
+    {
+        return $this->view = $view;
     }
 }

@@ -146,7 +146,7 @@ class BasicView implements View
     public function getDocument(string $contentKey = null): ViewRessource
     {
         return new ViewRessource(array(
-            'head' => $this->getHead()->asArray,
+            'head' => $this->getHeadValue()->asArray,
             'content' => $this->getContent($contentKey)->asArray,
         ), 'asJSON');
     }
@@ -181,10 +181,12 @@ class BasicView implements View
 
 
 
+/*
     public function printContent(string $key = null): void
     {
         echo $this->getContent($key)->asString();
     }
+*/
 
 
 

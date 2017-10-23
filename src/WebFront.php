@@ -2,127 +2,22 @@
 
 namespace Transitive\Core;
 
-if (!function_exists('http_response_code')) {
-    function http_response_code($newcode = null) {
-        static $code = 200;
-        if($newcode !== null) {
-            header('X-PHP-Response-Code: '.$newcode, true, $newcode);
-            if(!headers_sent())
-                $code = $newcode;
-        }
-
-        return $code;
-    }
-}
-
-function getBestSupportedMimeType($mimeTypes = null) {
-    // Values will be stored in this array
-    $acceptTypes = array();
-
-    // divide it into parts in the place of a ","
-    $accept = explode(',', strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT'])));
-    foreach ($accept as $a) {
-        // the default quality is 1.
-        $q = 1;
-        // check if there is a different quality
-        if (strpos($a, ';q=')) {
-            // divide "mime/type;q=X" into two parts: "mime/type" i "X"
-            list($a, $q) = explode(';q=', $a);
-        }
-        // mime-type $a is accepted with the quality $q
-        // WARNING: $q == 0 means, that mime-type isn’t supported!
-        $acceptTypes[$a] = $q;
-    }
-    arsort($acceptTypes);
-
-    // if no parameter was passed, just return parsed data
-    if (!$mimeTypes) return $acceptTypes;
-
-    $mimeTypes = array_map('strtolower', (array) $mimeTypes);
-
-    // let’s check our supported types:
-    foreach ($acceptTypes as $mime => $q) {
-       if ($q && in_array($mime, $mimeTypes)) return $mime;
-    }
-    // no mime-type found
-    return null;
-}
-
-function includePresenter(FrontController &$binder, string $path, Route $route)
+class WebFront implements FrontController
 {
-    $presenter = $binder->getPresenter();
-
-    if($binder->obClean) {
-        ob_start();
-        ob_clean();
-
-        include $path;
-
-        return ob_get_clean();
-    } else
-        include $path;
-}
-
-function includeView(FrontController &$binder, string $path)
-{
-    if($path === null)
-        return;
-
-    $view = $binder->getView();
-
-    if(is_file($path))
-        if($binder->obClean) {
-            ob_start();
-            ob_clean();
-
-            include $path;
-
-            return ob_get_clean();
-        } else
-            include $path;
-}
-
-function noContent(): void
-{
-    throw ControllerException('No content', 204);
-}
-
-function notFound(): void
-{
-    throw ControllerException('Not found', 404);
-}
-
-class FrontController
-{
-    /**
-     * @var Presenter
-     */
-    private $presenter;
-
-    /**
-     * @var View
-     */
-    private $view;
-
     /**
      * @var array Router
      */
-    private $routers;
-    private $route;
-
-    public $layout;
-
-    private $contentType;
-
-    public $obClean;
-    private $obContent;
-
-    private $executed = false;
 
     private $httpErrorRoute;
-
     public static $defaultHttpErrorRoute;
 
+    private $routers;
+    private $route;
+    public $layout;
+    private $contentType;
+    public $obClean;
+    private $obContent;
+    private $executed = false;
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
@@ -132,19 +27,13 @@ class FrontController
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
     );
-
     public function __construct()
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
-
         $this->obClean = true;
         $this->obContent = '';
-
         $cwd = dirname(getcwd()).'/';
-        $this->httpErrorRoute = new Route($cwd.'presenters/genericHttpErrorHandler.presenter.php', $cwd.'views/genericHttpErrorHandler.view.php');
-
         $this->layout = function () { ?>
-
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
 <!--[if IE 7]>   <html class="lt-ie9 lt-ie8" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
@@ -161,151 +50,92 @@ class FrontController
 <?php $this->printContent(); ?>
 </body>
 </html>
-
 <?php  };
 }
-
     public function getContentType(): ?string
     {
         return $this->contentType;
     }
-
     public function isAPI(): string
     {
         return $this->getContentType() == 'application/json' || $this->getContentType() == 'application/xml';
     }
-
     public function getRequestMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
-
-    public function getHttpErrorRoute(): ?Route
-    {
-        return $this->httpErrorRoute;
-    }
-
-    public function setHttpErrorRoute(Route $httpErrorRoute = null): void
-    {
-        $this->httpErrorRoute = $httpErrorRoute;
-    }
-
     public function getObContent(): string
     {
         return $this->obContent;
     }
-
     /**
      * @return Presenter
      */
     public function getPresenter(): Presenter
     {
-        return $this->presenter;
+        return $this->route->getPresenter();
     }
-
     /**
      * @return bool
      */
     public function hasView(): bool
     {
-        return isset($this->view);
+        return isset($this->route->view);
     }
-
     /**
      * @return View
      */
     public function getView(): ?View
     {
-        return $this->view;
+        return $this->route->getView();
     }
-
     private function _getRoute(string $query): ?Route
     {
         foreach($this->routers as $router)
             if(($testRoute = $router->execute($query)) !== null)
                 return $testRoute;
-
         throw new RoutingException('No route.');
     }
-
-    private function _follow(Route &$route): bool
-    {
-        if(is_string($route->presenter)) {
-            if(!is_file($route->presenter)) {
-                notFound();
-                $this->route->view = '';
-
-                return false;
-            }
-
-            $this->presenter = new Presenter();
-            $this->obContent .= includePresenter($this, $route->presenter, $route);
-        } elseif(get_class($route->presenter) == 'Presenter')
-            $this->presenter = $route->presenter;
-
-        if(!$this->executed) {
-            if(is_string($route->view)) {
-                $this->view = new View();
-                $this->view->setData($this->presenter->getData());
-                $this->obContent .= includeView($this, $route->view);
-            } elseif(get_class($route->view) == 'View') {
-                $this->view = $route->view;
-                $this->view->setData($this->presenter->getData());
-            }
-        }
-
-        return true;
-    }
-
     public function execute(string $queryURL = null): bool
     {
-        $this->executed;
-
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
-
-        if(!isset($this->routers)) {
-            notFound();
-
+        if(!isset($this->routers))
             throw new RoutingException('No routeR.');
-        } else {
-            try {
-                $this->route = $this->_getRoute($queryURL);
+        else {
+            $routes = [$this->_getRoute($queryURL), $this->httpErrorRoute, self::$defaultHttpErrorRoute];
+            foreach($routes as $route) {
+	            if(isset($route))
+	            	try {
+		            	$this->route = $route;
+						$this->obContent = $route->execute($this);
 
-                if(!$this->_follow($this->route))
-                    if(!$this->_follow($this->httpErrorRoute))
-                        $this->_follow(self::$defaultHttpErrorRoute);
-
-                $this->executed = true;
-            } catch(RoutingException $e) {
-                notFound();
-                throw $e;
+						break;
+					} catch(RoutingException $e) {
+						if($e->getCode()>200) {
+							http_response_code($e->getCode());
+							$_SERVER['REDIRECT_STATUS'] = $e->getCode();
+						}
+						continue;
+					}
+            }
+            if($this->hasView() && !$this->getView()->hasContent()) {
+                http_response_code(204);
+				$_SERVER['REDIRECT_STATUS'] = 204;
             }
 
+            $this->executed = true;
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
-
                 if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
                     header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
                     header('Cache-Control: public, max-age=60');
                 }
             }
-
             header('Vary: X-Requested-With,Content-Type');
-
-            if($this->hasView() && !$this->getView()->hasContent()) {
-                noContent();
-
-                return false;
-            }
 
             return true;
         }
-    }
-
-    public function printMetas(): void
-    {
-        $this->view->printMetas();
     }
 
     /**
@@ -318,13 +148,10 @@ class FrontController
     public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
     {
         $title = $this->view->getTitle();
-
         if(!empty($title))
             return $prefix.$separator.$title.$endSeparator;
-
         return $prefix;
     }
-
     /**
      * @param string $prefix
      * @param string $separator
@@ -332,8 +159,7 @@ class FrontController
      */
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
-        $title = $this->view->getTitle();
-
+        $title = (isset($this->route->view))? $this->route->view->getTitle() : '';
         echo '<title>';
         if(!empty($prefix)) {
             echo $prefix;
@@ -345,92 +171,93 @@ class FrontController
             echo $endSeparator;
         echo '</title>';
     }
-
+/*
     public function printStyles(): void
     {
-        $this->view->printStyles();
+		if(isset($this->route->view))
+	        $this->route->view->printStyles();
     }
-
+*/
+/*
     public function printScripts(): void
     {
-        $this->view->printScripts();
+	    if(isset($this->route->view))
+	        $this->route->view->printScripts();
     }
-
+*/
     /**
      * @param string $key
      */
     public function hasContent(string $key = null): bool
     {
-        return $this->view->hasContent($key);
+	    if(isset($this->route->view))
+	        return $this->route->view->hasContent($key);
     }
-
     /**
      * @param string $key
      */
-    public function getContent(string $key = null)
+    public function getContent(string $key = null): ?string
     {
-        return $this->view->getContent($key);
+	    if(isset($this->route->view))
+	        return $this->route->view->getContent($key);
     }
-
     /**
      * @param string $key
      */
+/*
     public function printContent(string $key = null): void
     {
-        $this->view->printContent($key);
+	    if(isset($this->route->view))
+        	$this->route->view->printContent($key);
     }
-
+*/
     public function getHead(): ViewRessource
     {
-        return $this->view->getHead();
+	    if(isset($this->route->view))
+	        return $this->route->view->getHeadValue();
     }
-
     public function printHead(): void
     {
-        $this->view->printHead();
+	    if(isset($this->route->view))
+	        $this->route->view->printHead();
     }
-
     public function getBody()
     {
-        return $this->view->getBody();
+	    if(isset($this->route->view))
+	        return $this->route->view->getBody();
     }
-
     public function printBody(): void
     {
-        $this->view->printBody();
+	    if(isset($this->route->view))
+        	$this->route->view->printBody();
     }
-
     public function getDocument()
     {
-        return $this->view->getDocument();
+	    if(isset($this->route->view))
+	        return $this->route->view->getDocument();
     }
-
     public function printDocument(): void
     {
-        $this->view->printDocument();
+	    if(isset($this->route->view))
+	        $this->route->view->printDocument();
     }
-
 /*
     public function __debugInfo():void
     {
         // TODO: implement here
     }
 */
-
     public function __toString(): string
     {
         ob_start();
         ob_clean();
         $this->print();
-
         return ob_get_clean();
     }
-
     public function print($contentType = null): void
     {
         if($contentType == null)
             $contentType = $this->contentType;
-
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
                 echo $this->getDocument();
@@ -441,7 +268,6 @@ class FrontController
             case 'application/vnd.transitive.document+yaml':
                 echo $this->getDocument()->asYAML();
             break;
-
             case 'application/vnd.transitive.head+json':
                 echo $this->getHead()->asJson();
             break;
@@ -451,18 +277,15 @@ class FrontController
             case 'application/vnd.transitive.head+yaml':
                 echo $this->getHead()->asYAML();
             break;
-
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
                 echo $this->getContent();
             break;
-
             case 'application/vnd.transitive.content+css':
-                echo $this->view->getStylesContent();
+                echo $this->getView()->getStylesContent();
             break;
             case 'application/vnd.transitive.content+javascript':
-                echo $this->view->getScriptsContent();
+                echo $this->getView()->getScriptsContent();
             break;
-
             case 'application/vnd.transitive.content+json':
                 echo $this->getContent()->asJson();
             break;
@@ -494,7 +317,6 @@ class FrontController
                 }
         }
     }
-
     public function redirect($url, $delay = 0, $code = 303) {
         if(isset($this->view))
             $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
@@ -502,31 +324,24 @@ class FrontController
             $this->executed = true;
             $this->view = new View();
         }
-
         if(!headers_sent()) {
             http_response_code($code);
             $_SERVER['REDIRECT_STATUS'] = $code;
-
             if($delay <= 0)
                 header('Location: '.$url, true, $code);
             else
                 header('Refresh:'.$delay.'; url='.$url, true, $code);
-
             return true;
         }
-
         return false;
     }
-
     public function goBack() {
         if(isset($_SESSION['referrer'])) {
             $this->redirect($_SESSION['referrer']);
-
             return true;
         } else
             return false;
     }
-
     /**
      * @return array
      */
@@ -534,7 +349,6 @@ class FrontController
     {
         return $this->routers;
     }
-
     /**
      * @param array $routers
      */
@@ -542,7 +356,6 @@ class FrontController
     {
         $this->routers = $routers;
     }
-
     /**
      * @param Router $router
      */
@@ -550,11 +363,15 @@ class FrontController
     {
         $this->routers[] = $router;
     }
-
     public function removeRouter(Router $router): bool
     {
         // TODO: implement here
     }
+
+    public function getRoute(): ?Route
+    {
+	    return $this->route;
+    }
 }
 
-FrontController::$defaultHttpErrorRoute = new Route(dirname(__DIR__).'/presenters/genericHttpErrorHandler.presenter.php', dirname(__DIR__).'/views/genericHttpErrorHandler.view.php');
+WebFront::$defaultHttpErrorRoute = new Route(dirname(getcwd()).'/presenters/genericHttpErrorHandler.presenter.php', dirname(getcwd()).'/views/genericHttpErrorHandler.view.php');
