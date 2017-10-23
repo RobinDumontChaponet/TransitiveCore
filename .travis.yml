@@ -7,6 +7,6 @@ install:
   - composer selfupdate
   - composer install
 
- script:
+script:
   - vendor/bin/phpcs --standard=psr2 src/
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
