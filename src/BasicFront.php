@@ -64,8 +64,10 @@ class BasicFront implements FrontController
     }
     public function execute(string $queryURL = null): bool
     {
+/*
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
+*/
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {

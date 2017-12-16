@@ -98,8 +98,10 @@ class WebFront implements FrontController
     }
     public function execute(string $queryURL = null): bool
     {
+/*
         if(empty($queryURL))
             $queryURL = 'genericHttpErrorHandler';
+*/
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
@@ -119,12 +121,12 @@ class WebFront implements FrontController
 						continue;
 					}
             }
+            $this->executed = true;
+
             if($this->hasView() && !$this->getView()->hasContent()) {
                 http_response_code(204);
 				$_SERVER['REDIRECT_STATUS'] = 204;
             }
-
-            $this->executed = true;
             if(!empty($this->contentType)) {
                 header('Content-Type: '.$this->contentType);
                 if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {

@@ -55,7 +55,7 @@ class Route
         	if(is_file($presenter)) {
 		        $presenter = new Presenter();
 
-		        $obContent .= self::includePresenter($this->getPresenter(), ['binder'=>$binder, 'presenter'=>$presenter], '', $binder->obClean);
+		        $obContent .= self::includePresenter($this->getPresenter(), ['binder'=>$binder, 'presenter'=>$presenter], $this->prefix, $binder->obClean);
 
 				$this->setPresenter($presenter);
 			} else {
@@ -72,7 +72,7 @@ class Route
 	        if(is_file($view)) {
 	     	   $view = new WebView();
 
-		 	   $obContent .= self::includeView($this->getView(), ['view'=>$view], '', $binder->obClean);
+		 	   $obContent .= self::includeView($this->getView(), ['view'=>$view], $this->prefix, $binder->obClean);
 
 		 	   $this->setView($view);
 		 	} else {
@@ -86,11 +86,17 @@ class Route
         return $obContent;
     }
 
-    public function __construct($presenter, $view = null)
+    public function __construct($presenter, $view = null, string $prefix = null)
     {
         $this->presenter = $presenter;
 		$this->view = $view;
+		$this->prefix = $prefix;
     }
+
+	/**
+	 * @var String | null : prefix for exposed variables
+	 */
+	private $prefix;
 
     /**
      * @var Presenter | string
