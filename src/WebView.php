@@ -106,14 +106,14 @@ class WebView extends BasicView implements View
     /**
      * @param string $key
      */
-    public function getContentValue(string $key = null): ViewRessource
+    public function getContentValue(string $key = null): ViewResource
     {
-        return new ViewRessource($this->getContent($key));
+        return new ViewResource($this->getContent($key));
     }
 
-    public function getHeadValue(): ViewRessource
+    public function getHeadValue(): ViewResource
     {
-        return new ViewRessource(array(
+        return new ViewResource(array(
             'metas' => $this->getMetas(),
             'title' => $this->getTitle(),
             'scripts' => $this->getScriptsValue(),

@@ -62,7 +62,7 @@ interface FrontController
         	$this->route->view->printContent($key);
     }
 */
-    public function getHead(): ViewRessource;
+    public function getHead(): ViewResource;
 
     public function printHead(): void;
 

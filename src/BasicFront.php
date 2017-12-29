@@ -141,7 +141,7 @@ class BasicFront implements FrontController
         	$this->route->view->printContent($key);
     }
 */
-    public function getHead(): ViewRessource
+    public function getHead(): ViewResource
     {
 	    if(isset($this->route->view))
 	        return $this->route->view->getHeadValue();

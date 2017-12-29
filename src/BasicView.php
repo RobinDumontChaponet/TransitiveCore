@@ -112,7 +112,7 @@ class BasicView implements View
     /**
      * @param string $key
      */
-    public function getContent(string $key = null): ViewRessource
+    public function getContent(string $key = null): ViewResource
     {
         $content = null;
         if($this->hasContent($key)) {
@@ -128,12 +128,12 @@ class BasicView implements View
                 $content = $this->_getContent($this->content);
         }
 
-        return new ViewRessource($content);
+        return new ViewResource($content);
     }
 
-    public function getHeadValue(): ViewRessource
+    public function getHeadValue(): ViewResource
     {
-        return new ViewRessource(array(
+        return new ViewResource(array(
             'title' => $this->getTitle(),
         ), 'asArray');
     }
@@ -143,9 +143,9 @@ class BasicView implements View
         return $this->getHeadValue()->asString();
     }
 
-    public function getDocument(string $contentKey = null): ViewRessource
+    public function getDocument(string $contentKey = null): ViewResource
     {
-        return new ViewRessource(array(
+        return new ViewResource(array(
             'head' => $this->getHeadValue()->asArray,
             'content' => $this->getContent($contentKey)->asArray,
         ), 'asJSON');

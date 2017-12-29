@@ -223,7 +223,7 @@ class WebFront implements FrontController
     /**
      * @param string $key
      */
-    public function getContent(string $key = null): ViewRessource
+    public function getContent(string $key = null): ViewResource
     {
 	    if(isset($this->route->view))
 	        return $this->route->view->getContentValue($key);
@@ -238,7 +238,7 @@ class WebFront implements FrontController
         	$this->route->view->printContent($key);
     }
 */
-    public function getHead(): ViewRessource
+    public function getHead(): ViewResource
     {
 	    if(isset($this->route->view))
 	        return $this->route->view->getHeadValue();

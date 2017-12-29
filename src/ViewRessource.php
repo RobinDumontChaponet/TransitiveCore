@@ -2,7 +2,7 @@
 
 namespace Transitive\Core;
 
-class ViewRessource
+class ViewResource
 {
     /**
      * @var mixed

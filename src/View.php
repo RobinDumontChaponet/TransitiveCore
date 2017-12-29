@@ -8,9 +8,9 @@ interface View
 
     public function setTitle(string $title = null): void;
 
-    public function getContent(string $key = null): ViewRessource;
+    public function getContent(string $key = null): ViewResource;
 
-    public function getHeadValue(): ViewRessource;
+    public function getHeadValue(): ViewResource;
 
     public function __toString();
 }
