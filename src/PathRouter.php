@@ -11,8 +11,8 @@ class PathRouter implements Router
     private $viewsPath;
     private $separator;
 
-    private $presenterSuffix = '.presenter.php';
-    private $viewSuffix = '.view.php';
+    private $presenterSuffix = '.php';
+    private $viewSuffix = '.php';
 
     public $method;
 

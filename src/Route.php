@@ -4,21 +4,21 @@ namespace Transitive\Core;
 
 class Route
 {
+	private static function _include($exposedVariables, $_prefix) {
+		extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
+		unset($exposedVariables);
+
+		include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
+	}
+
     private static function includePresenter(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
     {
-		$inc = function($exposedVariables) use($_prefix) {
-			extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
-			unset($exposedVariables);
-
-			include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
-		};
-
 		if($obClean) {
             ob_start();
 			ob_clean();
 		}
 
-		$inc(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables);
+		self::_include(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables, $_prefix);
 
         if($obClean)
             return ob_get_clean();
@@ -26,19 +26,12 @@ class Route
 
     private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
     {
-		$inc = function($exposedVariables) use($_prefix) {
-			extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
-			unset($exposedVariables);
-
-			include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
-		};
-
         if($obClean) {
             ob_start();
 			ob_clean();
 		}
 
-		$inc(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables);
+		self::_include(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables, $_prefix);
 
         if($obClean)
             return ob_get_clean();

@@ -2,6 +2,17 @@
 
 namespace Transitive\Core;
 
+function isImportable (string $filepath, string $method = __METHOD__) {
+    if(!is_file($filepath)) {
+        throw new ResourceException($method.' : file "'.$filepath.'" failed for import, ressource not found or not a file');
+        return false;
+    }
+    if(!is_readable($filepath)) {
+        throw new ResourceException($method.' : file "'.$filepath.'" failed for import, ressource is not readable');
+        return false;
+    }
+}
+
 class WebView extends BasicView implements View
 {
     /**
@@ -82,12 +93,22 @@ class WebView extends BasicView implements View
     /**
      * @param string $key
      */
+/*
     public function printContent(string $key = null): void
     {
         if(!isset($key))
             if($this->hasContent('html'))
                 $key = 'html';
         echo $this->getContent($key)->asString();
+    }
+*/
+
+    /**
+     * @param string $key
+     */
+    public function getContentValue(string $key = null): ViewRessource
+    {
+        return new ViewRessource($this->getContent($key));
     }
 
     public function getHeadValue(): ViewRessource
@@ -166,6 +187,11 @@ class WebView extends BasicView implements View
                     $str .= $meta['raw'];
 
         return $str;
+    }
+
+    public function printMetas(): void
+    {
+        echo $this->getMetas();
     }
 
     /**
@@ -257,10 +283,8 @@ class WebView extends BasicView implements View
      */
     public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = false): bool
     {
-        if(!file_exists($filepath)) {
-            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, ressource doesn\'t exists');
-            return false;
-        }
+        return isImportable($filepath, __METHOD__);
+
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
         $this->addStyle(self::_getIncludeContents($filepath), $type);
@@ -277,10 +301,8 @@ class WebView extends BasicView implements View
      */
     public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = false): bool
     {
-        if(!file_exists($filepath)) {
-            throw new \Exception(__METHOD__.'file "'.$filepath.'" failed for import, ressource doesn\'t exists');
-            return false;
-        }
+        return isImportable($filepath);
+
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
         $this->addScript(self::_getIncludeContents($filepath), $type);
@@ -315,16 +337,30 @@ class WebView extends BasicView implements View
         return $content;
     }
 
-    public function printScripts(): void
+    public function printStyles(): void
     {
+        echo $this->getStyles();
+    }
+
+    public function getScripts(): string
+    {
+	    $str = '';
+
         if(isset($this->scripts))
             foreach($this->scripts as $script)
                 if(isset($script['content']))
-                    echo '<script type="'.$script['type'].'">'.$script['content'].'</script>';
+                    $str.= '<script type="'.$script['type'].'">'.$script['content'].'</script>';
                 elseif(isset($script['href']))
-                    echo '<script type="'.$script['type'].'" src="'.$script['href'].'"'.(($script['defer']) ? ' defer async' : '').'></script>';
+                    $str.= '<script type="'.$script['type'].'" src="'.$script['href'].'"'.(($script['defer']) ? ' defer async' : '').'></script>';
                 elseif(isset($script['raw']))
-                    echo $script['raw'];
+                    $str.= $script['raw'];
+
+        return $str;
+    }
+
+    public function printScripts(): void
+    {
+        echo $this->getScripts();
     }
 
     public function getScriptsContent(): string

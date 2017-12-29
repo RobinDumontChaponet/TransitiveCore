@@ -2,15 +2,43 @@
 
 namespace Transitive\Core;
 
+function getBestSupportedMimeType($mimeTypes = null) {
+    // Values will be stored in this array
+    $acceptTypes = array();
+    // divide it into parts in the place of a ","
+    $accept = explode(',', strtolower(str_replace(' ', '', $_SERVER['HTTP_ACCEPT'])));
+    foreach ($accept as $a) {
+        // the default quality is 1.
+        $q = 1;
+        // check if there is a different quality
+        if (strpos($a, ';q=')) {
+            // divide "mime/type;q=X" into two parts: "mime/type" i "X"
+            list($a, $q) = explode(';q=', $a);
+        }
+        // mime-type $a is accepted with the quality $q
+        // WARNING: $q == 0 means, that mime-type isn’t supported!
+        $acceptTypes[$a] = $q;
+    }
+    arsort($acceptTypes);
+    // if no parameter was passed, just return parsed data
+    if (!$mimeTypes) return $acceptTypes;
+    $mimeTypes = array_map('strtolower', (array) $mimeTypes);
+    // let’s check our supported types:
+    foreach ($acceptTypes as $mime => $q) {
+       if ($q && in_array($mime, $mimeTypes)) return $mime;
+    }
+    // no mime-type found
+    return null;
+}
+
 class WebFront implements FrontController
 {
-    /**
+    private $httpErrorRoute;
+    private static $defaultHttpErrorRoute;
+
+	/**
      * @var array Router
      */
-
-    private $httpErrorRoute;
-    public static $defaultHttpErrorRoute;
-
     private $routers;
     private $route;
     public $layout;
@@ -29,10 +57,10 @@ class WebFront implements FrontController
     );
     public function __construct()
     {
-        $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+//         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
         $this->obClean = true;
         $this->obContent = '';
-        $cwd = dirname(getcwd()).'/';
+//         $cwd = dirname(getcwd()).'/';
         $this->layout = function () { ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
@@ -98,10 +126,8 @@ class WebFront implements FrontController
     }
     public function execute(string $queryURL = null): bool
     {
-/*
-        if(empty($queryURL))
-            $queryURL = 'genericHttpErrorHandler';
-*/
+	    $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
@@ -179,14 +205,13 @@ class WebFront implements FrontController
 		if(isset($this->route->view))
 	        $this->route->view->printStyles();
     }
-*/
-/*
     public function printScripts(): void
     {
 	    if(isset($this->route->view))
 	        $this->route->view->printScripts();
     }
 */
+
     /**
      * @param string $key
      */
@@ -198,10 +223,10 @@ class WebFront implements FrontController
     /**
      * @param string $key
      */
-    public function getContent(string $key = null): ?string
+    public function getContent(string $key = null): ViewRessource
     {
 	    if(isset($this->route->view))
-	        return $this->route->view->getContent($key);
+	        return $this->route->view->getContentValue($key);
     }
     /**
      * @param string $key
@@ -243,12 +268,18 @@ class WebFront implements FrontController
 	    if(isset($this->route->view))
 	        $this->route->view->printDocument();
     }
-/*
-    public function __debugInfo():void
+
+	public function __debugInfo()
     {
-        // TODO: implement here
+		return [
+			'httpErrorRoute' => $this->httpErrorRoute,
+			'routers' => $this->routers,
+			'route' => $this->route,
+			'obClean' => $this->obClean,
+			'obContent' => $this->obContent,
+			'executed' => $this->executed,
+		];
     }
-*/
     public function __toString(): string
     {
         ob_start();
@@ -297,14 +328,18 @@ class WebFront implements FrontController
             case 'application/vnd.transitive.content+yaml':
                 echo $this->getContent()->asYAML();
             break;
+/*
             case 'application/json':
                 if($this->hasContent('api'))
                     echo $this->getContent('api')->asJson();
             break;
+*/
+/*
             case 'application/xml':
                 if($this->hasContent('api'))
                     echo $this->getContent('api')->asXML();
             break;
+*/
             default:
                 switch(gettype($layout = $this->layout)) {
                     case 'string': case 'integer': case 'double':
@@ -374,6 +409,15 @@ class WebFront implements FrontController
     {
 	    return $this->route;
     }
+
+    public static function setDefaultHttpErrorRoute(Route $route): void
+    {
+	    self::$defaultHttpErrorRoute = $route;
+    }
+    public function setHttpErrorRoute(Route $route): void
+    {
+	    $this->httpErrorRoute = $route;
+    }
 }
 
-WebFront::$defaultHttpErrorRoute = new Route(dirname(getcwd()).'/presenters/genericHttpErrorHandler.presenter.php', dirname(getcwd()).'/views/genericHttpErrorHandler.view.php');
+WebFront::setDefaultHttpErrorRoute(new Route(dirname(getcwd()).'/presenters/genericHttpErrorHandler.php', dirname(getcwd()).'/views/genericHttpErrorHandler.php'));
