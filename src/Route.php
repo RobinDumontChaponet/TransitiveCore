@@ -62,10 +62,10 @@ class Route
 		$view = $this->getView();
 
         if(is_string($view)) {
-	        if(is_file($view)) {
-	     	   $view = new WebView();
+			if(is_file($view)) {
+				$view = new WebView();
 
-		 	   $obContent .= self::includeView($this->getView(), ['view'=>$view], $this->prefix, $binder->obClean);
+				$obContent .= self::includeView($this->getView(), ['view'=>$view], $this->prefix, $binder->obClean);
 
 		 	   $this->setView($view);
 		 	} else {
@@ -101,6 +101,11 @@ class Route
      */
     public $view;
 
+	public function hasPresenter(): bool
+    {
+        return isset($this->presenter) && $this->presenter instanceof Presenter;
+    }
+
     /**
      * @return Presenter | string
      */
@@ -112,6 +117,11 @@ class Route
     public function setPresenter(Presenter $presenter)
     {
         return $this->presenter = $presenter;
+    }
+
+	public function hasView(): bool
+    {
+        return isset($this->view) && $this->view instanceof View;
     }
 
     /**

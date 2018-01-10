@@ -24,7 +24,7 @@ interface FrontController
      */
     public function getView(): ?View;
 
-    public function execute(string $queryURL = null): bool;
+    public function execute(string $queryURL = null): ?Route;
 
     /**
      * @param string $prefix

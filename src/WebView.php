@@ -2,17 +2,6 @@
 
 namespace Transitive\Core;
 
-function isImportable (string $filepath, string $method = __METHOD__) {
-    if(!is_file($filepath)) {
-        throw new ResourceException($method.' : file "'.$filepath.'" failed for import, ressource not found or not a file');
-        return false;
-    }
-    if(!is_readable($filepath)) {
-        throw new ResourceException($method.' : file "'.$filepath.'" failed for import, ressource is not readable');
-        return false;
-    }
-}
-
 class WebView extends BasicView implements View
 {
     /**
@@ -283,7 +272,14 @@ class WebView extends BasicView implements View
      */
     public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = false): bool
     {
-        return isImportable($filepath, __METHOD__);
+		if(!is_file($filepath)) {
+			trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
+			return false;
+		}
+		if(!is_readable($filepath)) {
+			trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
+			return false;
+    	}
 
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
@@ -301,7 +297,14 @@ class WebView extends BasicView implements View
      */
     public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = false): bool
     {
-        return isImportable($filepath);
+		if(!is_file($filepath)) {
+			trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
+			return false;
+		}
+		if(!is_readable($filepath)) {
+			trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
+			return false;
+    	}
 
         if($cacheBust)
             $filepath = self::cacheBust($filepath);

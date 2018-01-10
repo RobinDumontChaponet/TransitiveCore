@@ -124,7 +124,7 @@ class WebFront implements FrontController
                 return $testRoute;
         throw new RoutingException('No route.');
     }
-    public function execute(string $queryURL = null): bool
+    public function execute(string $queryURL = null): ?Route
     {
 	    $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
 
@@ -162,7 +162,7 @@ class WebFront implements FrontController
             }
             header('Vary: X-Requested-With,Content-Type');
 
-            return true;
+            return $this->route;
         }
     }
 

@@ -46,7 +46,7 @@ class BasicFront implements FrontController
      */
     public function hasView(): bool
     {
-        return isset($this->view);
+        return $this->route->hasView();
     }
     /**
      * @return View
@@ -62,7 +62,7 @@ class BasicFront implements FrontController
                 return $testRoute;
         throw new RoutingException('No route.');
     }
-    public function execute(string $queryURL = null): bool
+    public function execute(string $queryURL = null): ?Route
     {
 /*
         if(empty($queryURL))
@@ -77,7 +77,7 @@ class BasicFront implements FrontController
 
             $this->executed = true;
 
-            return true;
+            return $this->route;
         }
     }
 
