@@ -4,21 +4,21 @@ namespace Transitive\Core;
 
 class Route
 {
-	private static function _include($exposedVariables, $_prefix) {
-		extract($exposedVariables, (!empty($_prefix))?EXTR_PREFIX_ALL:null, $_prefix);
-		unset($exposedVariables);
+    private static function _include($exposedVariables, $_prefix) {
+        extract($exposedVariables, (!empty($_prefix)) ? EXTR_PREFIX_ALL : null, $_prefix);
+        unset($exposedVariables);
 
-		include ${$_prefix.((!empty($_prefix))?'_':'').'path'};
-	}
+        include ${$_prefix.((!empty($_prefix)) ? '_' : '').'path'};
+    }
 
     private static function includePresenter(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
     {
-		if($obClean) {
+        if($obClean) {
             ob_start();
-			ob_clean();
-		}
+            ob_clean();
+        }
 
-		self::_include(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables, $_prefix);
+        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
         if($obClean)
             return ob_get_clean();
@@ -28,53 +28,54 @@ class Route
     {
         if($obClean) {
             ob_start();
-			ob_clean();
-		}
+            ob_clean();
+        }
 
-		self::_include(['path'=>$path, 'obClean'=>$obClean]+$exposedVariables, $_prefix);
+        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
         if($obClean)
             return ob_get_clean();
     }
 
-    public function execute(FrontController $binder)
+    public function execute(array $exposedVariablesPresenter = null, array $exposedVariablesView = null, bool $obClean = true)
     {
         $obContent = '';
+        if(!is_array($exposedVariablesView) && is_array($exposedVariablesPresenter))
+            $exposedVariablesView = $exposedVariablesPresenter;
 
-		// Presenter
-		$presenter = $this->getPresenter();
+        // Presenter
+        $presenter = $this->getPresenter();
 
         if(is_string($presenter)) {
-        	if(is_file($presenter)) {
-		        $presenter = new Presenter();
+            if(is_file($presenter)) {
+                $presenter = new Presenter();
 
-		        $obContent .= self::includePresenter($this->getPresenter(), ['binder'=>$binder, 'presenter'=>$presenter], $this->prefix, $binder->obClean);
+                $obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
 
-				$this->setPresenter($presenter);
-			} else {
+                $this->setPresenter($presenter);
+            } else {
                 $this->setView();
                 throw new RoutingException('Presenter not found', 404);
             }
         }
 
-
-		// View
-		$view = $this->getView();
+        // View
+        $view = $this->getView();
 
         if(is_string($view)) {
-			if(is_file($view)) {
-				$view = new WebView();
+            if(is_file($view)) {
+                $view = new WebView();
 
-				$obContent .= self::includeView($this->getView(), ['view'=>$view], $this->prefix, $binder->obClean);
+                $obContent .= self::includeView($this->getView(), $exposedVariablesView + ['view' => $view], $this->prefix, $obClean);
 
-		 	   $this->setView($view);
-		 	} else {
+                $this->setView($view);
+            } else {
                 throw new RoutingException('View not found', 404);
             }
         }
 
-	    if(is_object($this->view))
-			$this->view->setData($this->presenter->getData());
+        if(is_object($this->view))
+            $this->view->setData($this->presenter->getData());
 
         return $obContent;
     }
@@ -82,14 +83,14 @@ class Route
     public function __construct($presenter, $view = null, string $prefix = null)
     {
         $this->presenter = $presenter;
-		$this->view = $view;
-		$this->prefix = $prefix;
+        $this->view = $view;
+        $this->prefix = $prefix;
     }
 
-	/**
-	 * @var String | null : prefix for exposed variables
-	 */
-	private $prefix;
+    /**
+     * @var string | null : prefix for exposed variables
+     */
+    private $prefix;
 
     /**
      * @var Presenter | string
@@ -101,7 +102,7 @@ class Route
      */
     public $view;
 
-	public function hasPresenter(): bool
+    public function hasPresenter(): bool
     {
         return isset($this->presenter) && $this->presenter instanceof Presenter;
     }
@@ -119,7 +120,7 @@ class Route
         return $this->presenter = $presenter;
     }
 
-	public function hasView(): bool
+    public function hasView(): bool
     {
         return isset($this->view) && $this->view instanceof View;
     }
@@ -132,7 +133,7 @@ class Route
         return $this->view;
     }
 
-	public function setView(View $view = null)
+    public function setView(View $view = null)
     {
         return $this->view = $view;
     }

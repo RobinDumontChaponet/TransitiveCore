@@ -92,7 +92,7 @@ class BasicView implements View
                 return $content;
             break;
             case 'object':
-                if(get_class($content) == 'Closure') {
+                if('Closure' == get_class($content)) {
                     ob_start();
                     ob_clean();
                     $returned = $content($this->data);
@@ -176,20 +176,12 @@ class BasicView implements View
         );
     }
 
-
-
-
-
-
 /*
     public function printContent(string $key = null): void
     {
         echo $this->getContent($key)->asString();
     }
 */
-
-
-
 
     public function __toString(): string
     {

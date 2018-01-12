@@ -58,8 +58,8 @@ interface FrontController
 /*
     public function printContent(string $key = null): void
     {
-	    if(isset($this->route->view))
-        	$this->route->view->printContent($key);
+        if(isset($this->route->view))
+            $this->route->view->printContent($key);
     }
 */
     public function getHead(): ViewResource;
@@ -101,6 +101,7 @@ interface FrontController
             return false;
     }
 */
+
     /**
      * @return array
      */

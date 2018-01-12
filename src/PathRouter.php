@@ -19,9 +19,9 @@ class PathRouter implements Router
     public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all')
     {
         $this->presentersPath = $presentersPath;
-        $this->presentersPath .= (substr($presentersPath, -1) != '/') ? '/' : '';
+        $this->presentersPath .= ('/' != substr($presentersPath, -1)) ? '/' : '';
         $this->viewsPath = $viewsPath ?? $presentersPath;
-        $this->viewsPath .= (substr($viewsPath, -1) != '/') ? '/' : '';
+        $this->viewsPath .= ('/' != substr($viewsPath, -1)) ? '/' : '';
 
         $this->method = $method;
         $this->separator = $separator;
@@ -47,10 +47,10 @@ class PathRouter implements Router
     private static function _real(string $filename, string $separator = '/') {
         $path = [];
         foreach(explode($separator, $filename) as $part) {
-            if (empty($part) || $part === '.')
+            if (empty($part) || '.' === $part)
                 continue;
 
-            if ($part !== '..')
+            if ('..' !== $part)
                 array_push($path, $part);
             elseif (count($path) > 0)
                 array_pop($path);

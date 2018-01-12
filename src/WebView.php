@@ -272,14 +272,16 @@ class WebView extends BasicView implements View
      */
     public function importStyleSheet(string $filepath, string $type = 'text/css', bool $cacheBust = false): bool
     {
-		if(!is_file($filepath)) {
-			trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
-			return false;
-		}
-		if(!is_readable($filepath)) {
-			trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
-			return false;
-    	}
+        if(!is_file($filepath)) {
+            trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
+
+            return false;
+        }
+        if(!is_readable($filepath)) {
+            trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
+
+            return false;
+        }
 
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
@@ -297,14 +299,16 @@ class WebView extends BasicView implements View
      */
     public function importScript(string $filepath, string $type = 'text/javascript', bool $cacheBust = false): bool
     {
-		if(!is_file($filepath)) {
-			trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
-			return false;
-		}
-		if(!is_readable($filepath)) {
-			trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
-			return false;
-    	}
+        if(!is_file($filepath)) {
+            trigger_error('file "'.$filepath.'" failed for import, ressource not found or not a file', E_USER_NOTICE);
+
+            return false;
+        }
+        if(!is_readable($filepath)) {
+            trigger_error('file "'.$filepath.'" failed for import, ressource is not readable', E_USER_NOTICE);
+
+            return false;
+        }
 
         if($cacheBust)
             $filepath = self::cacheBust($filepath);
@@ -347,16 +351,16 @@ class WebView extends BasicView implements View
 
     public function getScripts(): string
     {
-	    $str = '';
+        $str = '';
 
         if(isset($this->scripts))
             foreach($this->scripts as $script)
                 if(isset($script['content']))
-                    $str.= '<script type="'.$script['type'].'">'.$script['content'].'</script>';
+                    $str .= '<script type="'.$script['type'].'">'.$script['content'].'</script>';
                 elseif(isset($script['href']))
-                    $str.= '<script type="'.$script['type'].'" src="'.$script['href'].'"'.(($script['defer']) ? ' defer async' : '').'></script>';
+                    $str .= '<script type="'.$script['type'].'" src="'.$script['href'].'"'.(($script['defer']) ? ' defer async' : '').'></script>';
                 elseif(isset($script['raw']))
-                    $str.= $script['raw'];
+                    $str .= $script['raw'];
 
         return $str;
     }

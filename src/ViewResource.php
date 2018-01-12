@@ -48,7 +48,7 @@ class ViewResource
 
     public function __toString()
     {
-        return $this->{$this->default}()??'';
+        return $this->{$this->default}() ?? '';
     }
 
     public function __debugInfo()

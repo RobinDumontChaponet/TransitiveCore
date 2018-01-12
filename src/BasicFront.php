@@ -1,14 +1,16 @@
 <?php
+
 namespace Transitive\Core;
 
 class BasicFront implements FrontController
 {
+    private $layout;
+
     /**
      * @var array Router
      */
     private $routers;
     private $route;
-    public $layout;
     private $contentType;
     public $obClean;
     private $obContent;
@@ -17,23 +19,32 @@ class BasicFront implements FrontController
     public function __construct()
     {
 //         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+
         $this->obClean = true;
         $this->obContent = '';
-        $cwd = dirname(getcwd()).'/';
-}
+
+        $this->layout = new Route(new Presenter(), new BasicView());
+
+        $this->layout->getView()->content = function ($data) {
+            echo $data['view'];
+        };
+    }
+
     public function getContentType(): ?string
     {
         return $this->contentType;
     }
+
     public function isAPI(): string
     {
-        return $this->getContentType() == 'application/json' || $this->getContentType() == 'application/xml';
+        return 'application/json' == $this->getContentType() || 'application/xml' == $this->getContentType();
     }
 
     public function getObContent(): string
     {
         return $this->obContent;
     }
+
     /**
      * @return Presenter
      */
@@ -41,6 +52,7 @@ class BasicFront implements FrontController
     {
         return $this->route->getPresenter();
     }
+
     /**
      * @return bool
      */
@@ -48,6 +60,7 @@ class BasicFront implements FrontController
     {
         return $this->route->hasView();
     }
+
     /**
      * @return View
      */
@@ -55,27 +68,32 @@ class BasicFront implements FrontController
     {
         return $this->route->getView();
     }
+
     private function _getRoute(string $query): ?Route
     {
         foreach($this->routers as $router)
-            if(($testRoute = $router->execute($query)) !== null)
+            if(null !== ($testRoute = $router->execute($query)))
                 return $testRoute;
         throw new RoutingException('No route.');
     }
+
     public function execute(string $queryURL = null): ?Route
     {
-/*
-        if(empty($queryURL))
-            $queryURL = 'genericHttpErrorHandler';
-*/
+        $exposedVariables = ['binder' => $this];
+
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
-			$this->route = $this->_getRoute($queryURL);
-	        if(isset($this->route))
-				$this->obContent = $this->route->execute($this);
+            $this->route = $this->_getRoute($queryURL);
+            if(isset($this->route))
+                $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
 
             $this->executed = true;
+
+            $content = ['view' => $this->getView()];
+
+            $this->layout->getPresenter()->setData($content);
+            $this->layout->execute(null, null, $this->obClean);
 
             return $this->route;
         }
@@ -93,8 +111,10 @@ class BasicFront implements FrontController
         $title = $this->view->getTitle();
         if(!empty($title))
             return $prefix.$separator.$title.$endSeparator;
+
         return $prefix;
     }
+
     /**
      * @param string $prefix
      * @param string $separator
@@ -102,7 +122,7 @@ class BasicFront implements FrontController
      */
     public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
-        $title = (isset($this->route->view))? $this->route->view->getTitle() : '';
+        $title = (isset($this->route->view)) ? $this->route->view->getTitle() : '';
         echo '<title>';
         if(!empty($prefix)) {
             echo $prefix;
@@ -120,57 +140,65 @@ class BasicFront implements FrontController
      */
     public function hasContent(string $key = null): bool
     {
-	    if(isset($this->route->view))
-	        return $this->route->view->hasContent($key);
+        if(isset($this->route->view))
+            return $this->route->view->hasContent($key);
     }
+
     /**
      * @param string $key
      */
     public function getContent(string $key = null)
     {
-	    if(isset($this->route->view))
-	        return $this->route->view->getContent($key);
+        if(isset($this->route->view))
+            return $this->route->view->getContent($key);
     }
+
     /**
      * @param string $key
      */
 /*
     public function printContent(string $key = null): void
     {
-	    if(isset($this->route->view))
-        	$this->route->view->printContent($key);
+        if(isset($this->route->view))
+            $this->route->view->printContent($key);
     }
 */
     public function getHead(): ViewResource
     {
-	    if(isset($this->route->view))
-	        return $this->route->view->getHeadValue();
+        if(isset($this->route->view))
+            return $this->route->view->getHeadValue();
     }
+
     public function printHead(): void
     {
-	    if(isset($this->route->view))
-	        $this->route->view->printHead();
+        if(isset($this->route->view))
+            $this->route->view->printHead();
     }
+
     public function getBody()
     {
-	    if(isset($this->route->view))
-	        return $this->route->view->getBody();
+        if(isset($this->route->view))
+            return $this->route->view->getBody();
     }
+
     public function printBody(): void
     {
-	    if(isset($this->route->view))
-        	$this->route->view->printBody();
+        if(isset($this->route->view))
+            $this->route->view->printBody();
     }
+
     public function getDocument()
     {
-	    if(isset($this->route->view))
-	        return $this->route->view->getDocument();
+        if(isset($this->route->view))
+            return $this->route->view->getDocument();
     }
+
     public function printDocument(): void
     {
-	    if(isset($this->route->view))
-	        $this->route->view->printDocument();
+        if(isset($this->route->view))
+            $this->route->view->printDocument();
     }
+
 /*
     public function __debugInfo():void
     {
@@ -182,11 +210,13 @@ class BasicFront implements FrontController
         ob_start();
         ob_clean();
         $this->print();
+
         return ob_get_clean();
     }
+
     public function print($contentType = null): void
     {
-        if($contentType == null)
+        if(null == $contentType)
             $contentType = $this->contentType;
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
@@ -239,7 +269,7 @@ class BasicFront implements FrontController
                         echo $layout;
                     break;
                     case 'object':
-                        if(get_class($layout) == 'Closure')
+                        if('Closure' == get_class($layout))
                             $layout($this);
                     break;
                     default:
@@ -255,6 +285,7 @@ class BasicFront implements FrontController
     {
         return $this->routers;
     }
+
     /**
      * @param array $routers
      */
@@ -262,6 +293,7 @@ class BasicFront implements FrontController
     {
         $this->routers = $routers;
     }
+
     /**
      * @param Router $router
      */
@@ -269,6 +301,7 @@ class BasicFront implements FrontController
     {
         $this->routers[] = $router;
     }
+
     public function removeRouter(Router $router): bool
     {
         // TODO: implement here
@@ -276,6 +309,6 @@ class BasicFront implements FrontController
 
     public function getRoute(): ?Route
     {
-	    return $this->route;
+        return $this->route;
     }
 }
