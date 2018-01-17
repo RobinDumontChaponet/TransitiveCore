@@ -31,25 +31,18 @@ function getBestSupportedMimeType($mimeTypes = null) {
     return null;
 }
 
+/**
+ * WebFront class.
+ *
+ * @extends BasicFront
+ * @implements FrontController
+ */
 class WebFront extends BasicFront implements FrontController
 {
-    /**
-     * @var Route
-     */
-    private $layout;
-
     private $httpErrorRoute;
     private static $defaultHttpErrorRoute;
 
-    /**
-     * @var array Router
-     */
-    private $routers;
-    private $route;
     private $contentType;
-    public $obClean;
-    private $obContent;
-    private $executed = false;
     public static $mimeTypes = array(
         'application/xhtml+xml', 'text/html',
         'application/json', 'application/xml',
@@ -62,19 +55,15 @@ class WebFront extends BasicFront implements FrontController
 
     public function __construct()
     {
-//         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
         $this->obClean = true;
         $this->obContent = '';
-//         $cwd = dirname(getcwd()).'/';
 
         $this->layout = new Route(new Presenter(), new BasicView());
 
         $this->layout->getView()->content = function ($data) { ?>
 <!DOCTYPE html>
-<!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
-<!--[if IE 7]>   <html class="lt-ie9 lt-ie8" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
-<!--[if IE 8]>   <html class="lt-ie9" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
-<!--[if gt IE 8]><html class="get-ie9" xmlns="http://www.w3.org/1999/xhtml"><![endif]-->
+<html>
 <head>
 <meta charset="UTF-8">
 <?php $data['view']->printMetas(); ?>
@@ -83,8 +72,7 @@ class WebFront extends BasicFront implements FrontController
 <?php $data['view']->printScripts(); ?>
 </head>
 <body>
-<?php //$this->printContent();?>
-<?php echo $data['view']; ?>
+<?= $data['view']; ?>
 </body>
 </html>
 <?php  };
@@ -95,51 +83,16 @@ class WebFront extends BasicFront implements FrontController
         return $this->contentType;
     }
 
+/*
     public function isAPI(): string
     {
         return 'application/json' == $this->getContentType() || 'application/xml' == $this->getContentType();
     }
+*/
 
     public function getRequestMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
-    }
-
-    public function getObContent(): string
-    {
-        return $this->obContent;
-    }
-
-    /**
-     * @return Presenter
-     */
-    public function getPresenter(): Presenter
-    {
-        return $this->route->getPresenter();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasView(): bool
-    {
-        return isset($this->route->view);
-    }
-
-    /**
-     * @return View
-     */
-    public function getView(): ?View
-    {
-        return $this->route->getView();
-    }
-
-    private function _getRoute(string $query): ?Route
-    {
-        foreach($this->routers as $router)
-            if(null !== ($testRoute = $router->execute($query)))
-                return $testRoute;
-        throw new RoutingException('No route.');
     }
 
     public function execute(string $queryURL = null): ?Route
@@ -155,8 +108,12 @@ class WebFront extends BasicFront implements FrontController
             foreach($routes as $route) {
                 if(isset($route))
                     try {
-                        $this->route = $route;
                         $this->obContent = $route->execute($exposedVariables, [], $this->obClean);
+						$this->route = $route;
+/*
+						unset($routes);
+						unset($route);
+*/
 
                         break;
                     } catch(RoutingException $e) {
@@ -169,7 +126,7 @@ class WebFront extends BasicFront implements FrontController
             }
             $this->executed = true;
 
-            if($this->hasView() && !$this->getView()->hasContent()) {
+            if($this->route->hasView() && !$this->route->getView()->hasContent()) {
                 http_response_code(204);
                 $_SERVER['REDIRECT_STATUS'] = 204;
             }
@@ -182,126 +139,13 @@ class WebFront extends BasicFront implements FrontController
             }
             header('Vary: X-Requested-With,Content-Type');
 
-            $content = ['view' => $this->getView()];
+            $content = ['view' => $this->route->getView()];
 
             $this->layout->getPresenter()->setData($content);
             $this->layout->execute(null, null, $this->obClean);
 
             return $this->route;
         }
-    }
-
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     *
-     * @return string
-     */
-    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
-    {
-        $title = $this->route->view->getTitle();
-        if(!empty($title))
-            return $prefix.$separator.$title.$endSeparator;
-
-        return $prefix;
-    }
-
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     */
-    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
-    {
-        $title = (isset($this->route->view)) ? $this->route->view->getTitle() : '';
-        echo '<title>';
-        if(!empty($prefix)) {
-            echo $prefix;
-            if(!empty($title) && !empty($separator))
-                echo $separator;
-        }
-        echo $title;
-        if(!empty($endSeparator))
-            echo $endSeparator;
-        echo '</title>';
-    }
-
-/*
-    public function printStyles(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printStyles();
-    }
-    public function printScripts(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printScripts();
-    }
-*/
-
-    /**
-     * @param string $key
-     */
-    public function hasContent(string $key = null): bool
-    {
-        if(isset($this->route->view))
-            return $this->route->view->hasContent($key);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function getContent(string $key = null): ViewResource
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getContentValue($key);
-    }
-
-    /**
-     * @param string $key
-     */
-/*
-    public function printContent(string $key = null): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printContent($key);
-    }
-*/
-    public function getHead(): ViewResource
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getHeadValue();
-    }
-
-    public function printHead(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printHead();
-    }
-
-    public function getBody()
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getBody();
-    }
-
-    public function printBody(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printBody();
-    }
-
-    public function getDocument()
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getDocument();
-    }
-
-    public function printDocument(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printDocument();
     }
 
     public function __debugInfo()
@@ -318,53 +162,49 @@ class WebFront extends BasicFront implements FrontController
 
     public function __toString(): string
     {
-        ob_start();
-        ob_clean();
-        $this->print();
-
-        return ob_get_clean();
+	    return $this->getContent();
     }
 
-    public function print($contentType = null): void
+    public function getContent(string $contentType = null): string
     {
-        if(null == $contentType)
+	    if(null == $contentType)
             $contentType = $this->contentType;
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
-                echo $this->getDocument();
+                return $this->route->getDocument();
             break;
             case 'application/vnd.transitive.document+xml':
-                echo $this->getDocument()->asXML('document');
+                return $this->route->getDocument()->asXML('document');
             break;
             case 'application/vnd.transitive.document+yaml':
-                echo $this->getDocument()->asYAML();
+                return $this->route->getDocument()->asYAML();
             break;
             case 'application/vnd.transitive.head+json':
-                echo $this->getHead()->asJson();
+                return $this->route->getHead()->asJson();
             break;
             case 'application/vnd.transitive.head+xml':
-                echo $this->getHead()->asXML('head');
+                return $this->route->getHead()->asXML('head');
             break;
             case 'application/vnd.transitive.head+yaml':
-                echo $this->getHead()->asYAML();
+                return $this->route->getHead()->asYAML();
             break;
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
-                echo $this->getContent();
+                return $this->route->getContent();
             break;
             case 'application/vnd.transitive.content+css':
-                echo $this->getView()->getStylesContent();
+                return $this->route->getView()->getStylesContent();
             break;
             case 'application/vnd.transitive.content+javascript':
-                echo $this->getView()->getScriptsContent();
+                return $this->route->getView()->getScriptsContent();
             break;
             case 'application/vnd.transitive.content+json':
-                echo $this->getContent()->asJson();
+                return $this->route->getContent()->asJson();
             break;
             case 'application/vnd.transitive.content+xml':
-                echo $this->getContent()->asXML('content');
+                return $this->route->getContent()->asXML('content');
             break;
             case 'application/vnd.transitive.content+yaml':
-                echo $this->getContent()->asYAML();
+                return $this->route->getContent()->asYAML();
             break;
 /*
             case 'application/json':
@@ -379,20 +219,7 @@ class WebFront extends BasicFront implements FrontController
             break;
 */
             default:
-/*
-                switch(gettype($layout = $this->layout->getView())) {
-                    case 'string': case 'integer': case 'double':
-                        echo $layout;
-                    break;
-                    case 'object':
-                        if(get_class($layout) == 'Closure')
-                            $layout($this);
-                    break;
-                    default:
-                        echo 'No Layout';
-                }
-*/
-                echo $this->layout->getView();
+                return $this->layout->getView();
         }
     }
 
@@ -424,40 +251,6 @@ class WebFront extends BasicFront implements FrontController
             return true;
         } else
             return false;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRouters(): array
-    {
-        return $this->routers;
-    }
-
-    /**
-     * @param array $routers
-     */
-    public function setRouters(array $routers): void
-    {
-        $this->routers = $routers;
-    }
-
-    /**
-     * @param Router $router
-     */
-    public function addRouter(Router $router): void
-    {
-        $this->routers[] = $router;
-    }
-
-    public function removeRouter(Router $router): bool
-    {
-        // TODO: implement here
-    }
-
-    public function getRoute(): ?Route
-    {
-        return $this->route;
     }
 
     public static function setDefaultHttpErrorRoute(Route $route): void

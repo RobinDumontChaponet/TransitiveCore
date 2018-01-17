@@ -2,6 +2,9 @@
 
 namespace Transitive\Core;
 
+/**
+ * Route class.
+ */
 class Route
 {
     private static function _include($exposedVariables, $_prefix) {
@@ -136,5 +139,107 @@ class Route
     public function setView(View $view = null)
     {
         return $this->view = $view;
+    }
+
+
+
+    /**
+     * @param string $prefix
+     * @param string $separator
+     * @param string $endSeparator
+     *
+     * @return string
+     */
+    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
+    {
+        $title = $this->view->getTitle();
+        if(!empty($title))
+            return $prefix.$separator.$title.$endSeparator;
+
+        return $prefix;
+    }
+
+    /**
+     * @param string $prefix
+     * @param string $separator
+     * @param string $endSeparator
+     */
+    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
+    {
+        $title = (isset($this->view)) ? $this->view->getTitle() : '';
+        echo '<title>';
+        if(!empty($prefix)) {
+            echo $prefix;
+            if(!empty($title) && !empty($separator))
+                echo $separator;
+        }
+        echo $title;
+        if(!empty($endSeparator))
+            echo $endSeparator;
+        echo '</title>';
+    }
+
+    /**
+     * @param string $key
+     */
+    public function hasContent(string $key = null): bool
+    {
+        if(isset($this->view))
+            return $this->view->hasContent($key);
+    }
+
+    /**
+     * @param string $key
+     */
+    public function getContent(string $key = null)
+    {
+        if(isset($this->view))
+            return $this->view->getContent($key);
+    }
+
+    /**
+     * @param string $key
+     */
+/*
+    public function printContent(string $key = null): void
+    {
+        if(isset($this->view))
+            $this->view->printContent($key);
+    }
+*/
+    public function getHead(): ViewResource
+    {
+        if(isset($this->view))
+            return $this->view->getHeadValue();
+    }
+
+    public function printHead(): void
+    {
+        if(isset($this->view))
+            $this->view->printHead();
+    }
+
+    public function getBody()
+    {
+        if(isset($this->view))
+            return $this->view->getBody();
+    }
+
+    public function printBody(): void
+    {
+        if(isset($this->view))
+            $this->view->printBody();
+    }
+
+    public function getDocument()
+    {
+        if(isset($this->view))
+            return $this->view->getDocument();
+    }
+
+    public function printDocument(): void
+    {
+        if(isset($this->view))
+            $this->view->printDocument();
     }
 }

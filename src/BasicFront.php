@@ -2,24 +2,26 @@
 
 namespace Transitive\Core;
 
+/**
+ * BasicFront class.
+ *
+ * @implements FrontController
+ */
 class BasicFront implements FrontController
 {
-    private $layout;
+    protected $layout;
 
     /**
      * @var array Router
      */
-    private $routers;
-    private $route;
-    private $contentType;
+    protected $routers;
+    protected $route;
     public $obClean;
-    private $obContent;
-    private $executed = false;
+    protected $obContent;
+    protected $executed = false;
 
     public function __construct()
     {
-//         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
-
         $this->obClean = true;
         $this->obContent = '';
 
@@ -35,41 +37,12 @@ class BasicFront implements FrontController
         return $this->contentType;
     }
 
-    public function isAPI(): string
-    {
-        return 'application/json' == $this->getContentType() || 'application/xml' == $this->getContentType();
-    }
-
     public function getObContent(): string
     {
         return $this->obContent;
     }
 
-    /**
-     * @return Presenter
-     */
-    public function getPresenter(): Presenter
-    {
-        return $this->route->getPresenter();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasView(): bool
-    {
-        return $this->route->hasView();
-    }
-
-    /**
-     * @return View
-     */
-    public function getView(): ?View
-    {
-        return $this->route->getView();
-    }
-
-    private function _getRoute(string $query): ?Route
+    protected function _getRoute(string $query): ?Route
     {
         foreach($this->routers as $router)
             if(null !== ($testRoute = $router->execute($query)))
@@ -90,7 +63,7 @@ class BasicFront implements FrontController
 
             $this->executed = true;
 
-            $content = ['view' => $this->getView()];
+            $content = ['view' => $this->route->getView()];
 
             $this->layout->getPresenter()->setData($content);
             $this->layout->execute(null, null, $this->obClean);
@@ -99,186 +72,94 @@ class BasicFront implements FrontController
         }
     }
 
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     *
-     * @return string
-     */
-    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
+    public function __debugInfo()
     {
-        $title = $this->view->getTitle();
-        if(!empty($title))
-            return $prefix.$separator.$title.$endSeparator;
-
-        return $prefix;
+        return [
+            'routers' => $this->routers,
+            'route' => $this->route,
+            'obClean' => $this->obClean,
+            'obContent' => $this->obContent,
+            'executed' => $this->executed,
+        ];
     }
 
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     */
-    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
-    {
-        $title = (isset($this->route->view)) ? $this->route->view->getTitle() : '';
-        echo '<title>';
-        if(!empty($prefix)) {
-            echo $prefix;
-            if(!empty($title) && !empty($separator))
-                echo $separator;
-        }
-        echo $title;
-        if(!empty($endSeparator))
-            echo $endSeparator;
-        echo '</title>';
-    }
-
-    /**
-     * @param string $key
-     */
-    public function hasContent(string $key = null): bool
-    {
-        if(isset($this->route->view))
-            return $this->route->view->hasContent($key);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function getContent(string $key = null)
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getContent($key);
-    }
-
-    /**
-     * @param string $key
-     */
-/*
-    public function printContent(string $key = null): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printContent($key);
-    }
-*/
-    public function getHead(): ViewResource
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getHeadValue();
-    }
-
-    public function printHead(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printHead();
-    }
-
-    public function getBody()
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getBody();
-    }
-
-    public function printBody(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printBody();
-    }
-
-    public function getDocument()
-    {
-        if(isset($this->route->view))
-            return $this->route->view->getDocument();
-    }
-
-    public function printDocument(): void
-    {
-        if(isset($this->route->view))
-            $this->route->view->printDocument();
-    }
-
-/*
-    public function __debugInfo():void
-    {
-        // TODO: implement here
-    }
-*/
     public function __toString(): string
     {
-        ob_start();
-        ob_clean();
-        $this->print();
-
-        return ob_get_clean();
+        return $this->getContent();
     }
 
-    public function print($contentType = null): void
+    public function getContent(string $contentType = null): string
     {
         if(null == $contentType)
             $contentType = $this->contentType;
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
-                echo $this->getDocument();
+                return $this->getDocument();
             break;
             case 'application/vnd.transitive.document+xml':
-                echo $this->getDocument()->asXML('document');
+                return $this->getDocument()->asXML('document');
             break;
             case 'application/vnd.transitive.document+yaml':
-                echo $this->getDocument()->asYAML();
+                return $this->getDocument()->asYAML();
             break;
             case 'application/vnd.transitive.head+json':
-                echo $this->getHead()->asJson();
+                return $this->getHead()->asJson();
             break;
             case 'application/vnd.transitive.head+xml':
-                echo $this->getHead()->asXML('head');
+                return $this->getHead()->asXML('head');
             break;
             case 'application/vnd.transitive.head+yaml':
-                echo $this->getHead()->asYAML();
+                return $this->getHead()->asYAML();
             break;
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
-                echo $this->getContent();
+                return $this->getContent();
             break;
             case 'application/vnd.transitive.content+css':
-                echo $this->getView()->getStylesContent();
+                return $this->getView()->getStylesContent();
             break;
             case 'application/vnd.transitive.content+javascript':
-                echo $this->getView()->getScriptsContent();
+                return $this->getView()->getScriptsContent();
             break;
             case 'application/vnd.transitive.content+json':
-                echo $this->getContent()->asJson();
+                return $this->getContent()->asJson();
             break;
             case 'application/vnd.transitive.content+xml':
-                echo $this->getContent()->asXML('content');
+                return $this->getContent()->asXML('content');
             break;
             case 'application/vnd.transitive.content+yaml':
-                echo $this->getContent()->asYAML();
+                return $this->getContent()->asYAML();
             break;
             case 'application/json':
                 if($this->hasContent('api'))
-                    echo $this->getContent('api')->asJson();
+                    return $this->getContent('api')->asJson();
             break;
             case 'application/xml':
                 if($this->hasContent('api'))
-                    echo $this->getContent('api')->asXML();
+                    return $this->getContent('api')->asXML();
             break;
             default:
                 switch(gettype($layout = $this->layout)) {
                     case 'string': case 'integer': case 'double':
-                        echo $layout;
+                        return $layout;
                     break;
                     case 'object':
-                        if('Closure' == get_class($layout))
+                        if('Closure' == get_class($layout)) {
+	                        ob_start();
+							ob_clean();
+
                             $layout($this);
+
+					        return ob_get_clean();
+                        }
                     break;
                     default:
-                        echo 'No Layout';
+                        return 'No Layout';
                 }
         }
     }
 
     /**
+	 * Get all routers.
      * @return array
      */
     public function getRouters(): array
@@ -287,6 +168,7 @@ class BasicFront implements FrontController
     }
 
     /**
+	 * Set routers list, replacing any previously set Router.
      * @param array $routers
      */
     public function setRouters(array $routers): void
@@ -295,6 +177,7 @@ class BasicFront implements FrontController
     }
 
     /**
+	 * Add specified Router.
      * @param Router $router
      */
     public function addRouter(Router $router): void
@@ -302,11 +185,21 @@ class BasicFront implements FrontController
         $this->routers[] = $router;
     }
 
+	/**
+	 * Remove specified Router.
+	 * @return bool
+     * @param Router $router
+	 * @todo implement this
+     */
     public function removeRouter(Router $router): bool
     {
-        // TODO: implement here
+	    return false;
     }
 
+	/**
+	 * Get current Route.
+	 * @return Route
+     */
     public function getRoute(): ?Route
     {
         return $this->route;
