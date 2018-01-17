@@ -1,0 +1,17 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('build')
+    ->exclude('docs')
+    ->exclude('test')
+    ->exclude('vendor')
+    ->in(__DIR__)
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules(array(
+        '@Symfony' => true,
+        'braces' => false,
+    ))
+    ->setFinder($finder)
+;

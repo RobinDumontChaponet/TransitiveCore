@@ -8,5 +8,5 @@ install:
   - composer install
 
 script:
-  - vendor/bin/phpcbf --standard=psr2 src/
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - composer check
+  - composer test
