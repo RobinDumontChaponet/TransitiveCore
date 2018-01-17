@@ -7,6 +7,7 @@ Code base for many of my simples (or not) projects now.
 
 [![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
 [![License](https://poser.pugx.org/transitive/core/license?format=flat-square)](https://packagist.org/packages/transitive/core)
+[![Build Status](https://travis-ci.org/RobinDumontChaponet/TransitiveCore.svg?branch=next)](https://travis-ci.org/RobinDumontChaponet/TransitiveCore)
 
 ## Installation
 
