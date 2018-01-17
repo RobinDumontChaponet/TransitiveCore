@@ -8,7 +8,7 @@ class ViewResource
      * @var mixed
      */
     public $value;
-    private $default;
+    private $defaultTransformer;
 
     private static function _arrayToXML(array $data, \SimpleXMLElement &$xmlData): void
     {
@@ -39,16 +39,24 @@ class ViewResource
         $this->value = $value;
     }
 
-    private function setDefault($default): void
+    private function setDefault($defaultTransformer): void
     {
-        if(!method_exists($this, $default))
-            throw new Exception('Default transfomer "'.$default.'" is not implemented.');
-        $this->default = $default;
+        if(!method_exists($this, $defaultTransformer))
+            throw new \InvalidArgumentException('Default transfomer "'.$defaultTransformer.'" is not implemented.');
+        $this->defaultTransformer = $defaultTransformer;
     }
 
     public function __toString()
     {
-        return $this->{$this->default}() ?? '';
+        if(isset($this->defaultTransformer)) {
+            $result = $this->{$this->defaultTransformer}();
+            if(is_object($result))
+                return var_export($result, true);
+            else
+                return $result;
+        }
+
+        return '';
     }
 
     public function __debugInfo()
@@ -99,7 +107,8 @@ class ViewResource
             $str .= $value.$glue;
         });
 
-        $str = substr($str, 0, 0 - strlen($glue));
+        if(strlen($glue))
+            $str = substr($str, 0, 0 - strlen($glue));
 
         return $str;
     }
