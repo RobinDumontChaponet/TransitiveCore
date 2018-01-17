@@ -4,6 +4,8 @@ php:
   - 7.1
 
 install:
+  - printf "\n" | pecl install yaml
+  - echo "extension=yaml.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer selfupdate
   - composer install
 
