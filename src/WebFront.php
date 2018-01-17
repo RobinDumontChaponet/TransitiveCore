@@ -55,7 +55,7 @@ class WebFront extends BasicFront implements FrontController
 
     public function __construct()
     {
-		$this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+        $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
         $this->obClean = true;
         $this->obContent = '';
 
@@ -109,10 +109,10 @@ class WebFront extends BasicFront implements FrontController
                 if(isset($route))
                     try {
                         $this->obContent = $route->execute($exposedVariables, [], $this->obClean);
-						$this->route = $route;
+                        $this->route = $route;
 /*
-						unset($routes);
-						unset($route);
+                        unset($routes);
+                        unset($route);
 */
 
                         break;
@@ -162,12 +162,12 @@ class WebFront extends BasicFront implements FrontController
 
     public function __toString(): string
     {
-	    return $this->getContent();
+        return $this->getContent();
     }
 
     public function getContent(string $contentType = null): string
     {
-	    if(null == $contentType)
+        if(null == $contentType)
             $contentType = $this->contentType;
         switch($contentType) {
             case 'application/vnd.transitive.document+json':

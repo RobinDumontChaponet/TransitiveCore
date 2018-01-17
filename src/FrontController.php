@@ -4,13 +4,14 @@ namespace Transitive\Core;
 
 interface FrontController
 {
-	/**
+    /**
      * @return string
      */
     public function getObContent(): string;
 
-	/**
+    /**
      * @return Route
+     *
      * @param string $queryUrl = null
      */
     public function execute(string $queryURL = null): ?Route;
@@ -32,6 +33,7 @@ interface FrontController
 
     /**
      * @return bool
+     *
      * @param Router $router
      */
     public function removeRouter(Router $router): bool;
@@ -41,9 +43,11 @@ interface FrontController
      */
     public function getRoute(): ?Route;
 
-	/**
-	 * Get calculated content.
+    /**
+     * Get calculated content.
+     *
      * @return string
+     *
      * @param string $contentType = null
      */
     public function getContent(string $contentType = null): string;

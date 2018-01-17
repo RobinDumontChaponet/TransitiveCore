@@ -141,8 +141,6 @@ class Route
         return $this->view = $view;
     }
 
-
-
     /**
      * @param string $prefix
      * @param string $separator

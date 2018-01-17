@@ -137,29 +137,15 @@ class BasicFront implements FrontController
                 if($this->hasContent('api'))
                     return $this->getContent('api')->asXML();
             break;
+
             default:
-                switch(gettype($layout = $this->layout)) {
-                    case 'string': case 'integer': case 'double':
-                        return $layout;
-                    break;
-                    case 'object':
-                        if('Closure' == get_class($layout)) {
-	                        ob_start();
-							ob_clean();
-
-                            $layout($this);
-
-					        return ob_get_clean();
-                        }
-                    break;
-                    default:
-                        return 'No Layout';
-                }
+                return $this->layout->getView();
         }
     }
 
     /**
-	 * Get all routers.
+     * Get all routers.
+     *
      * @return array
      */
     public function getRouters(): array
@@ -168,7 +154,8 @@ class BasicFront implements FrontController
     }
 
     /**
-	 * Set routers list, replacing any previously set Router.
+     * Set routers list, replacing any previously set Router.
+     *
      * @param array $routers
      */
     public function setRouters(array $routers): void
@@ -177,7 +164,8 @@ class BasicFront implements FrontController
     }
 
     /**
-	 * Add specified Router.
+     * Add specified Router.
+     *
      * @param Router $router
      */
     public function addRouter(Router $router): void
@@ -185,20 +173,24 @@ class BasicFront implements FrontController
         $this->routers[] = $router;
     }
 
-	/**
-	 * Remove specified Router.
-	 * @return bool
+    /**
+     * Remove specified Router.
+     *
+     * @return bool
+     *
      * @param Router $router
-	 * @todo implement this
+     *
+     * @todo implement this
      */
     public function removeRouter(Router $router): bool
     {
-	    return false;
+        return false;
     }
 
-	/**
-	 * Get current Route.
-	 * @return Route
+    /**
+     * Get current Route.
+     *
+     * @return Route
      */
     public function getRoute(): ?Route
     {
