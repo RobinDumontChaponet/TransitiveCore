@@ -9,18 +9,36 @@ class Presenter
      */
     public $data;
 
+    /**
+     * __construct function.
+     *
+     * @access public
+     * @return void
+     */
     public function __construct()
     {
         $this->data = array();
     }
 
+
+
+	/**
+	 * Get whole data array
+	 *
+	 * @access public
+	 * @return &array
+	 */
     public function &getData(): array
     {
         return $this->data;
     }
 
     /**
-     * @param array $data
+	 * Set data array
+	 *
+	 * @access public
+     * @param array &$data
+	 * @return void
      */
     public function setData(array &$data): void
     {
@@ -28,19 +46,35 @@ class Presenter
     }
 
     /**
-     * @param array $data
+	 * Add data as key/value pair
+	 *
+	 * @access public
+     * @param mixed $key
+     * @param mixed $value = null
+	 * @return void
      */
     public function addData($key, $value = null): void
     {
         $this->data[$key] = $value;
     }
 
+	/**
+	 * Add data as key/value pair
+	 *
+	 * @access public
+     * @param mixed $key
+     * @param mixed $value = null
+	 * @return void
+     * @codeCoverageIgnore
+     */
     public function add($key, $value = null): void
     {
         $this->addData($key, $value);
     }
 
-    // pretty useless for now…
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __debugInfo()
     {
         return array(

@@ -46,6 +46,9 @@ class ViewResource
         $this->defaultTransformer = $defaultTransformer;
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __toString()
     {
         if(isset($this->defaultTransformer)) {
@@ -59,11 +62,17 @@ class ViewResource
         return '';
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __debugInfo()
     {
         return (array) $this->getValue();
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __get($name)
     {
         if(method_exists($this, $name))

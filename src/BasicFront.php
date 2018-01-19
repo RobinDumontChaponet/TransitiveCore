@@ -72,6 +72,9 @@ class BasicFront implements FrontController
         }
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __debugInfo()
     {
         return [
@@ -83,6 +86,9 @@ class BasicFront implements FrontController
         ];
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __toString(): string
     {
         return $this->getContent();

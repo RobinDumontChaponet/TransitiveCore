@@ -122,6 +122,9 @@ class WebView extends BasicView implements View
         echo $this->getDocument();
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __debugInfo()
     {
         return array(

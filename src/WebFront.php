@@ -148,18 +148,20 @@ class WebFront extends BasicFront implements FrontController
         }
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __debugInfo()
     {
-        return [
+        return parent::__debugInfo()
+        +[
             'httpErrorRoute' => $this->httpErrorRoute,
-            'routers' => $this->routers,
-            'route' => $this->route,
-            'obClean' => $this->obClean,
-            'obContent' => $this->obContent,
-            'executed' => $this->executed,
         ];
     }
 
+	/**
+	 * @codeCoverageIgnore
+	 */
     public function __toString(): string
     {
         return $this->getContent();
