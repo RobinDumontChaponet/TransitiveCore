@@ -114,6 +114,7 @@ class WebFront extends BasicFront implements FrontController
                         unset($routes);
                         unset($route);
 */
+			            $this->executed = true;
 
                         break;
                     } catch(RoutingException $e) {
@@ -122,9 +123,12 @@ class WebFront extends BasicFront implements FrontController
                             $_SERVER['REDIRECT_STATUS'] = $e->getCode();
                         }
                         continue;
+                    } catch(BreakFlowException $e) {
+	                    $this->execute($e->getQueryURL());
+
+	                    break;
                     }
             }
-            $this->executed = true;
 
             if($this->route->hasView() && !$this->route->getView()->hasContent()) {
                 http_response_code(204);

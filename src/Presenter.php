@@ -20,7 +20,10 @@ class Presenter
         $this->data = array();
     }
 
-
+	public function execute(string $queryURL = null)
+	{
+		throw new BreakFlowException($queryURL);
+	}
 
 	/**
 	 * Get whole data array

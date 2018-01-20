@@ -21,10 +21,15 @@ class Route
             ob_clean();
         }
 
-        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
+		try {
+	        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
-        if($obClean)
-            return ob_get_clean();
+			if($obClean)
+				return ob_get_clean();
+		} catch(BreakFlowException $e) {
+			ob_clean();
+			throw $e;
+		}
     }
 
     private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
@@ -34,9 +39,9 @@ class Route
             ob_clean();
         }
 
-        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
+		self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
-        if($obClean)
+		if($obClean)
             return ob_get_clean();
     }
 
@@ -53,12 +58,18 @@ class Route
             if(is_file($presenter)) {
                 $presenter = new Presenter();
 
-                $obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
+				try {
+					$obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
+				} catch(BreakFlowException $e) {
+					$this->setView();
 
-                $this->setPresenter($presenter);
-            } else {
-                $this->setView();
-                throw new RoutingException('Presenter not found', 404);
+					throw $e;
+        		}
+
+				$this->setPresenter($presenter);
+			} else {
+				$this->setView();
+				throw new RoutingException('Presenter not found', 404);
             }
         }
 

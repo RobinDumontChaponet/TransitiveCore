@@ -59,7 +59,11 @@ class BasicFront implements FrontController
         else {
             $this->route = $this->_getRoute($queryURL);
             if(isset($this->route))
-                $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
+            	try {
+	                $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
+	            } catch(BreakFlowException $e) {
+					$this->execute($e->getQueryURL());
+				}
 
             $this->executed = true;
 
