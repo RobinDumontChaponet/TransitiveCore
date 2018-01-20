@@ -148,20 +148,18 @@ class WebFront extends BasicFront implements FrontController
         }
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
     public function __debugInfo()
     {
-        return parent::__debugInfo()
-        +[
+        return [
             'httpErrorRoute' => $this->httpErrorRoute,
+            'routers' => $this->routers,
+            'route' => $this->route,
+            'obClean' => $this->obClean,
+            'obContent' => $this->obContent,
+            'executed' => $this->executed,
         ];
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
     public function __toString(): string
     {
         return $this->getContent();
@@ -226,11 +224,11 @@ class WebFront extends BasicFront implements FrontController
     }
 
     public function redirect($url, $delay = 0, $code = 303) {
-        if(isset($this->view))
-            $this->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+        if(isset($this->route->view))
+            $this->route->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
         else {
-            $this->executed = true;
-            $this->view = new View();
+            $this->route->executed = true;
+            $this->route->view = new WebView();
         }
         if(!headers_sent()) {
             http_response_code($code);

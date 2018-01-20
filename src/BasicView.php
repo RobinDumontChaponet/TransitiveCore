@@ -40,7 +40,7 @@ class BasicView implements View
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-    private static function _getIncludeContents($include): string
+    protected static function _getIncludeContents($include): string
     {
         ob_start();
         include $include;
@@ -191,7 +191,7 @@ class BasicView implements View
 	 */
     public function __toString(): string
     {
-        return $this->getContent();
+        return $this->getContent()->asString();
     }
 
     /**

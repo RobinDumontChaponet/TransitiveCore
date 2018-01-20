@@ -142,42 +142,6 @@ class Route
     }
 
     /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     *
-     * @return string
-     */
-    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
-    {
-        $title = $this->view->getTitle();
-        if(!empty($title))
-            return $prefix.$separator.$title.$endSeparator;
-
-        return $prefix;
-    }
-
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     */
-    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
-    {
-        $title = (isset($this->view)) ? $this->view->getTitle() : '';
-        echo '<title>';
-        if(!empty($prefix)) {
-            echo $prefix;
-            if(!empty($title) && !empty($separator))
-                echo $separator;
-        }
-        echo $title;
-        if(!empty($endSeparator))
-            echo $endSeparator;
-        echo '</title>';
-    }
-
-    /**
      * @param string $key
      */
     public function hasContent(string $key = null): bool

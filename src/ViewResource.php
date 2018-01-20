@@ -51,15 +51,15 @@ class ViewResource
 	 */
     public function __toString()
     {
+	    $result = null;
+
         if(isset($this->defaultTransformer)) {
             $result = $this->{$this->defaultTransformer}();
-            if(is_object($result))
-                return var_export($result, true);
-            else
-                return $result;
+            if(!is_string($result))
+                $result = var_export($result, true);
         }
 
-        return '';
+        return $result ?? '';
     }
 
 	/**

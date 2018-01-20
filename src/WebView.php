@@ -5,12 +5,6 @@ namespace Transitive\Core;
 class WebView extends BasicView implements View
 {
     /**
-     * The view's title.
-     *
-     * @var string
-     */
-    public $title;
-    /**
      * styles.
      *
      * @var array
@@ -52,31 +46,39 @@ class WebView extends BasicView implements View
     }
 
     /**
-     * Get the view's title.
+     * @param string $prefix
+     * @param string $separator
+     * @param string $endSeparator
      *
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
     {
-        return $this->title;
+        $title = parent::getTitle();
+        if(!empty($title))
+            return $prefix.$separator.$title.$endSeparator;
+
+        return $prefix;
     }
 
     /**
-     * Print the view's title.
+     * @param string $prefix
+     * @param string $separator
+     * @param string $endSeparator
      */
-    public function printTitle(): void
+    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
     {
-        echo '<title>', $this->getTitle(), '</title>';
-    }
-
-    /**
-     * Set the view's title.
-     *
-     * @param string $title
-     */
-    public function setTitle(string $title = null): void
-    {
-        $this->title = $title;
+        $title = parent::getTitle();
+        echo '<title>';
+        if(!empty($prefix)) {
+            echo $prefix;
+            if(!empty($title) && !empty($separator))
+                echo $separator;
+        }
+        echo $title;
+        if(!empty($endSeparator))
+            echo $endSeparator;
+        echo '</title>';
     }
 
     /**
@@ -122,9 +124,6 @@ class WebView extends BasicView implements View
         echo $this->getDocument();
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
     public function __debugInfo()
     {
         return array(
