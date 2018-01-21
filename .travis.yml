@@ -11,3 +11,6 @@ install:
 script:
   - composer check
   - composer test
+
+after_script:
+  - php vendor/bin/coveralls -v
