@@ -10,16 +10,16 @@ final class RouteTest extends PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {
-	    $presenter = new Presenter();
-	    $view = new BasicView();
+        $presenter = new Presenter();
+        $view = new BasicView();
         $instance = new Route($presenter, $view);
 
         $this->assertEquals(
-			$instance->presenter,
+            $instance->presenter,
             $presenter
         );
         $this->assertEquals(
-			$instance->view,
+            $instance->view,
             $view
         );
     }

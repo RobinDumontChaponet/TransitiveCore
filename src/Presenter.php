@@ -11,37 +11,31 @@ class Presenter
 
     /**
      * __construct function.
-     *
-     * @access public
-     * @return void
      */
     public function __construct()
     {
         $this->data = array();
     }
 
-	public function execute(string $queryURL = null)
-	{
-		throw new BreakFlowException($queryURL);
-	}
+    public function execute(string $queryURL = null)
+    {
+        throw new BreakFlowException($queryURL);
+    }
 
-	/**
-	 * Get whole data array
-	 *
-	 * @access public
-	 * @return &array
-	 */
+    /**
+     * Get whole data array.
+     *
+     * @return &array
+     */
     public function &getData(): array
     {
         return $this->data;
     }
 
     /**
-	 * Set data array
-	 *
-	 * @access public
+     * Set data array.
+     *
      * @param array &$data
-	 * @return void
      */
     public function setData(array &$data): void
     {
@@ -49,25 +43,21 @@ class Presenter
     }
 
     /**
-	 * Add data as key/value pair
-	 *
-	 * @access public
+     * Add data as key/value pair.
+     *
      * @param mixed $key
      * @param mixed $value = null
-	 * @return void
      */
     public function addData($key, $value = null): void
     {
         $this->data[$key] = $value;
     }
 
-	/**
-	 * Add data as key/value pair
-	 *
-	 * @access public
+    /**
+     * Add data as key/value pair.
+     *
      * @param mixed $key
      * @param mixed $value = null
-	 * @return void
      * @codeCoverageIgnore
      */
     public function add($key, $value = null): void
@@ -75,9 +65,9 @@ class Presenter
         $this->addData($key, $value);
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
+    /**
+     * @codeCoverageIgnore
+     */
     public function __debugInfo()
     {
         return array(

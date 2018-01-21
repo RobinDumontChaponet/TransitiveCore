@@ -114,7 +114,7 @@ class WebFront extends BasicFront implements FrontController
                         unset($routes);
                         unset($route);
 */
-			            $this->executed = true;
+                        $this->executed = true;
 
                         break;
                     } catch(RoutingException $e) {
@@ -124,9 +124,9 @@ class WebFront extends BasicFront implements FrontController
                         }
                         continue;
                     } catch(BreakFlowException $e) {
-	                    $this->execute($e->getQueryURL());
+                        $this->execute($e->getQueryURL());
 
-	                    break;
+                        break;
                     }
             }
 

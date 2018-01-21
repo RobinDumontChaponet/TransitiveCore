@@ -167,9 +167,9 @@ class BasicView implements View
             return isset($this->content);
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
+    /**
+     * @codeCoverageIgnore
+     */
     public function __debugInfo()
     {
         return array(
@@ -186,9 +186,9 @@ class BasicView implements View
     }
 */
 
-	/**
-	 * @codeCoverageIgnore
-	 */
+    /**
+     * @codeCoverageIgnore
+     */
     public function __toString(): string
     {
         return $this->getContent()->asString();

@@ -59,11 +59,11 @@ class BasicFront implements FrontController
         else {
             $this->route = $this->_getRoute($queryURL);
             if(isset($this->route))
-            	try {
-	                $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
-	            } catch(BreakFlowException $e) {
-					$this->execute($e->getQueryURL());
-				}
+                try {
+                    $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
+                } catch(BreakFlowException $e) {
+                    $this->execute($e->getQueryURL());
+                }
 
             $this->executed = true;
 
@@ -76,9 +76,9 @@ class BasicFront implements FrontController
         }
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
+    /**
+     * @codeCoverageIgnore
+     */
     public function __debugInfo()
     {
         return [
@@ -90,9 +90,9 @@ class BasicFront implements FrontController
         ];
     }
 
-	/**
-	 * @codeCoverageIgnore
-	 */
+    /**
+     * @codeCoverageIgnore
+     */
     public function __toString(): string
     {
         return $this->getContent();

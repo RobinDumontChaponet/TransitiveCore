@@ -8,44 +8,44 @@ final class PresenterTest extends PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {
-		$instance = new Presenter();
+        $instance = new Presenter();
 
         $this->assertInternalType(
-			'array',
-			$instance->data
+            'array',
+            $instance->data
         );
     }
 
     public function testGetData()
     {
-		$instance = new Presenter();
+        $instance = new Presenter();
 
         $this->assertInternalType(
-			'array',
-			$instance->getData()
+            'array',
+            $instance->getData()
         );
     }
 
     public function testSetData()
     {
-		$instance = new Presenter();
-		$value = ['key'=>'value'];
-		$instance->setData($value);
+        $instance = new Presenter();
+        $value = ['key' => 'value'];
+        $instance->setData($value);
 
         $this->assertEquals(
-			$value,
-			$instance->data
+            $value,
+            $instance->data
         );
     }
 
     public function testAddData()
     {
-		$instance = new Presenter();
-		$instance->addData('key', 'value');
+        $instance = new Presenter();
+        $instance->addData('key', 'value');
 
         $this->assertEquals(
-			['key'=>'value'],
-			$instance->data
+            ['key' => 'value'],
+            $instance->data
         );
     }
 }

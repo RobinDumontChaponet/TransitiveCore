@@ -21,15 +21,15 @@ class Route
             ob_clean();
         }
 
-		try {
-	        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
+        try {
+            self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
-			if($obClean)
-				return ob_get_clean();
-		} catch(BreakFlowException $e) {
-			ob_clean();
-			throw $e;
-		}
+            if($obClean)
+                return ob_get_clean();
+        } catch(BreakFlowException $e) {
+            ob_clean();
+            throw $e;
+        }
     }
 
     private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
@@ -39,9 +39,9 @@ class Route
             ob_clean();
         }
 
-		self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
+        self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
-		if($obClean)
+        if($obClean)
             return ob_get_clean();
     }
 
@@ -58,18 +58,18 @@ class Route
             if(is_file($presenter)) {
                 $presenter = new Presenter();
 
-				try {
-					$obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
-				} catch(BreakFlowException $e) {
-					$this->setView();
+                try {
+                    $obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
+                } catch(BreakFlowException $e) {
+                    $this->setView();
 
-					throw $e;
-        		}
+                    throw $e;
+                }
 
-				$this->setPresenter($presenter);
-			} else {
-				$this->setView();
-				throw new RoutingException('Presenter not found', 404);
+                $this->setPresenter($presenter);
+            } else {
+                $this->setView();
+                throw new RoutingException('Presenter not found', 404);
             }
         }
 
