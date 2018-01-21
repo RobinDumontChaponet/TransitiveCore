@@ -6,12 +6,9 @@ Code base for many of my simples (or not) projects now.
 ~~I'm not doing yet another php framework. It would be pointless. More explanations ...later ;-)~~
 
 [![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
-
 [![License](https://poser.pugx.org/transitive/core/license?format=flat-square)](https://packagist.org/packages/transitive/core)
-
 [![Build Status](https://travis-ci.org/RobinDumontChaponet/TransitiveCore.svg?branch=next)](https://travis-ci.org/RobinDumontChaponet/TransitiveCore)
-
-[![Coverage Status](https://coveralls.io/repos/github/RobinDumontChaponet/TransitiveCore/badge.svg?branch=master)](https://coveralls.io/github/RobinDumontChaponet/TransitiveCore?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/RobinDumontChaponet/TransitiveCore/badge.svg)](https://coveralls.io/github/RobinDumontChaponet/TransitiveCore)
 
 ## Installation
 
@@ -35,7 +32,7 @@ $request = @$_GET['request'];
 
 $transit->execute($request ?? 'index');
 
-$transit->print();
+echo $transit;
 
 //echo $transit->getObContent();
 ```

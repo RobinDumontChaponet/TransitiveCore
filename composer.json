@@ -35,7 +35,7 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/coverage.clover",
+        "test": "./vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/coverage.xml",
         "check": "./vendor/bin/php-cs-fixer fix --dry-run",
         "fix": "./vendor/bin/php-cs-fixer fix"
     }
