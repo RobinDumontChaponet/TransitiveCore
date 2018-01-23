@@ -1,14 +1,41 @@
-# TransitiveCore
-
-	Doing some heavy work lately to modularize code, repo might not be up-to-date.
-
+# Transitive\Core
 
 Very simple MVP (Model - View - Presenter) PHP framework.
 Code base for many of my simples (or not) projects now.
 
-I'm not doing yet another php framework. It would be pointless. More explanations ...later ;-)
+~~I'm not doing yet another php framework. It would be pointless. More explanations ...later ;-)~~
 
-## More info ...later.
+[![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
+[![License](https://poser.pugx.org/transitive/core/license?format=flat-square)](https://packagist.org/packages/transitive/core)
+[![Build Status](https://travis-ci.org/RobinDumontChaponet/TransitiveCore.svg?branch=next)](https://travis-ci.org/RobinDumontChaponet/TransitiveCore)
+[![Coverage Status](https://coveralls.io/repos/github/RobinDumontChaponet/TransitiveCore/badge.svg)](https://coveralls.io/github/RobinDumontChaponet/TransitiveCore)
+
+## Installation
+
+```sh
+composer require transitive/core
+```
+
+## Basic Usage
+
+```php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../config/default.php';
+
+$transit = new Transitive\Core\WebFront();
+
+$transit->addRouter(new Transitive\Core\PathRouter(PRESENTERS, VIEWS));
+
+$request = @$_GET['request'];
+
+$transit->execute($request ?? 'index');
+
+echo $transit;
+
+//echo $transit->getObContent();
+```
 
 ## License
 

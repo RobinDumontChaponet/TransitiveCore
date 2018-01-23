@@ -1,2 +1,7 @@
 vendor/
+build/
 composer.lock
+docs/
+doxygen-config
+coverage.clover
+.php_cs.cache

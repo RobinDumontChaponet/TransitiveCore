@@ -1,0 +1,16 @@
+language: php
+
+php:
+  - 7.1
+
+install:
+  - printf "\n" | pecl install yaml
+  - composer selfupdate
+  - composer install
+
+script:
+  - composer check
+  - composer test
+
+after_script:
+  - php vendor/bin/coveralls -v

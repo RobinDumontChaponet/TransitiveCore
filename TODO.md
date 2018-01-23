@@ -1,0 +1,1 @@
+- InheritedView::decorate(View $object)

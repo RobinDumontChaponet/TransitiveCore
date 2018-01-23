@@ -2,13 +2,13 @@
 
 namespace Transitive\Core;
 
-class ViewRessource
+class ViewResource
 {
     /**
      * @var mixed
      */
     public $value;
-    private $default;
+    private $defaultTransformer;
 
     private static function _arrayToXML(array $data, \SimpleXMLElement &$xmlData): void
     {
@@ -39,23 +39,40 @@ class ViewRessource
         $this->value = $value;
     }
 
-    private function setDefault($default): void
+    private function setDefault($defaultTransformer): void
     {
-        if(!method_exists($this, $default))
-            throw new Exception('Default transfomer "'.$default.'" is not implemented.');
-        $this->default = $default;
+        if(!method_exists($this, $defaultTransformer))
+            throw new \InvalidArgumentException('Default transfomer "'.$defaultTransformer.'" is not implemented.');
+        $this->defaultTransformer = $defaultTransformer;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __toString()
     {
-        return $this->{$this->default}();
+        $result = null;
+
+        if(isset($this->defaultTransformer)) {
+            $result = $this->{$this->defaultTransformer}();
+            if(!is_string($result))
+                $result = var_export($result, true);
+        }
+
+        return $result ?? '';
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __debugInfo()
     {
         return (array) $this->getValue();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __get($name)
     {
         if(method_exists($this, $name))
@@ -90,14 +107,17 @@ class ViewRessource
         return (array) $this->getValue();
     }
 
-    public function asString(): string
+    public function asString(string $glue = ''): string
     {
         $value = $this->asArray();
         $str = '';
 
-        array_walk_recursive($value, function ($value, $key) use (&$str) {
-            $str .= $value;
+        array_walk_recursive($value, function ($value, $key) use (&$str, $glue) {
+            $str .= $value.$glue;
         });
+
+        if(strlen($glue))
+            $str = substr($str, 0, 0 - strlen($glue));
 
         return $str;
     }
