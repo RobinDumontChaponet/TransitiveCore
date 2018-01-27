@@ -74,15 +74,14 @@ class ListRouter implements Router
             elseif(isset($this->routes[$pattern][$method]))
                 $route = $this->routes[$pattern][$method];
 
-		if($route && !$route->hasExposedVariables())
-			$route->setExposedVariables($this->exposedVariables);
+        if($route && !$route->hasExposedVariables())
+            $route->setExposedVariables($this->exposedVariables);
 
         return $route;
     }
 
-	public function setExposedVariables(array $exposedVariables = []): void
+    public function setExposedVariables(array $exposedVariables = []): void
     {
-	    $this->exposedVariables = $exposedVariables;
+        $this->exposedVariables = $exposedVariables;
     }
-
 }

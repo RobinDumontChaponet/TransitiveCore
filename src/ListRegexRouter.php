@@ -70,13 +70,13 @@ class ListRegexRouter implements Router
             }
 
         if($route && !$route->hasExposedVariables())
-			$route->setExposedVariables($this->exposedVariables);
+            $route->setExposedVariables($this->exposedVariables);
 
         return $route;
     }
 
     public function setExposedVariables(array $exposedVariables = []): void
     {
-	    $this->exposedVariables = $exposedVariables;
+        $this->exposedVariables = $exposedVariables;
     }
 }

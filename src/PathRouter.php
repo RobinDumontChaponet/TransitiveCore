@@ -16,8 +16,8 @@ class PathRouter implements Router
 
     public $method;
 
-	private $prefix;
-	private $exposedVariables;
+    private $prefix;
+    private $exposedVariables;
 
     public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all', string $prefix = null, array $exposedVariables = [])
     {
@@ -29,7 +29,7 @@ class PathRouter implements Router
         $this->method = $method;
         $this->separator = $separator;
 
-		$this->setPrefix($prefix);
+        $this->setPrefix($prefix);
         $this->exposedVariables = $exposedVariables;
     }
 
@@ -80,13 +80,13 @@ class PathRouter implements Router
         return $array;
     }
 
-	public function setExposedVariables(array $exposedVariables = []): void
+    public function setExposedVariables(array $exposedVariables = []): void
     {
-	    $this->exposedVariables = $exposedVariables;
+        $this->exposedVariables = $exposedVariables;
     }
 
     public function setPrefix(string $prefix = null): void
     {
-	    $this->prefix = $prefix;
+        $this->prefix = $prefix;
     }
 }

@@ -119,11 +119,12 @@ class Route
 
     public function setExposedVariables(array $exposedVariables = []): void
     {
-	    $this->exposedVariables = $exposedVariables;
+        $this->exposedVariables = $exposedVariables;
     }
+
     public function hasExposedVariables(): bool
     {
-	    return !empty($this->exposedVariables);
+        return !empty($this->exposedVariables);
     }
 
     public function hasPresenter(): bool
