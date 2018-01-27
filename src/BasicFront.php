@@ -52,15 +52,13 @@ class BasicFront implements FrontController
 
     public function execute(string $queryURL = null): ?Route
     {
-        $exposedVariables = ['binder' => $this];
-
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
             $this->route = $this->_getRoute($queryURL);
             if(isset($this->route))
                 try {
-                    $this->obContent = $route->execute($exposedVariables, null, $this->obClean);
+                    $this->obContent = $route->execute($this->obClean);
                 } catch(BreakFlowException $e) {
                     $this->execute($e->getQueryURL());
                 }
@@ -70,7 +68,7 @@ class BasicFront implements FrontController
             $content = ['view' => $this->route->getView()];
 
             $this->layout->getPresenter()->setData($content);
-            $this->layout->execute(null, null, $this->obClean);
+            $this->layout->execute($this->obClean);
 
             return $this->route;
         }

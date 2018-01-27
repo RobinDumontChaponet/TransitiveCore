@@ -99,8 +99,6 @@ class WebFront extends BasicFront implements FrontController
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
 
-        $exposedVariables = ['binder' => $this];
-
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
@@ -108,7 +106,7 @@ class WebFront extends BasicFront implements FrontController
             foreach($routes as $route) {
                 if(isset($route))
                     try {
-                        $this->obContent = $route->execute($exposedVariables, [], $this->obClean);
+                        $this->obContent = $route->execute($this->obClean);
                         $this->route = $route;
 /*
                         unset($routes);
@@ -146,7 +144,7 @@ class WebFront extends BasicFront implements FrontController
             $content = ['view' => $this->route->getView()];
 
             $this->layout->getPresenter()->setData($content);
-            $this->layout->execute(null, null, $this->obClean);
+            $this->layout->execute($this->obClean);
 
             return $this->route;
         }

@@ -21,9 +21,11 @@ class ListRouter implements Router
      * @var array Route
      */
     public $routes;
+    private $exposedVariables;
 
-    public function __construct(array $routes) {
+    public function __construct(array $routes, array $exposedVariables = []) {
         $this->setRoutes($routes);
+        $this->exposedVariables = $exposedVariables;
     }
 
     public function getRoutes(): array
@@ -64,13 +66,23 @@ class ListRouter implements Router
     public function execute(string $pattern, string $method = 'all'): ?Route
     {
         $pattern = rtrim($pattern, '/');
+        $route = null;
 
         if(isset($this->routes[$pattern]))
             if(!is_array($this->routes[$pattern]))
-                return $this->routes[$pattern];
+                $route = $this->routes[$pattern];
             elseif(isset($this->routes[$pattern][$method]))
-                return $this->routes[$pattern][$method];
+                $route = $this->routes[$pattern][$method];
 
-        return null;
+		if($route && !$route->hasExposedVariables())
+			$route->setExposedVariables($this->exposedVariables);
+
+        return $route;
     }
+
+	public function setExposedVariables(array $exposedVariables = []): void
+    {
+	    $this->exposedVariables = $exposedVariables;
+    }
+
 }

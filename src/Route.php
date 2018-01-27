@@ -45,11 +45,9 @@ class Route
             return ob_get_clean();
     }
 
-    public function execute(array $exposedVariablesPresenter = null, array $exposedVariablesView = null, bool $obClean = true)
+    public function execute(bool $obClean = true)
     {
         $obContent = '';
-        if(!is_array($exposedVariablesView) && is_array($exposedVariablesPresenter))
-            $exposedVariablesView = $exposedVariablesPresenter;
 
         // Presenter
         $presenter = $this->getPresenter();
@@ -59,7 +57,7 @@ class Route
                 $presenter = new Presenter();
 
                 try {
-                    $obContent .= self::includePresenter($this->getPresenter(), $exposedVariablesPresenter + ['presenter' => $presenter], $this->prefix, $obClean);
+                    $obContent .= self::includePresenter($this->getPresenter(), $this->exposedVariables + ['presenter' => $presenter], $this->prefix, $obClean);
                 } catch(BreakFlowException $e) {
                     $this->setView();
 
@@ -80,7 +78,7 @@ class Route
             if(is_file($view)) {
                 $view = new WebView();
 
-                $obContent .= self::includeView($this->getView(), $exposedVariablesView + ['view' => $view], $this->prefix, $obClean);
+                $obContent .= self::includeView($this->getView(), ['view' => $view], $this->prefix, $obClean);
 
                 $this->setView($view);
             } else {
@@ -94,11 +92,12 @@ class Route
         return $obContent;
     }
 
-    public function __construct($presenter, $view = null, string $prefix = null)
+    public function __construct($presenter, $view = null, string $prefix = null, array $exposedVariables = [])
     {
         $this->presenter = $presenter;
         $this->view = $view;
         $this->prefix = $prefix;
+        $this->exposedVariables = $exposedVariables;
     }
 
     /**
@@ -115,6 +114,17 @@ class Route
      * @var View | string | null
      */
     public $view;
+
+    private $exposedVariables;
+
+    public function setExposedVariables(array $exposedVariables = []): void
+    {
+	    $this->exposedVariables = $exposedVariables;
+    }
+    public function hasExposedVariables(): bool
+    {
+	    return !empty($this->exposedVariables);
+    }
 
     public function hasPresenter(): bool
     {

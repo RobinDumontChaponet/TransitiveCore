@@ -8,9 +8,11 @@ class ListRegexRouter implements Router
      * @var array Route
      */
     public $routes;
+    private $exposedVariables;
 
-    public function __construct(array $routes) {
+    public function __construct(array $routes, array $exposedVariables = []) {
         $this->setRoutes($routes);
+        $this->exposedVariables = $exposedVariables;
     }
 
     public function getRoutes(): array
@@ -51,18 +53,30 @@ class ListRegexRouter implements Router
     public function execute(string $pattern, string $method = 'all'): ?Route
     {
         $pattern = rtrim($pattern, '/');
+        $route = null;
 
-        foreach ($this->routes as $key => $route)
+        foreach ($this->routes as $key => $tmp)
             if (preg_match('@'.$key.'@', $pattern, $matches)) {
                 unset($matches[key($matches)]);
                 $_GET += $matches;
 
-                if(!is_array($route))
-                    return $route;
-                elseif(isset($route[$method]))
-                    return $route[$method];
+                if(!is_array($tmp)) {
+                    $route = $tmp;
+                    break;
+                } elseif(isset($tmp[$method])) {
+                    $route = $tmp[$method];
+                    break;
+                }
             }
 
-        return null;
+        if($route && !$route->hasExposedVariables())
+			$route->setExposedVariables($this->exposedVariables);
+
+        return $route;
+    }
+
+    public function setExposedVariables(array $exposedVariables = []): void
+    {
+	    $this->exposedVariables = $exposedVariables;
     }
 }

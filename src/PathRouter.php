@@ -16,7 +16,10 @@ class PathRouter implements Router
 
     public $method;
 
-    public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all')
+	private $prefix;
+	private $exposedVariables;
+
+    public function __construct(string $presentersPath, string $viewsPath = null, string $separator = '/', string $method = 'all', string $prefix = null, array $exposedVariables = [])
     {
         $this->presentersPath = $presentersPath;
         $this->presentersPath .= ('/' != substr($presentersPath, -1)) ? '/' : '';
@@ -25,6 +28,9 @@ class PathRouter implements Router
 
         $this->method = $method;
         $this->separator = $separator;
+
+		$this->setPrefix($prefix);
+        $this->exposedVariables = $exposedVariables;
     }
 
     public function execute(string $pattern, string $method = 'all'): ?Route
@@ -39,7 +45,7 @@ class PathRouter implements Router
         $realView = self::_real($viewPattern, $this->separator);
 
         if($realPresenter && $realView)
-            return new Route($this->presentersPath.$realPresenter, $this->viewsPath.$realView);
+            return new Route($this->presentersPath.$realPresenter, $this->viewsPath.$realView, $this->prefix, $this->exposedVariables);
         else
             return null;
     }
@@ -72,5 +78,15 @@ class PathRouter implements Router
         }
 
         return $array;
+    }
+
+	public function setExposedVariables(array $exposedVariables = []): void
+    {
+	    $this->exposedVariables = $exposedVariables;
+    }
+
+    public function setPrefix(string $prefix = null): void
+    {
+	    $this->prefix = $prefix;
     }
 }
