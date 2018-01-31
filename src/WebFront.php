@@ -225,36 +225,6 @@ class WebFront extends BasicFront implements FrontController
         }
     }
 
-    public function redirect($url, $delay = 0, $code = 303) {
-        if(isset($this->route->view))
-            $this->route->view->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
-        else {
-            $this->route->executed = true;
-            $this->route->view = new WebView();
-        }
-        if(!headers_sent()) {
-            http_response_code($code);
-            $_SERVER['REDIRECT_STATUS'] = $code;
-            if($delay <= 0)
-                header('Location: '.$url, true, $code);
-            else
-                header('Refresh:'.$delay.'; url='.$url, true, $code);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public function goBack() {
-        if(isset($_SESSION['referrer'])) {
-            $this->redirect($_SESSION['referrer']);
-
-            return true;
-        } else
-            return false;
-    }
-
     public static function setDefaultHttpErrorRoute(Route $route): void
     {
         self::$defaultHttpErrorRoute = $route;

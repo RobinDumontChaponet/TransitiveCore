@@ -398,4 +398,21 @@ class WebView extends BasicView implements View
     {
         return $this->styles;
     }
+
+    public function redirect($url, $delay = 0, $code = 303) {
+		$this->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+
+        if(!headers_sent()) {
+            http_response_code($code);
+            $_SERVER['REDIRECT_STATUS'] = $code;
+            if($delay <= 0)
+                header('Location: '.$url, true, $code);
+            else
+                header('Refresh:'.$delay.'; url='.$url, true, $code);
+
+            return true;
+        }
+
+        return false;
+    }
 }

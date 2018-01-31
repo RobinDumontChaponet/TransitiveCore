@@ -24,12 +24,13 @@ class Route
         try {
             self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
 
-            if($obClean)
-                return ob_get_clean();
         } catch(BreakFlowException $e) {
             ob_clean();
             throw $e;
         }
+
+		if($obClean)
+			return ob_get_clean();
     }
 
     private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
