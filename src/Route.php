@@ -23,14 +23,13 @@ class Route
 
         try {
             self::_include(['path' => $path, 'obClean' => $obClean] + $exposedVariables, $_prefix);
-
         } catch(BreakFlowException $e) {
             ob_clean();
             throw $e;
         }
 
-		if($obClean)
-			return ob_get_clean();
+        if($obClean)
+            return ob_get_clean();
     }
 
     private static function includeView(string $path, array $exposedVariables = [], string $_prefix = null, bool $obClean = true)
@@ -182,16 +181,6 @@ class Route
             return $this->view->getContent($key);
     }
 
-    /**
-     * @param string $key
-     */
-/*
-    public function printContent(string $key = null): void
-    {
-        if(isset($this->view))
-            $this->view->printContent($key);
-    }
-*/
     public function getHead(): ViewResource
     {
         if(isset($this->view))

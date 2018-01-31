@@ -59,7 +59,7 @@ class BasicView implements View
      *
      * @return string
      */
-    final public function getTitleValue(): ?string
+    public function getTitleValue(): ?string
     {
         return $this->title;
     }

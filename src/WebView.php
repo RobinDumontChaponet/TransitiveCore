@@ -52,7 +52,7 @@ class WebView extends BasicView implements View
      *
      * @return string
      */
-    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
+    public function getTitleValue(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
     {
         $title = parent::getTitle();
         if(!empty($title))
@@ -66,33 +66,22 @@ class WebView extends BasicView implements View
      * @param string $separator
      * @param string $endSeparator
      */
-    public function printTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): void
+    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
     {
+        $str = '<title>';
         $title = parent::getTitle();
-        echo '<title>';
         if(!empty($prefix)) {
-            echo $prefix;
+            $str .= $prefix;
             if(!empty($title) && !empty($separator))
-                echo $separator;
+                $str .= $separator;
         }
-        echo $title;
+        $str .= $title;
         if(!empty($endSeparator))
-            echo $endSeparator;
-        echo '</title>';
-    }
+            $str .= $endSeparator;
+        $str .= '</title>';
 
-    /**
-     * @param string $key
-     */
-/*
-    public function printContent(string $key = null): void
-    {
-        if(!isset($key))
-            if($this->hasContent('html'))
-                $key = 'html';
-        echo $this->getContent($key)->asString();
+        return $str;
     }
-*/
 
     /**
      * @param string $key
@@ -117,11 +106,6 @@ class WebView extends BasicView implements View
         return '<head><meta charset="UTF-8">'
                .$this->getHeadValue()->asString()
                .'</head>';
-    }
-
-    public function printDocument(): void
-    {
-        echo $this->getDocument();
     }
 
     public function __debugInfo()
@@ -178,11 +162,6 @@ class WebView extends BasicView implements View
                     $str .= $meta['raw'];
 
         return $str;
-    }
-
-    public function printMetas(): void
-    {
-        echo $this->getMetas();
     }
 
     /**
@@ -346,11 +325,6 @@ class WebView extends BasicView implements View
         return $content;
     }
 
-    public function printStyles(): void
-    {
-        echo $this->getStyles();
-    }
-
     public function getScripts(): string
     {
         $str = '';
@@ -365,11 +339,6 @@ class WebView extends BasicView implements View
                     $str .= $script['raw'];
 
         return $str;
-    }
-
-    public function printScripts(): void
-    {
-        echo $this->getScripts();
     }
 
     public function getScriptsContent(): string
@@ -400,7 +369,7 @@ class WebView extends BasicView implements View
     }
 
     public function redirect($url, $delay = 0, $code = 303) {
-		$this->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
+        $this->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
 
         if(!headers_sent()) {
             http_response_code($code);

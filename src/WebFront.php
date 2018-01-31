@@ -90,11 +90,6 @@ class WebFront extends BasicFront implements FrontController
     }
 */
 
-    public function getRequestMethod(): string
-    {
-        return $_SERVER['REQUEST_METHOD'];
-    }
-
     public function execute(string $queryURL = null): ?Route
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
