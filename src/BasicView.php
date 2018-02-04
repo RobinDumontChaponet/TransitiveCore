@@ -10,12 +10,14 @@ class BasicView implements View
      * @var string
      */
     public $title;
+
     /**
      * content.
      *
      * @var mixed
      */
     public $content;
+
     /**
      * data pushed from the presenter.
      *
@@ -40,7 +42,11 @@ class BasicView implements View
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-    protected static function _getIncludeContents($include): string
+    /*
+     * @param string $include
+     * @return string
+     */
+    protected static function _getIncludeContents(string $include): string
     {
         ob_start();
         include $include;
@@ -67,9 +73,12 @@ class BasicView implements View
     /**
      * Get the view's title.
      */
-    public function getTitle(): string
+    public function getTitle(string $prefix = '', string $separator = ' | ', string $sufix = ''): string
     {
-        return $this->getTitleValue();
+        if(empty($this->getTitleValue()))
+            $separator = '';
+
+        return $prefix.$separator.$this->getTitleValue().$sufix;
     }
 
     /**
@@ -83,7 +92,9 @@ class BasicView implements View
     }
 
     /**
-     * @return
+     * @param mixed content
+     *
+     * @return mixed
      */
     protected function _getContent($content)
     {
@@ -111,6 +122,8 @@ class BasicView implements View
 
     /**
      * @param string $key
+     *
+     * @return ViewResource
      */
     public function getContent(string $key = null): ViewResource
     {
@@ -131,6 +144,9 @@ class BasicView implements View
         return new ViewResource($content);
     }
 
+    /*
+     * @return ViewResource
+     */
     public function getHeadValue(): ViewResource
     {
         return new ViewResource(array(
@@ -138,11 +154,18 @@ class BasicView implements View
         ), 'asArray');
     }
 
+    /*
+     * @return string
+     */
     public function getHead(): string
     {
         return $this->getHeadValue()->asString();
     }
 
+    /*
+     * @param string $content = null
+     * @return ViewResource
+     */
     public function getDocument(string $contentKey = null): ViewResource
     {
         return new ViewResource(array(
@@ -151,12 +174,17 @@ class BasicView implements View
         ), 'asJSON');
     }
 
+    /*
+     * @return string
+    */
     public function getDocumentValue(): string
     {
         return $this->getDocument()->__toString();
     }
 
     /**
+     * @param string $key = null
+     *
      * @return bool
      */
     public function hasContent(string $key = null): bool
@@ -179,13 +207,6 @@ class BasicView implements View
         );
     }
 
-/*
-    public function printContent(string $key = null): void
-    {
-        echo $this->getContent($key)->asString();
-    }
-*/
-
     /**
      * @codeCoverageIgnore
      */
@@ -195,9 +216,11 @@ class BasicView implements View
     }
 
     /**
+     * @param string $key = null
+     *
      * @return array
      */
-    public function &getData(string $key = null)
+    public function &getData(string $key = null): array
     {
         if(isset($key))
             return $this->data[$key];
@@ -206,7 +229,7 @@ class BasicView implements View
     }
 
     /**
-     * @param array $data
+     * @param array &$data
      */
     public function setData(array &$data): void
     {

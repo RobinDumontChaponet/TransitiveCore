@@ -83,13 +83,6 @@ class WebFront extends BasicFront implements FrontController
         return $this->contentType;
     }
 
-/*
-    public function isAPI(): string
-    {
-        return 'application/json' == $this->getContentType() || 'application/xml' == $this->getContentType();
-    }
-*/
-
     public function execute(string $queryURL = null): ?Route
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
@@ -203,18 +196,7 @@ class WebFront extends BasicFront implements FrontController
             case 'application/vnd.transitive.content+yaml':
                 return $this->route->getContent()->asYAML();
             break;
-/*
-            case 'application/json':
-                if($this->hasContent('api'))
-                    echo $this->getContent('api')->asJson();
-            break;
-*/
-/*
-            case 'application/xml':
-                if($this->hasContent('api'))
-                    echo $this->getContent('api')->asXML();
-            break;
-*/
+
             default:
                 return $this->layout->getView();
         }

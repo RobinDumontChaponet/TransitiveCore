@@ -17,7 +17,11 @@ class Presenter
         $this->data = array();
     }
 
-    public function execute(string $queryURL = null)
+    /*
+     * @param string $queryURL = null
+     * @return void
+     */
+    public function execute(string $queryURL = null): void
     {
         throw new BreakFlowException($queryURL);
     }

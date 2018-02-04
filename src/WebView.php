@@ -5,31 +5,35 @@ namespace Transitive\Core;
 class WebView extends BasicView implements View
 {
     /**
-     * styles.
+     * styles tags and linked scripts.
      *
      * @var array
      */
     public $styles;
+
     /**
-     * scripts.
+     * scripts tags and linked scripts.
      *
      * @var array
      */
     public $scripts;
+
     /**
-     * metas.
+     * metas tags.
      *
      * @var array
      */
     public $metas;
+
     /**
-     * content.
+     * content : array | string | scalar | closure.
      *
      * @var mixed
      */
     public $content;
+
     /**
-     * data.
+     * data pushed by presenter.
      *
      * @var array
      */
@@ -41,7 +45,6 @@ class WebView extends BasicView implements View
         $this->scripts = array();
         $this->metas = array();
         $this->title = '';
-//         $this->content = 'No viewable content.';
         $this->content = null;
     }
 
@@ -49,48 +52,25 @@ class WebView extends BasicView implements View
      * @param string $prefix
      * @param string $separator
      * @param string $endSeparator
-     *
-     * @return string
      */
-    public function getTitleValue(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
+    public function getTitle(string $prefix = '', string $separator = ' | ', string $sufix = ''): string
     {
-        $title = parent::getTitle();
-        if(!empty($title))
-            return $prefix.$separator.$title.$endSeparator;
-
-        return $prefix;
-    }
-
-    /**
-     * @param string $prefix
-     * @param string $separator
-     * @param string $endSeparator
-     */
-    public function getTitle(string $prefix = '', string $separator = ' | ', string $endSeparator = ''): string
-    {
-        $str = '<title>';
-        $title = parent::getTitle();
-        if(!empty($prefix)) {
-            $str .= $prefix;
-            if(!empty($title) && !empty($separator))
-                $str .= $separator;
-        }
-        $str .= $title;
-        if(!empty($endSeparator))
-            $str .= $endSeparator;
-        $str .= '</title>';
-
-        return $str;
+        return parent::getTitle('<title>'.$prefix, $separator, $sufix.'</title>');
     }
 
     /**
      * @param string $key
+     *
+     * @return ViewResource
      */
     public function getContentValue(string $key = null): ViewResource
     {
         return new ViewResource($this->getContent($key));
     }
 
+    /*
+     * @return ViewResource
+     */
     public function getHeadValue(): ViewResource
     {
         return new ViewResource(array(
@@ -101,6 +81,9 @@ class WebView extends BasicView implements View
         ), 'asArray');
     }
 
+    /*
+     * @return string
+     */
     public function getHead(): string
     {
         return '<head><meta charset="UTF-8">'
@@ -150,6 +133,9 @@ class WebView extends BasicView implements View
         return $this->metas;
     }
 
+    /*
+     * @return string
+     */
     public function getMetas(): string
     {
         $str = '';
@@ -209,9 +195,9 @@ class WebView extends BasicView implements View
 
     /**
      * @param string $href
-     * @param string $type
-     * @param bool   $defer
-     * @param bool   $cahceBust
+     * @param string $type      = 'text/javascript'
+     * @param bool   $defer     = false
+     * @param bool   $cacheBust = true
      */
     public function linkScript(string $href, string $type = 'text/javascript', bool $defer = false, bool $cacheBust = true): void
     {
@@ -246,8 +232,8 @@ class WebView extends BasicView implements View
 
     /**
      * @param string $filepath
-     * @param string $type
-     * @param bool   $cacheBust
+     * @param string $type      = 'text/css'
+     * @param bool   $cacheBust = false
      *
      * @return bool
      */
@@ -273,8 +259,8 @@ class WebView extends BasicView implements View
 
     /**
      * @param string $filepath
-     * @param string $type
-     * @param bool   $cacheBust
+     * @param string $type      = 'text/javascript'
+     * @param bool   $cacheBust = false
      *
      * @return bool
      */
@@ -298,6 +284,9 @@ class WebView extends BasicView implements View
         return true;
     }
 
+    /*
+     * @return string
+     */
     public function getStyles(): string
     {
         $str = '';
@@ -314,6 +303,9 @@ class WebView extends BasicView implements View
         return $str;
     }
 
+    /*
+     * @return string
+     */
     public function getStylesContent(): string
     {
         $content = '';
@@ -325,6 +317,9 @@ class WebView extends BasicView implements View
         return $content;
     }
 
+    /*
+     * @return string
+     */
     public function getScripts(): string
     {
         $str = '';
@@ -341,6 +336,9 @@ class WebView extends BasicView implements View
         return $str;
     }
 
+    /*
+     * @return string
+     */
     public function getScriptsContent(): string
     {
         $content = '';
@@ -368,7 +366,14 @@ class WebView extends BasicView implements View
         return $this->styles;
     }
 
-    public function redirect($url, $delay = 0, $code = 303) {
+    /*
+     * @param string url
+     * @param int delay = 0
+     * @param int code = 303
+     * @return bool
+     */
+    public function redirect(string $url, int $delay = 0, int $code = 303): bool
+    {
         $this->addRawMetaTag('<meta http-equiv="refresh" content="'.$delay.'; url='.$url.'">');
 
         if(!headers_sent()) {
