@@ -131,6 +131,7 @@ class Route
     {
         $this->prefix = $prefix;
     }
+
     public function hasPrefix(): bool
     {
         return !empty($this->prefix);

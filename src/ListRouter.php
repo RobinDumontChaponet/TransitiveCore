@@ -63,10 +63,10 @@ class ListRouter implements Router
                 $route = $this->routes[$pattern][$method];
 
         if($route) {
-	        if(!$route->hasExposedVariables())
-            	$route->setExposedVariables($this->exposedVariables);
-	        if(!$route->hasPrefix())
-            	$route->setPrefix($this->prefix);
+            if(!$route->hasExposedVariables())
+                $route->setExposedVariables($this->exposedVariables);
+            if(!$route->hasPrefix())
+                $route->setPrefix($this->prefix);
         }
 
         return $route;
@@ -76,6 +76,7 @@ class ListRouter implements Router
     {
         $this->exposedVariables = $exposedVariables;
     }
+
     public function setPrefix(string $prefix = null): void
     {
         $this->prefix = $prefix;
