@@ -127,6 +127,15 @@ class Route
         return !empty($this->exposedVariables);
     }
 
+    public function setPrefix(string $prefix = null): void
+    {
+        $this->prefix = $prefix;
+    }
+    public function hasPrefix(): bool
+    {
+        return !empty($this->prefix);
+    }
+
     public function hasPresenter(): bool
     {
         return isset($this->presenter) && $this->presenter instanceof Presenter;

@@ -8,6 +8,7 @@ class ListRegexRouter implements Router
      * @var array Route
      */
     public $routes;
+    private $prefix;
     private $exposedVariables;
 
     public function __construct(array $routes, array $exposedVariables = []) {
@@ -69,8 +70,12 @@ class ListRegexRouter implements Router
                 }
             }
 
-        if($route && !$route->hasExposedVariables())
-            $route->setExposedVariables($this->exposedVariables);
+        if($route) {
+	        if(!$route->hasExposedVariables())
+            	$route->setExposedVariables($this->exposedVariables);
+	        if(!$route->hasPrefix())
+            	$route->setPrefix($this->prefix);
+        }
 
         return $route;
     }
@@ -78,5 +83,9 @@ class ListRegexRouter implements Router
     public function setExposedVariables(array $exposedVariables = []): void
     {
         $this->exposedVariables = $exposedVariables;
+    }
+    public function setPrefix(string $prefix = null): void
+    {
+        $this->prefix = $prefix;
     }
 }
