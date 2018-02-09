@@ -2,7 +2,7 @@
 
 namespace Transitive\Core;
 
-class BreakFlowException extends \Exception
+class BreakFlowException extends \RuntimeException
 {
     private $queryURL;
 

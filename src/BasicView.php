@@ -116,7 +116,7 @@ class BasicView implements View
                     return $content->content;
             break;
             default:
-                throw new Exception('wrong view content type');
+                throw new InvalidArgumentException('wrong view content type : '. gettype($content));
         }
     }
 
