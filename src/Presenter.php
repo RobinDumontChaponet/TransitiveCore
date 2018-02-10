@@ -21,7 +21,7 @@ class Presenter
      * @param string $queryURL = null
      * @return void
      */
-    public function execute(string $queryURL = null): void
+    public function redirect(string $queryURL = null): void
     {
         throw new BreakFlowException($queryURL);
     }
