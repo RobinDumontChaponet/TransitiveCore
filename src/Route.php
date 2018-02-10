@@ -197,33 +197,15 @@ class Route
             return $this->view->getHeadValue();
     }
 
-    public function printHead(): void
-    {
-        if(isset($this->view))
-            $this->view->printHead();
-    }
-
     public function getBody()
     {
         if(isset($this->view))
             return $this->view->getBody();
     }
 
-    public function printBody(): void
-    {
-        if(isset($this->view))
-            $this->view->printBody();
-    }
-
     public function getDocument()
     {
         if(isset($this->view))
             return $this->view->getDocument();
-    }
-
-    public function printDocument(): void
-    {
-        if(isset($this->view))
-            $this->view->printDocument();
     }
 }
