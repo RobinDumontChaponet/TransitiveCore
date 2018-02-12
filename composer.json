@@ -21,7 +21,7 @@
 	"suggest": {
         "transitive/utils": "sometimes usefull methods and function",
 		"nikic/fast-route": "Fast request router for PHP",
-		"twig/twig": "The flexible, fast and secure template engine for PHP"
+		"twig/twig": "The flexible, fast and secure template engine for PHP",
 		"psr/http-message": "^1.0"
     },
 	"autoload": {
