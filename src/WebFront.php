@@ -32,7 +32,7 @@ function getBestSupportedMimeType($mimeTypes = null) {
 }
 
 /**
- * WebFront class.
+ * WebFront class
  *
  * @extends BasicFront
  * @implements FrontController
@@ -61,23 +61,25 @@ class WebFront extends BasicFront implements FrontController
 
         $this->layout = new Route(new Presenter(), new BasicView());
 
-        $this->layout->getView()->content = function ($data) { ?>
-<!DOCTYPE html>
+        $this->setLayoutContent(function ($data) { ?><!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<?php $data['view']->printMetas(); ?>
-<?php $data['view']->printTitle('Default layout'); ?>
-<?php $data['view']->printStyles(); ?>
-<?php $data['view']->printScripts(); ?>
+<?= $data['view']->getMetas(); ?>
+<?= $data['view']->getTitle('Default layout'); ?>
+<?= $data['view']->getStyles(); ?>
+<?= $data['view']->getScripts(); ?>
 </head>
 <body>
-<?= $data['view']; ?>
+	<?= $data['view']; ?>
 </body>
-</html>
-<?php  };
-}
+</html><?php
+		});
+	}
 
+	/*
+	 * @todo remove this ?
+	 */
     public function getContentType(): ?string
     {
         return $this->contentType;
@@ -138,6 +140,9 @@ class WebFront extends BasicFront implements FrontController
         }
     }
 
+	/**
+     * @codeCoverageIgnore
+     */
     public function __debugInfo()
     {
         return [
@@ -150,11 +155,20 @@ class WebFront extends BasicFront implements FrontController
         ];
     }
 
+	/**
+     * @codeCoverageIgnore
+     */
     public function __toString(): string
     {
         return $this->getContent();
     }
 
+	/**
+     * Return processed content from current route
+     *
+     * @return string
+     * @param string $contentType = null
+     */
     public function getContent(string $contentType = null): string
     {
         if(null == $contentType)
@@ -197,6 +211,10 @@ class WebFront extends BasicFront implements FrontController
                 return $this->route->getContent()->asYAML();
             break;
 
+            case 'text/plain':
+                return $this->getContent()->asString();
+            break;
+
             default:
                 return $this->layout->getView();
         }
@@ -210,17 +228,6 @@ class WebFront extends BasicFront implements FrontController
     public function setHttpErrorRoute(Route $route): void
     {
         $this->httpErrorRoute = $route;
-    }
-
-    public function setLayoutContent($content = null): bool
-    {
-        if(isset($this->layout) && $this->layout->hasView()) {
-            $this->layout->getView()->content = $content;
-
-            return true;
-        }
-
-        return false;
     }
 }
 

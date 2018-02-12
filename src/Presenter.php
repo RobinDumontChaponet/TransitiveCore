@@ -9,9 +9,6 @@ class Presenter
      */
     public $data;
 
-    /**
-     * __construct function.
-     */
     public function __construct()
     {
         $this->data = array();

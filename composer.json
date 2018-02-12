@@ -12,8 +12,7 @@
 		}
 	],
 	"require": {
-		"php": "^7.1",
-		"psr/http-message": "^1.0"
+		"php": "^7.1"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~6.4.0",
@@ -23,6 +22,7 @@
         "transitive/utils": "sometimes usefull methods and function",
 		"nikic/fast-route": "Fast request router for PHP",
 		"twig/twig": "The flexible, fast and secure template engine for PHP"
+		"psr/http-message": "^1.0"
     },
 	"autoload": {
 		"psr-4": {
