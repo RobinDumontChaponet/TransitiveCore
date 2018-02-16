@@ -76,7 +76,7 @@ class Route
 
         if(is_string($view)) {
             if(is_file($view)) {
-                $view = new WebView();
+                $view = new $this->defaultViewClassName();
 
                 $obContent .= self::includeView($this->getView(), ['view' => $view], $this->prefix, $obClean);
 
@@ -92,18 +92,24 @@ class Route
         return $obContent;
     }
 
-    public function __construct($presenter, $view = null, string $prefix = null, array $exposedVariables = [])
+    public function __construct($presenter, $view = null, string $prefix = null, array $exposedVariables = [], string $defaultViewClassName = null)
     {
         $this->presenter = $presenter;
         $this->view = $view;
         $this->prefix = $prefix;
         $this->exposedVariables = $exposedVariables;
+        $this->setDefaultViewClassName($defaultViewClassName);
     }
 
     /**
      * @var string | null : prefix for exposed variables
      */
     private $prefix;
+
+    /**
+     * @var string : View's ClassName for when we have specified a path instead of a View instance
+     */
+    private $defaultViewClassName;
 
     /**
      * @var Presenter | string
@@ -116,6 +122,16 @@ class Route
     public $view;
 
     private $exposedVariables;
+
+    public function setDefaultViewClassName(?string $defaultViewClassName = '\Transitive\Core\BasicView'): void
+    {
+        $this->defaultViewClassName = $defaultViewClassName;
+    }
+
+    public function hasDefaultViewClassName(): bool
+    {
+        return !empty($this->defaultViewClassName);
+    }
 
     public function setExposedVariables(array $exposedVariables = []): void
     {
@@ -135,6 +151,11 @@ class Route
     public function hasPrefix(): bool
     {
         return !empty($this->prefix);
+    }
+
+    public function getPrefix(): ?string
+    {
+        return $this->prefix;
     }
 
     public function hasPresenter(): bool

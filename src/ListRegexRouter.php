@@ -10,6 +10,7 @@ class ListRegexRouter implements Router
     public $routes;
     private $prefix;
     private $exposedVariables;
+    private $defaultViewClassName;
 
     public function __construct(array $routes, array $exposedVariables = []) {
         $this->setRoutes($routes);
@@ -75,6 +76,8 @@ class ListRegexRouter implements Router
                 $route->setExposedVariables($this->exposedVariables);
             if(!$route->hasPrefix())
                 $route->setPrefix($this->prefix);
+            if(!$route->hasDefaultViewClassName())
+                $route->setDefaultViewClassName($this->defaultViewClassName);
         }
 
         return $route;
@@ -88,5 +91,10 @@ class ListRegexRouter implements Router
     public function setPrefix(string $prefix = null): void
     {
         $this->prefix = $prefix;
+    }
+
+    public function setDefaultViewClassName(string $defaultViewClassName = null): void
+    {
+        $this->defaultViewClassName = $defaultViewClassName;
     }
 }

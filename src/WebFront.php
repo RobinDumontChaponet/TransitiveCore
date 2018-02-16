@@ -32,7 +32,7 @@ function getBestSupportedMimeType($mimeTypes = null) {
 }
 
 /**
- * WebFront class
+ * WebFront class.
  *
  * @extends BasicFront
  * @implements FrontController
@@ -74,12 +74,12 @@ class WebFront extends BasicFront implements FrontController
 	<?= $data['view']; ?>
 </body>
 </html><?php
-		});
-	}
+        });
+    }
 
-	/*
-	 * @todo remove this ?
-	 */
+    /*
+     * @todo remove this ?
+     */
     public function getContentType(): ?string
     {
         return $this->contentType;
@@ -89,58 +89,54 @@ class WebFront extends BasicFront implements FrontController
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
 
-        if(!isset($this->routers))
-            throw new RoutingException('No routeR.');
-        else {
-            $routes = [$this->_getRoute($queryURL), $this->httpErrorRoute, self::$defaultHttpErrorRoute];
-            foreach($routes as $route) {
-                if(isset($route))
-                    try {
-                        $this->obContent = $route->execute($this->obClean);
-                        $this->route = $route;
+        $routes = [$this->_getRoute($queryURL, '\Transitive\Core\WebView'), $this->httpErrorRoute, self::$defaultHttpErrorRoute];
+        foreach($routes as $route) {
+            if(isset($route))
+                try {
+                    $this->obContent = $route->execute($this->obClean);
+                    $this->route = $route;
 /*
-                        unset($routes);
-                        unset($route);
+                    unset($routes);
+                    unset($route);
 */
-                        $this->executed = true;
+                    $this->executed = true;
 
-                        break;
-                    } catch(RoutingException $e) {
-                        if($e->getCode() > 200) {
-                            http_response_code($e->getCode());
-                            $_SERVER['REDIRECT_STATUS'] = $e->getCode();
-                        }
-                        continue;
-                    } catch(BreakFlowException $e) {
-                        $this->execute($e->getQueryURL());
-
-                        break;
+                    break;
+                } catch(RoutingException $e) {
+                    if($e->getCode() > 200) {
+                        http_response_code($e->getCode());
+                        $_SERVER['REDIRECT_STATUS'] = $e->getCode();
                     }
-            }
+                    continue;
+                } catch(BreakFlowException $e) {
+                    $this->execute($e->getQueryURL());
 
-            if($this->route->hasView() && !$this->route->getView()->hasContent()) {
-                http_response_code(204);
-                $_SERVER['REDIRECT_STATUS'] = 204;
-            }
-            if(!empty($this->contentType)) {
-                header('Content-Type: '.$this->contentType);
-                if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
-                    header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
-                    header('Cache-Control: public, max-age=60');
+                    break;
                 }
-            }
-            header('Vary: X-Requested-With,Content-Type');
-
-            $content = ['view' => $this->route->getView()];
-
-            $this->layout->getPresenter()->setData($content);
-            $this->layout->execute($this->obClean);
-
-            return $this->route;
         }
+
+        if($this->route->hasView() && !$this->route->getView()->hasContent()) {
+            http_response_code(204);
+            $_SERVER['REDIRECT_STATUS'] = 204;
+        }
+        if(!empty($this->contentType)) {
+            header('Content-Type: '.$this->contentType);
+            if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
+                header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+                header('Cache-Control: public, max-age=60');
+            }
+        }
+        header('Vary: X-Requested-With,Content-Type');
+
+        $content = ['view' => $this->route->getView()];
+
+        $this->layout->getPresenter()->setData($content);
+        $this->layout->execute($this->obClean);
+
+        return $this->route;
     }
 
-	/**
+    /**
      * @codeCoverageIgnore
      */
     public function __debugInfo()
@@ -155,7 +151,7 @@ class WebFront extends BasicFront implements FrontController
         ];
     }
 
-	/**
+    /**
      * @codeCoverageIgnore
      */
     public function __toString(): string
@@ -163,10 +159,11 @@ class WebFront extends BasicFront implements FrontController
         return $this->getContent();
     }
 
-	/**
-     * Return processed content from current route
+    /**
+     * Return processed content from current route.
      *
      * @return string
+     *
      * @param string $contentType = null
      */
     public function getContent(string $contentType = null): string

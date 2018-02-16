@@ -3,59 +3,53 @@
 namespace Transitive\Core;
 
 /**
- * BasicFront class
+ * BasicFront class.
  *
  * @implements FrontController
  */
 class BasicFront implements FrontController
 {
-
     /**
-     * Layout route
+     * Layout route.
      *
      * @var Route
-     * @access protected
      */
     protected $layout;
 
     /**
-	 * List of Routers
-	 *
+     * List of Routers.
+     *
      * @var array Router
-     * @access protected
      */
     protected $routers;
 
     /**
-	 * Current route
-	 * @todo remove this ?
-	 *
+     * Current route.
+     *
+     * @todo remove this ?
+     *
      * @var Route
-     * @access protected
      */
     protected $route;
 
     /**
-	 * Should presenter & view 's buffer be cleaned ?
-	 *
+     * Should presenter & view 's buffer be cleaned ?
+     *
      * @var bool
-     * @access public
      */
     public $obClean;
 
     /**
-	 * content presenter & view 's buffer if obClean is set to true
-	 *
+     * content presenter & view 's buffer if obClean is set to true.
+     *
      * @var string
-     * @access protected
      */
     protected $obContent;
 
     /**
-	 * did execute run successfuly ?
-	 *
+     * did execute run successfuly ?
+     *
      * @var bool
-     * @access protected
      */
     protected $executed = false;
 
@@ -71,17 +65,17 @@ class BasicFront implements FrontController
         };
     }
 
-	/*
-	 * @todo remove this ?
-	 */
+    /*
+     * @todo remove this ?
+     */
     public function getContentType(): ?string
     {
         return $this->contentType;
     }
 
-	/**
-	 * Get presenter & view buffer (if obClean is enabled)
-	 *
+    /**
+     * Get presenter & view buffer (if obClean is enabled).
+     *
      * @return string
      */
     public function getObContent(): string
@@ -89,36 +83,38 @@ class BasicFront implements FrontController
         return $this->obContent;
     }
 
-    protected function _getRoute(string $query): ?Route
-    {
-        foreach($this->routers as $router)
-            if(null !== ($testRoute = $router->execute($query)))
-                return $testRoute;
-        throw new RoutingException('No route.');
-    }
-
-    public function execute(string $queryURL = null): ?Route
+    protected function _getRoute(string $query, string $defaultViewClassName = null): ?Route
     {
         if(!isset($this->routers))
             throw new RoutingException('No routeR.');
         else {
-            $this->route = $this->_getRoute($queryURL);
-            if(isset($this->route))
-                try {
-                    $this->obContent = $route->execute($this->obClean);
-                } catch(BreakFlowException $e) {
-                    $this->execute($e->getQueryURL());
-                }
+            foreach($this->routers as $router)
+                $router->setDefaultViewClassName($defaultViewClassName);
+                if(null !== ($testRoute = $router->execute($query)))
+                    return $testRoute;
 
-            $this->executed = true;
-
-            $content = ['view' => $this->route->getView()];
-
-            $this->layout->getPresenter()->setData($content);
-            $this->layout->execute($this->obClean);
-
-            return $this->route;
+            throw new RoutingException('No route.');
         }
+    }
+
+    public function execute(string $queryURL = null): ?Route
+    {
+        $this->route = $this->_getRoute($queryURL, '\Transitive\Core\BasicView');
+        if(isset($this->route))
+            try {
+                $this->obContent = $route->execute($this->obClean);
+            } catch(BreakFlowException $e) {
+                $this->execute($e->getQueryURL());
+            }
+
+        $this->executed = true;
+
+        $content = ['view' => $this->route->getView()];
+
+        $this->layout->getPresenter()->setData($content);
+        $this->layout->execute($this->obClean);
+
+        return $this->route;
     }
 
     /**
@@ -143,10 +139,11 @@ class BasicFront implements FrontController
         return $this->getContent();
     }
 
-	/**
-     * Return processed content from current route
+    /**
+     * Return processed content from current route.
      *
      * @return string
+     *
      * @param string $contentType = null
      */
     public function getContent(string $contentType = null): string
@@ -205,7 +202,7 @@ class BasicFront implements FrontController
     }
 
     /**
-     * Get all routers
+     * Get all routers.
      *
      * @return array
      */
@@ -215,7 +212,7 @@ class BasicFront implements FrontController
     }
 
     /**
-     * Set routers list, replacing any previously set Router
+     * Set routers list, replacing any previously set Router.
      *
      * @param array $routers
      */
@@ -225,9 +222,8 @@ class BasicFront implements FrontController
     }
 
     /**
-	 * Add specified router
-	 *
-     * @return void
+     * Add specified router.
+     *
      * @param Router $router
      */
     public function addRouter(Router $router): void
@@ -237,10 +233,12 @@ class BasicFront implements FrontController
 
     /**
      * Remove specified router
-     * return true at success and false otherwise
+     * return true at success and false otherwise.
      *
      * @return bool
+     *
      * @param Router $router
+     *
      * @todo implement this
      */
     public function removeRouter(Router $router): bool
@@ -249,9 +247,10 @@ class BasicFront implements FrontController
     }
 
     /**
-     * Return current Route
+     * Return current Route.
      *
      * @todo remove this ?
+     *
      * @return Route
      */
     public function getRoute(): ?Route
