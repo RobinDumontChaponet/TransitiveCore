@@ -7,6 +7,7 @@
 /phpunit.xml        export-ignore
 /.php_cs.dist       export-ignore
 /coveralls.yml      export-ignore
+/TODO.md            export-ignore
 
 # Auto detect text files and perform LF normalization
 * text=auto
