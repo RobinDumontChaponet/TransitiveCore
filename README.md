@@ -22,19 +22,17 @@ composer require transitive/core
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
-require __DIR__.'/../config/default.php';
 
-$transit = new Transitive\Core\WebFront();
+$front = new Transitive\Core\WebFront();
 
-$transit->addRouter(new Transitive\Core\PathRouter(PRESENTERS, VIEWS));
+$front->addRouter(new Transitive\Core\PathRouter(dirname(dirname(__FILE__)).'/presenters', dirname(dirname(__FILE__)).'/views'));
 
 $request = @$_GET['request'];
 
-$transit->execute($request ?? 'index');
+$front->execute($request ?? 'index');
 
-echo $transit;
+echo $front;
 
-//echo $transit->getObContent();
 ```
 
 ## License
