@@ -2,6 +2,10 @@
 
 namespace Transitive\Core;
 
+
+/**
+ * Exception break flow and send request to FrontController when thrown from presenter.
+ */
 class BreakFlowException extends \RuntimeException
 {
     private $queryURL;
