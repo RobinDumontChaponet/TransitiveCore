@@ -50,7 +50,7 @@ final class ViewResourceTest extends PHPUnit\Framework\TestCase
 
     public function testAsXMLElementType()
     {
-        $instance = new ViewResource(['',[]]);
+        $instance = new ViewResource(['', []]);
 
         $this->assertInstanceOf(
             'SimpleXMLElement',
