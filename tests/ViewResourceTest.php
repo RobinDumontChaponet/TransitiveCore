@@ -50,7 +50,7 @@ final class ViewResourceTest extends PHPUnit\Framework\TestCase
 
     public function testAsXMLElementType()
     {
-        $instance = new ViewResource('');
+        $instance = new ViewResource(['',[]]);
 
         $this->assertInstanceOf(
             'SimpleXMLElement',
@@ -93,6 +93,18 @@ final class ViewResourceTest extends PHPUnit\Framework\TestCase
         $this->assertEquals(
             $value,
             $instance->asString()
+        );
+    }
+
+    public function testAsStringGluedValue()
+    {
+        $value = ['test', 'test'];
+        $glue = ', ';
+        $instance = new ViewResource($value);
+
+        $this->assertEquals(
+            $value[0].$glue.$value[1],
+            $instance->asString($glue)
         );
     }
 

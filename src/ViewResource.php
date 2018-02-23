@@ -124,8 +124,11 @@ class ViewResource
 
     public function asYAML(): string
     {
+        // @codeCoverageIgnoreStart
         if(!function_exists('yaml_emit'))
             throw new \Exception('The YAML extension appears to not be installed.');
+        // @codeCoverageIgnoreEnd
+
         return yaml_emit($this->asArray());
     }
 
