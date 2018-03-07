@@ -51,6 +51,7 @@ class WebFront extends BasicFront implements FrontController
         'application/vnd.transitive.content+json', 'application/vnd.transitive.content+xml', 'application/vnd.transitive.content+yaml',
         'application/vnd.transitive.head+json', 'application/vnd.transitive.head+xml', 'application/vnd.head+yaml',
         'application/vnd.transitive.document+json', 'application/vnd.transitive.document+xml', 'application/vnd.transitive.document+yaml',
+        'text/plain',
     );
 
     public function __construct()
@@ -210,6 +211,23 @@ class WebFront extends BasicFront implements FrontController
 
             case 'text/plain':
                 return $this->getContent()->asString();
+            break;
+
+            case 'application/json':
+                if($this->route->hasContent('api'))
+                    return $this->route->getContent('api')->asJson();
+                elseif(http_response_code() != 404) {
+					http_response_code(404);
+                    $_SERVER['REDIRECT_STATUS'] = 404;
+                }
+            break;
+            case 'application/xml':
+                if($this->route->hasContent('api'))
+                    return $this->route->getContent('api')->asXML();
+                elseif(http_response_code() != 404) {
+					http_response_code(404);
+                    $_SERVER['REDIRECT_STATUS'] = 404;
+                }
             break;
 
             default:
