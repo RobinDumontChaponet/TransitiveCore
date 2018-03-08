@@ -86,26 +86,26 @@ class WebFront extends BasicFront implements FrontController
         return $this->contentType;
     }
 
-	protected function _getRoute(string $query, string $defaultViewClassName = null): ?Route
+    protected function _getRoute(string $query, string $defaultViewClassName = null): ?Route
     {
-	    try {
-		    return parent::_getRoute($query, $defaultViewClassName);
+        try {
+            return parent::_getRoute($query, $defaultViewClassName);
         } catch(RoutingException $e) {
-			if($e->getCode() > 200) {
-				http_response_code($e->getCode());
-				$_SERVER['REDIRECT_STATUS'] = $e->getCode();
-			}
+            if($e->getCode() > 200) {
+                http_response_code($e->getCode());
+                $_SERVER['REDIRECT_STATUS'] = $e->getCode();
+            }
 
-			return $this->httpErrorRoute ?? self::$defaultHttpErrorRoute ?? null;
-		}
+            return $this->httpErrorRoute ?? self::$defaultHttpErrorRoute ?? null;
+        }
     }
 
     public function execute(string $queryURL = null): ?Route
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
-		$this->route = $this->_getRoute($queryURL, '\Transitive\Core\WebView');
+        $this->route = $this->_getRoute($queryURL, '\Transitive\Core\WebView');
 
-		if(isset($this->route)) {
+        if(isset($this->route)) {
             try {
                 $this->obContent = $this->route->execute($this->obClean);
                 $this->executed = true;
@@ -118,24 +118,24 @@ class WebFront extends BasicFront implements FrontController
                 $this->execute($e->getQueryURL());
             }
 
-	        if($this->route->hasView() && !$this->route->getView()->hasContent()) {
-	            http_response_code(204);
-	            $_SERVER['REDIRECT_STATUS'] = 204;
-	        }
-	        if(!empty($this->contentType)) {
-	            header('Content-Type: '.$this->contentType);
-	            if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html', 'plain/text'))) {
-	                header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
-	                header('Cache-Control: public, max-age=60');
-	            }
-	        }
-	        header('Vary: X-Requested-With,Content-Type');
+            if($this->route->hasView() && !$this->route->getView()->hasContent()) {
+                http_response_code(204);
+                $_SERVER['REDIRECT_STATUS'] = 204;
+            }
+            if(!empty($this->contentType)) {
+                header('Content-Type: '.$this->contentType);
+                if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html', 'plain/text'))) {
+                    header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+                    header('Cache-Control: public, max-age=60');
+                }
+            }
+            header('Vary: X-Requested-With,Content-Type');
 
-	        $content = ['view' => $this->route->getView()];
+            $content = ['view' => $this->route->getView()];
 
-	        $this->layout->getPresenter()->setData($content);
-	        $this->layout->execute($this->obClean);
-	    }
+            $this->layout->getPresenter()->setData($content);
+            $this->layout->execute($this->obClean);
+        }
 
         return $this->route;
     }
@@ -172,12 +172,12 @@ class WebFront extends BasicFront implements FrontController
      */
     public function getContent(string $contentType = null): string
     {
-	    if(empty($this->route)) {
-		    http_response_code(404);
-	        $_SERVER['REDIRECT_STATUS'] = 404;
+        if(empty($this->route)) {
+            http_response_code(404);
+            $_SERVER['REDIRECT_STATUS'] = 404;
 
-	    	return 'No Route';
-	    }
+            return 'No Route';
+        }
 
         if(null == $contentType)
             $contentType = $this->contentType;
@@ -226,16 +226,16 @@ class WebFront extends BasicFront implements FrontController
             case 'application/json':
                 if($this->route->hasContent('api'))
                     return $this->route->getContent('api')->asJson();
-                elseif(http_response_code() != 404) {
-					http_response_code(404);
+                elseif(404 != http_response_code()) {
+                    http_response_code(404);
                     $_SERVER['REDIRECT_STATUS'] = 404;
                 }
             break;
             case 'application/xml':
                 if($this->route->hasContent('api'))
                     return $this->route->getContent('api')->asXML();
-                elseif(http_response_code() != 404) {
-					http_response_code(404);
+                elseif(404 != http_response_code()) {
+                    http_response_code(404);
                     $_SERVER['REDIRECT_STATUS'] = 404;
                 }
             break;

@@ -76,10 +76,10 @@ class Route
 
         if(is_string($view)) {
             if(is_file($view)) {
-	            if(empty($this->defaultViewClassName))
-		            $view = new BasicView();
-		        else
-	                $view = new $this->defaultViewClassName();
+                if(empty($this->defaultViewClassName))
+                    $view = new BasicView();
+                else
+                    $view = new $this->defaultViewClassName();
 
                 $obContent .= self::includeView($this->getView(), ['view' => $view], $this->prefix, $obClean);
 
