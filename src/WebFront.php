@@ -86,53 +86,56 @@ class WebFront extends BasicFront implements FrontController
         return $this->contentType;
     }
 
+	protected function _getRoute(string $query, string $defaultViewClassName = null): ?Route
+    {
+	    try {
+		    return parent::_getRoute($query, $defaultViewClassName);
+        } catch(RoutingException $e) {
+			if($e->getCode() > 200) {
+				http_response_code($e->getCode());
+				$_SERVER['REDIRECT_STATUS'] = $e->getCode();
+			}
+
+			return $this->httpErrorRoute ?? self::$defaultHttpErrorRoute ?? null;
+		}
+    }
+
     public function execute(string $queryURL = null): ?Route
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
+		$this->route = $this->_getRoute($queryURL, '\Transitive\Core\WebView');
 
-        $routes = [$this->_getRoute($queryURL, '\Transitive\Core\WebView'), $this->httpErrorRoute, self::$defaultHttpErrorRoute];
-        foreach($routes as $route) {
-            if(isset($route))
-                try {
-                    $this->obContent = $route->execute($this->obClean);
-                    $this->route = $route;
-/*
-                    unset($routes);
-                    unset($route);
-*/
-                    $this->executed = true;
-
-                    break;
-                } catch(RoutingException $e) {
-                    if($e->getCode() > 200) {
-                        http_response_code($e->getCode());
-                        $_SERVER['REDIRECT_STATUS'] = $e->getCode();
-                    }
-                    continue;
-                } catch(BreakFlowException $e) {
-                    $this->execute($e->getQueryURL());
-
-                    break;
+		if(isset($this->route)) {
+            try {
+                $this->obContent = $this->route->execute($this->obClean);
+                $this->executed = true;
+            } catch(RoutingException $e) {
+                if($e->getCode() > 200) {
+                    http_response_code($e->getCode());
+                    $_SERVER['REDIRECT_STATUS'] = $e->getCode();
                 }
-        }
-
-        if($this->route->hasView() && !$this->route->getView()->hasContent()) {
-            http_response_code(204);
-            $_SERVER['REDIRECT_STATUS'] = 204;
-        }
-        if(!empty($this->contentType)) {
-            header('Content-Type: '.$this->contentType);
-            if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html'))) {
-                header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
-                header('Cache-Control: public, max-age=60');
+            } catch(BreakFlowException $e) {
+                $this->execute($e->getQueryURL());
             }
-        }
-        header('Vary: X-Requested-With,Content-Type');
 
-        $content = ['view' => $this->route->getView()];
+	        if($this->route->hasView() && !$this->route->getView()->hasContent()) {
+	            http_response_code(204);
+	            $_SERVER['REDIRECT_STATUS'] = 204;
+	        }
+	        if(!empty($this->contentType)) {
+	            header('Content-Type: '.$this->contentType);
+	            if(!in_array($this->contentType, array('application/xhtml+xml', 'text/html', 'plain/text'))) {
+	                header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+	                header('Cache-Control: public, max-age=60');
+	            }
+	        }
+	        header('Vary: X-Requested-With,Content-Type');
 
-        $this->layout->getPresenter()->setData($content);
-        $this->layout->execute($this->obClean);
+	        $content = ['view' => $this->route->getView()];
+
+	        $this->layout->getPresenter()->setData($content);
+	        $this->layout->execute($this->obClean);
+	    }
 
         return $this->route;
     }
@@ -169,6 +172,13 @@ class WebFront extends BasicFront implements FrontController
      */
     public function getContent(string $contentType = null): string
     {
+	    if(empty($this->route)) {
+		    http_response_code(404);
+	        $_SERVER['REDIRECT_STATUS'] = 404;
+
+	    	return 'No Route';
+	    }
+
         if(null == $contentType)
             $contentType = $this->contentType;
         switch($contentType) {

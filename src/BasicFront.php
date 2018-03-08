@@ -86,14 +86,16 @@ class BasicFront implements FrontController
     protected function _getRoute(string $query, string $defaultViewClassName = null): ?Route
     {
         if(!isset($this->routers))
-            throw new RoutingException('No routeR.');
+            throw new RoutingException('No routeR.', 404);
         else {
-            foreach($this->routers as $router)
-                $router->setDefaultViewClassName($defaultViewClassName);
+            foreach($this->routers as $router) {
+	            if(!$router->hasDefaultViewClassName())
+	                $router->setDefaultViewClassName($defaultViewClassName);
                 if(null !== ($testRoute = $router->execute($query)))
                     return $testRoute;
+            }
 
-            throw new RoutingException('No route.');
+            throw new RoutingException('No route.', 404);
         }
     }
 

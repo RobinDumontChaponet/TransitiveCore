@@ -12,8 +12,9 @@ class ListRegexRouter implements Router
     private $exposedVariables;
     private $defaultViewClassName;
 
-    public function __construct(array $routes, array $exposedVariables = []) {
+    public function __construct(array $routes, string $prefix = null, array $exposedVariables = []) {
         $this->setRoutes($routes);
+        $this->setPrefix($prefix);
         $this->exposedVariables = $exposedVariables;
     }
 
@@ -96,5 +97,9 @@ class ListRegexRouter implements Router
     public function setDefaultViewClassName(string $defaultViewClassName = null): void
     {
         $this->defaultViewClassName = $defaultViewClassName;
+    }
+    public function hasDefaultViewClassName(): bool
+    {
+        return !empty($this->defaultViewClassName);
     }
 }

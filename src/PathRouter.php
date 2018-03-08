@@ -45,7 +45,7 @@ class PathRouter implements Router
         $realPresenter = self::_real($presenterPattern, $this->separator);
         $realView = self::_real($viewPattern, $this->separator);
 
-        if($realPresenter && $realView)
+        if($realPresenter && $realView && is_file($this->presentersPath.$realPresenter) && is_file($this->viewsPath.$realView))
             return new Route($this->presentersPath.$realPresenter, $this->viewsPath.$realView, $this->prefix, $this->exposedVariables, $this->defaultViewClassName);
         else
             return null;
@@ -94,5 +94,9 @@ class PathRouter implements Router
     public function setDefaultViewClassName(string $defaultViewClassName = null): void
     {
         $this->defaultViewClassName = $defaultViewClassName;
+    }
+    public function hasDefaultViewClassName(): bool
+    {
+        return !empty($this->defaultViewClassName);
     }
 }

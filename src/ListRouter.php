@@ -89,4 +89,8 @@ class ListRouter implements Router
     {
         $this->defaultViewClassName = $defaultViewClassName;
     }
+	public function hasDefaultViewClassName(): bool
+    {
+        return !empty($this->defaultViewClassName);
+    }
 }
