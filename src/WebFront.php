@@ -54,6 +54,8 @@ class WebFront extends BasicFront implements FrontController
         'text/plain',
     );
 
+    public const defaultViewClassName = '\Transitive\Core\WebView';
+
     public function __construct()
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
@@ -103,7 +105,7 @@ class WebFront extends BasicFront implements FrontController
     public function execute(string $queryURL = null): ?Route
     {
         $this->contentType = getBestSupportedMimeType(self::$mimeTypes);
-        $this->route = $this->_getRoute($queryURL, '\Transitive\Core\WebView');
+        $this->route = $this->_getRoute($queryURL, self::defaultViewClassName);
 
         if(isset($this->route)) {
             try {
@@ -256,4 +258,4 @@ class WebFront extends BasicFront implements FrontController
     }
 }
 
-WebFront::setDefaultHttpErrorRoute(new Route(dirname(getcwd()).'/presenters/genericHttpErrorHandler.php', dirname(getcwd()).'/views/genericHttpErrorHandler.php'));
+WebFront::setDefaultHttpErrorRoute(new Route(dirname(getcwd()).'/presenters/genericHttpErrorHandler.php', dirname(getcwd()).'/views/genericHttpErrorHandler.php', null, [], WebFront::defaultViewClassName));
