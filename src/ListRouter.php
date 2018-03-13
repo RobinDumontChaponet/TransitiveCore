@@ -8,11 +8,11 @@ class ListRouter implements Router
      * @var array Route
      */
     public $routes;
-    private $prefix;
-    private $exposedVariables;
-    private $defaultViewClassName;
+    protected $prefix;
+    protected $exposedVariables;
+    protected $defaultViewClassName;
 
-    public function __construct(array $routes, array $exposedVariables = []) {
+    public function __construct(array $routes = [], array $exposedVariables = []) {
         $this->setRoutes($routes);
         $this->exposedVariables = $exposedVariables;
     }
@@ -88,10 +88,5 @@ class ListRouter implements Router
     public function setDefaultViewClassName(string $defaultViewClassName = null): void
     {
         $this->defaultViewClassName = $defaultViewClassName;
-    }
-
-    public function hasDefaultViewClassName(): bool
-    {
-        return !empty($this->defaultViewClassName);
     }
 }
