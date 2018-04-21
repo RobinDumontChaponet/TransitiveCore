@@ -58,26 +58,16 @@ class WebView extends BasicView implements View
         return parent::getTitle('<title>'.$prefix, $separator, $sufix.'</title>');
     }
 
-    /**
-     * @param string $key
-     *
-     * @return ViewResource
-     */
-    public function getContentValue(string $key = null): ViewResource
-    {
-        return new ViewResource($this->getContent($key));
-    }
-
     /*
      * @return ViewResource
      */
     public function getHeadValue(): ViewResource
     {
         return new ViewResource(array(
-            'metas' => $this->getMetas(),
-            'title' => $this->getTitle(),
+            'metas' => $this->getMetasValue(),
+            'title' => $this->getTitleValue(),
             'scripts' => $this->getScriptsValue(),
-            'styles' => $this->getStyles(),
+            'styles' => $this->getStylesValue(),
         ), 'asArray');
     }
 

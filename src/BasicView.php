@@ -150,7 +150,7 @@ class BasicView implements View
     public function getHeadValue(): ViewResource
     {
         return new ViewResource(array(
-            'title' => $this->getTitle(),
+            'title' => $this->getTitleValue(),
         ), 'asArray');
     }
 
