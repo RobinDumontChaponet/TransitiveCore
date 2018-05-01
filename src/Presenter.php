@@ -20,6 +20,7 @@ class Presenter
      */
     public function redirect(string $queryURL = null): void
     {
+        unset($this->data);
         throw new BreakFlowException($queryURL);
     }
 
