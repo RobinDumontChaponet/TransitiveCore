@@ -34,6 +34,16 @@ class Presenter
     }
 
     /**
+     * Return true if data array is not empty, false otherwise.
+     *
+     * @return bool
+     */
+    public function hasData(): bool
+    {
+        return !empty($this->data);
+    }
+
+    /**
      * Set data array.
      *
      * @param array &$data

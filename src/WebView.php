@@ -25,20 +25,6 @@ class WebView extends BasicView implements View
      */
     public $metas;
 
-    /**
-     * content : array | string | scalar | closure.
-     *
-     * @var mixed
-     */
-    public $content;
-
-    /**
-     * data pushed by presenter.
-     *
-     * @var array
-     */
-    public $data;
-
     public function __construct()
     {
         $this->styles = array();
