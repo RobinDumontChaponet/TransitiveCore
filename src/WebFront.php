@@ -120,7 +120,7 @@ class WebFront extends BasicFront implements FrontController
                 $this->execute($e->getQueryURL());
             }
 
-            if($this->route->hasView() && !$this->route->getView()->hasContent()) {
+            if(/* !$this->route->hasView() ||  */($this->route->hasView() && !$this->route->getView()->hasContent())) {
                 http_response_code(204);
                 $_SERVER['REDIRECT_STATUS'] = 204;
             }

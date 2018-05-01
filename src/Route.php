@@ -75,21 +75,23 @@ class Route
         $view = $this->getView();
 
         if(is_string($view)) {
-            if(is_file($view)) {
-                if(empty($this->defaultViewClassName))
-                    $view = new BasicView();
-                else
-                    $view = new $this->defaultViewClassName();
+            if(empty($this->defaultViewClassName))
+                $view = new BasicView();
+            else
+                $view = new $this->defaultViewClassName();
+            $view->content = '';
 
-                $obContent .= self::includeView($this->getView(), ['view' => $view], $this->prefix, $obClean);
-
-                $this->setView($view);
+            if(is_file($this->getView())) {
+                $obContent .= self::includeView($this->getView(), ['view' => &$view], $this->prefix, $obClean);
             } else {
+                $this->setView($view);
                 throw new RoutingException('View not found', 404);
             }
+
+            $this->setView($view);
         }
 
-        if(is_object($this->view))
+        if($this->hasPresenter() && $this->hasView() && $this->presenter->hasData())
             $this->view->setData($this->presenter->getData());
 
         return $obContent;

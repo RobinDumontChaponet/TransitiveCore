@@ -150,8 +150,10 @@ class BasicFront implements FrontController
      */
     public function getContent(string $contentType = null): string
     {
+/*
         if(null == $contentType)
             $contentType = $this->contentType;
+*/
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
                 return $this->getDocument();

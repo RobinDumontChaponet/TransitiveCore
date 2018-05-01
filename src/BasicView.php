@@ -23,7 +23,7 @@ class BasicView implements View
      *
      * @var array
      */
-    public $data;
+    public $data = [];
 
     /**
      * cacheBust function.
