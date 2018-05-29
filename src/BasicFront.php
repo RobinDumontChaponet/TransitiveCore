@@ -104,7 +104,7 @@ class BasicFront implements FrontController
         $this->route = $this->_getRoute($queryURL, '\Transitive\Core\BasicView');
         if(isset($this->route))
             try {
-                $this->obContent = $route->execute($this->obClean);
+                $this->obContent = $this->route->execute($this->obClean);
             } catch(BreakFlowException $e) {
                 $this->execute($e->getQueryURL());
             }
