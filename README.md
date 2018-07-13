@@ -1,9 +1,8 @@
 # Transitive\Core
 
-Very simple MVP (Model - View - Presenter) PHP framework.
-Code base for many of my simples (or not) projects now.
+Provides presenter, view and viewRessource classes to Transitive\Front
 
-~~I'm not doing yet another php framework. It would be pointless. More explanations ...later ;-)~~
+Should be useable standalone.
 
 [![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
 [![License](https://poser.pugx.org/transitive/core/license?format=flat-square)](https://packagist.org/packages/transitive/core)
