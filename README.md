@@ -19,19 +19,7 @@ composer require transitive/core
 ## Basic Usage
 
 ```php
-<?php
-
-require __DIR__.'/../vendor/autoload.php';
-
-$front = new Transitive\Core\WebFront();
-
-$front->addRouter(new Transitive\Core\PathRouter(dirname(dirname(__FILE__)).'/presenters', dirname(dirname(__FILE__)).'/views'));
-
-$request = @$_GET['request'];
-
-$front->execute($request ?? 'index');
-
-echo $front;
+//@todo rewrite this
 
 ```
 

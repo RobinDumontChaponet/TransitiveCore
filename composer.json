@@ -1,7 +1,7 @@
 {
-	"name": "transitive/core",
-	"description": "Very simple MVP (Model - View - Presenter) PHP framework.",
-	"keywords": ["framework","mvp","simple","router","model","view","presenter"],
+	"name": "transitive/front",
+	"description": "Core classes of Transitive MVP framework",
+	"keywords": ["framework","mvp","model","view","presenter"],
 	"license": "MIT",
 	"authors": [
 		{
@@ -19,10 +19,7 @@
 		"friendsofphp/php-cs-fixer": "^2.10"
     },
 	"suggest": {
-        "transitive/utils": "sometimes usefull methods and function",
-		"nikic/fast-route": "Fast request router for PHP",
-		"twig/twig": "The flexible, fast and secure template engine for PHP",
-		"psr/http-message": "^1.0"
+		"twig/twig": "The flexible, fast and secure template engine for PHP"
     },
 	"autoload": {
 		"psr-4": {
