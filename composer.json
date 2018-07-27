@@ -1,5 +1,5 @@
 {
-	"name": "transitive/front",
+	"name": "transitive/core",
 	"description": "Core classes of Transitive MVP framework",
 	"keywords": ["framework","mvp","model","view","presenter"],
 	"license": "MIT",
