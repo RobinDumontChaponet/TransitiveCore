@@ -63,7 +63,7 @@ class Front implements Routing\FrontController
         $this->obClean = true;
         $this->obContent = '';
 
-        $this->layout = new Routing\Route(new Core\Presenter(), new Simple\View());
+        $this->layout = new Routing\Route(new Core\Presenter(), new View());
 
         $this->layout->getView()->content = function ($data) {
             echo $data['view'];
