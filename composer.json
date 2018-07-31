@@ -23,6 +23,7 @@
     },
 	"autoload": {
 		"psr-4": {
+			"Transitive\\Simple\\": "src/simple",
 			"Transitive\\Core\\": "src/"
 		}
 	},

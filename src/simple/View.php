@@ -1,8 +1,10 @@
 <?php
 
-namespace Transitive\Core;
+namespace Transitive\Simple;
 
-class BasicView implements View
+use Transitive\Core;
+
+class View implements Core\View
 {
     /**
      * The view's title.
@@ -116,16 +118,16 @@ class BasicView implements View
                     return $content->content;
             break;
             default:
-                throw new InvalidArgumentException('wrong view content type : '.gettype($content));
+                throw new \InvalidArgumentException('wrong view content type : '.gettype($content));
         }
     }
 
     /**
      * @param string $key
      *
-     * @return ViewResource
+     * @return Core\ViewResource
      */
-    public function getContent(string $key = null): ViewResource
+    public function getContent(string $key = null): Core\ViewResource
     {
         $content = null;
         if($this->hasContent($key)) {
@@ -141,15 +143,15 @@ class BasicView implements View
                 $content = $this->_getContent($this->content);
         }
 
-        return new ViewResource($content);
+        return new Core\ViewResource($content);
     }
 
     /*
-     * @return ViewResource
+     * @return Core\ViewResource
      */
-    public function getHeadValue(): ViewResource
+    public function getHeadValue(): Core\ViewResource
     {
-        return new ViewResource(array(
+        return new Core\ViewResource(array(
             'title' => $this->getTitleValue(),
         ), 'asArray');
     }
@@ -164,11 +166,11 @@ class BasicView implements View
 
     /*
      * @param string $content = null
-     * @return ViewResource
+     * @return Core\ViewResource
      */
-    public function getDocument(string $contentKey = null): ViewResource
+    public function getDocument(string $contentKey = null): Core\ViewResource
     {
-        return new ViewResource(array(
+        return new Core\ViewResource(array(
             'head' => $this->getHeadValue()->asArray,
             'content' => $this->getContent($contentKey)->asArray,
         ), 'asJSON');
