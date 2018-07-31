@@ -1,7 +1,6 @@
 # Transitive\Core
 
-Provides presenter, view and viewRessource classes to Transitive\Front
-
+Provides presenter, view and viewRessource classes.
 Should be useable standalone.
 
 [![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
