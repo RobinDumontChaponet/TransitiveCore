@@ -6,13 +6,13 @@ use Transitive\Core;
 use Transitive\Routing;
 
 /**
- * SimpleFront
+ * SimpleFront.
  *
  * @implements Routing\FrontController
  */
 class Front implements Routing\FrontController
 {
-	const defaultViewClassName = '\Transitive\Simple\View';
+    const defaultViewClassName = '\Transitive\Simple\View';
 
     /**
      * Layout route.
