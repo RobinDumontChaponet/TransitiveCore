@@ -149,7 +149,7 @@ class View implements Core\View
     /*
      * @return Core\ViewResource
      */
-    public function getHeadValue(): Core\ViewResource
+    public function getHead(): Core\ViewResource
     {
         return new Core\ViewResource(array(
             'title' => $this->getTitleValue(),
@@ -159,9 +159,9 @@ class View implements Core\View
     /*
      * @return string
      */
-    public function getHead(): string
+    public function getHeadValue(): string
     {
-        return $this->getHeadValue()->asString();
+        return $this->getHead()->__toString();
     }
 
     /*
