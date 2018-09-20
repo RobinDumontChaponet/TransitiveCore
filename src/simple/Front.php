@@ -22,7 +22,7 @@ class Front implements Routing\FrontController
     protected $layout;
 
     /**
-     * List of Routing\Routers.
+     * List of Routing\Router.
      *
      * @var array Routing\Router
      */

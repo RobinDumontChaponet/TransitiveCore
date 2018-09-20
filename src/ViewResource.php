@@ -23,7 +23,7 @@ class ViewResource
         }
     }
 
-    public function __construct($value = null, $defaultTransformer = 'getValue')
+    public function __construct($value = null, string $defaultTransformer = 'getValue')
     {
         $this->setValue($value);
         $this->setDefault($defaultTransformer);
@@ -39,7 +39,7 @@ class ViewResource
         $this->value = $value;
     }
 
-    private function setDefault($defaultTransformer): void
+    private function setDefault(string $defaultTransformer): void
     {
         if(!method_exists($this, $defaultTransformer))
             throw new \InvalidArgumentException('Default transfomer "'.$defaultTransformer.'" is not implemented.');
@@ -73,7 +73,7 @@ class ViewResource
     /**
      * @codeCoverageIgnore
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if(method_exists($this, $name))
             return $this->{$name}();
