@@ -1,5 +1,7 @@
 # Transitive\Core
 
+test
+
 Provides presenter, view and viewRessource classes.
 Should be useable standalone.
 
