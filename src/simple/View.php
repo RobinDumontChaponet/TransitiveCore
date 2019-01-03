@@ -171,7 +171,7 @@ class View implements Core\View
     public function getDocument(string $contentKey = null): Core\ViewResource
     {
         return new Core\ViewResource(array(
-            'head' => $this->getHeadValue()->asArray,
+            'head' => $this->getHead()->asArray,
             'content' => $this->getContent($contentKey)->asArray,
         ), 'asJSON');
     }
