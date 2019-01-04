@@ -111,7 +111,7 @@ class Front implements Routing\FrontController
             try {
                 $this->obContent = $this->route->execute($this->obClean);
             } catch(Core\BreakFlowException $e) {
-                $this->execute($e->getQueryURL());
+                return $this->execute($e->getQueryURL());
             }
 
         $this->executed = true;
@@ -122,6 +122,40 @@ class Front implements Routing\FrontController
         $this->layout->execute($this->obClean);
 
         return $this->route;
+    }
+
+    public function save(string $path = null): int
+    {
+	    if(empty($path))
+	    	$path = getcwd().'/../compiled';
+	    
+        $savedCount = 0;
+
+        $routes = array();
+        foreach($this->routers as $router)
+            $routes += $router->getRoutes();
+
+        $requests = array_keys($routes);
+
+        foreach($requests as $request) {
+			$route = $this->execute($request, false);
+
+            if($route) {
+				echo $request, ' [done]';
+
+                if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getDocument()->asJSON)) {
+                    ++$savedCount;
+					echo $request, ' [saved json]';
+                }
+
+                if(false !== file_put_contents($path.'/html/'.urlencode($request).'.html', $this)) {
+                    ++$savedCount;
+					echo $request, ' [saved html]';
+                }
+            }
+        }
+
+        return $savedCount;
     }
 
     /**
