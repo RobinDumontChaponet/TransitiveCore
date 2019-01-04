@@ -76,14 +76,4 @@ class Presenter
     {
         $this->addData($key, $value);
     }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public function __debugInfo()
-    {
-        return array(
-            'data' => $this->data,
-        );
-    }
 }
