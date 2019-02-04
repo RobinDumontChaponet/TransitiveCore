@@ -65,17 +65,9 @@ class Front implements Routing\FrontController
 
         $this->layout = new Routing\Route(new Core\Presenter(), new View());
 
-        $this->layout->getView()->content = function ($data) {
+        $this->setLayoutContent(function ($data) {
             echo $data['view'];
-        };
-    }
-
-    /*
-     * @todo remove this ?
-     */
-    public function getContentType(): ?string
-    {
-        return $this->contentType;
+        });
     }
 
     /**
@@ -141,16 +133,16 @@ class Front implements Routing\FrontController
             $route = $this->execute($request, false);
 
             if($route) {
-                echo $request, ' [done]';
+// 				echo $request, ' [done]';
 
-                if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getDocument()->asJSON)) {
+                if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getAllDocument()->asJSON)) {
                     ++$savedCount;
-                    echo $request, ' [saved json]';
+// 					echo $request, ' [saved json]';
                 }
 
                 if(false !== file_put_contents($path.'/html/'.urlencode($request).'.html', $this)) {
                     ++$savedCount;
-                    echo $request, ' [saved html]';
+// 					echo $request, ' [saved html]';
                 }
             }
         }
@@ -304,7 +296,7 @@ class Front implements Routing\FrontController
     public function setLayoutContent($content = null): bool
     {
         if(isset($this->layout) && $this->layout->hasView()) {
-            $this->layout->getView()->content = $content;
+            $this->layout->getView()->addContent($content);
 
             return true;
         }

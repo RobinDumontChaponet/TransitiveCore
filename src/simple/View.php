@@ -14,11 +14,11 @@ class View implements Core\View
     public $title;
 
     /**
-     * content.
+     * Array of content (string or scalar).
      *
-     * @var mixed
+     * @var array
      */
-    public $content;
+    private $content;
 
     /**
      * data pushed from the presenter.
@@ -59,7 +59,7 @@ class View implements Core\View
     public function __construct()
     {
         $this->title = '';
-        $this->content = 'No viewable content.';
+        $this->content = [];
     }
 
     /**
@@ -94,14 +94,34 @@ class View implements Core\View
     }
 
     /**
+     * @param string $key = null
+     *
+     * @return bool
+     */
+    public function hasContent(?string $contentType = null, ?string $contentKey = null): bool
+    {
+        return isset($this->content[$contentType][$contentKey]);
+    }
+
+    /**
      * @param mixed content
      *
      * @return mixed
      */
     protected function _getContent($content)
     {
+        if(!isset($content))
+            return;
+
+        if(is_array($content))
+            return array_map(
+                function ($value) {
+                    return $this->_getContent($value);
+                }, $content
+            );
+
         switch(gettype($content)) {
-            case 'string': case 'integer': case 'double':
+            case 'string': case 'integer': case 'double': case 'float':
                 return $content;
             break;
             case 'object':
@@ -123,27 +143,70 @@ class View implements Core\View
     }
 
     /**
-     * @param string $key
+     * @param string $key         = null
+     * @param string $contentType = null
      *
      * @return Core\ViewResource
      */
-    public function getContent(string $key = null): Core\ViewResource
+    public function getContent(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
-        $content = null;
-        if($this->hasContent($key)) {
-            if(is_array($this->content))
-                if(isset($key))
-                    $content = $this->_getContent($this->content[$key]);
-                else {
-                    $content = array();
-                    foreach($this->content as $key => $item)
-                        $content[$key] = $this->_getContent($item);
-                }
-            else
-                $content = $this->_getContent($this->content);
+        return new Core\ViewResource($this->_getContent(@$this->content[$contentType][$contentKey]));
+    }
+
+    /**
+     * @return Core\ViewResource
+     */
+    public function getAllContent(): Core\ViewResource
+    {
+        return new Core\ViewResource(array_map(
+            function ($type, $value) {
+                return [
+                    $type => array_map(
+                        function ($key, $value) {
+                            return [
+                                $key => $this->_getContent($value),
+                            ];
+                        }, array_keys($value), $value
+                    ),
+                ];
+            }, array_keys($this->content), $this->content
+        ));
+    }
+
+    public function getContentByType(string $contentType = null): Core\ViewResource
+    {
+        if(empty($contentType))
+            return new Core\ViewResource();
+
+        return new Core\ViewResource(
+            array_map(
+                function ($key, $value) {
+                    return [
+                        $key => $this->_getContent($value),
+                    ];
+                }, array_keys($this->content[$contentType]), $this->content[$contentType]
+            )
+        );
+    }
+
+    public function addContent($content, ?string $contentType = null, ?string $contentKey = null): void
+    {
+        if(is_array($content)) {
+            if(isset($content['content'])) {
+                $content = $content['content'];
+                if(isset($content['key']))
+                    $contentKey = $content['key'];
+                if(isset($content['type']))
+                    $contentType = $content['type'];
+            }
         }
 
-        return new Core\ViewResource($content);
+/*
+        if(isset($this->content[$contentType][$contentKey]))
+            trigger_error('Replacing existing content with key "'.((is_string($contentKey))?$contentKey:'{unnamed}').'" and type "'.((is_string($contentType))?$contentType:'{all}').'"');
+*/
+
+        $this->content[$contentType][$contentKey] = $content;
     }
 
     /*
@@ -166,13 +229,26 @@ class View implements Core\View
 
     /*
      * @param string $content = null
+     * @param string $contentType = null
      * @return Core\ViewResource
      */
-    public function getDocument(string $contentKey = null): Core\ViewResource
+    public function getDocument(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
         return new Core\ViewResource(array(
             'head' => $this->getHead()->asArray,
-            'content' => $this->getContent($contentKey)->asArray,
+            'content' => $this->getContent($contentKey, $contentType)->asArray,
+        ), 'asJSON');
+    }
+
+    /*
+     * @param string $content = null
+     * @return Core\ViewResource
+     */
+    public function getAllDocument(): Core\ViewResource
+    {
+        return new Core\ViewResource(array(
+            'head' => $this->getHead()->asArray,
+            'content' => $this->getAllContent()->asArray,
         ), 'asJSON');
     }
 
@@ -182,19 +258,6 @@ class View implements Core\View
     public function getDocumentValue(): string
     {
         return $this->getDocument()->__toString();
-    }
-
-    /**
-     * @param string $key = null
-     *
-     * @return bool
-     */
-    public function hasContent(string $key = null): bool
-    {
-        if(isset($key))
-            return is_array($this->content) && isset($this->content[$key]);
-        else
-            return isset($this->content);
     }
 
     /**
@@ -214,7 +277,12 @@ class View implements Core\View
      */
     public function __toString(): string
     {
-        return $this->getContent()->asString();
+        if($this->hasContent())
+            return $this->getContent()->asString();
+        else
+            trigger_error('View has no content');
+
+        return '';
     }
 
     /**
