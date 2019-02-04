@@ -126,9 +126,9 @@ class Front implements Routing\FrontController
 
     public function save(string $path = null): int
     {
-	    if(empty($path))
-	    	$path = getcwd().'/../compiled';
-	    
+        if(empty($path))
+            $path = getcwd().'/../compiled';
+
         $savedCount = 0;
 
         $routes = array();
@@ -138,19 +138,19 @@ class Front implements Routing\FrontController
         $requests = array_keys($routes);
 
         foreach($requests as $request) {
-			$route = $this->execute($request, false);
+            $route = $this->execute($request, false);
 
             if($route) {
-				echo $request, ' [done]';
+                echo $request, ' [done]';
 
                 if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getDocument()->asJSON)) {
                     ++$savedCount;
-					echo $request, ' [saved json]';
+                    echo $request, ' [saved json]';
                 }
 
                 if(false !== file_put_contents($path.'/html/'.urlencode($request).'.html', $this)) {
                     ++$savedCount;
-					echo $request, ' [saved html]';
+                    echo $request, ' [saved html]';
                 }
             }
         }
@@ -195,38 +195,38 @@ class Front implements Routing\FrontController
 */
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
-                return $this->getDocument();
+                return $this->route->getDocument();
             break;
             case 'application/vnd.transitive.document+xml':
-                return $this->getDocument()->asXML('document');
+                return $this->route->getDocument()->asXML('document');
             break;
             case 'application/vnd.transitive.document+yaml':
-                return $this->getDocument()->asYAML();
+                return $this->route->getDocument()->asYAML();
             break;
             case 'application/vnd.transitive.head+json':
-                return $this->getHead()->asJson();
+                return $this->route->getHead()->asJson();
             break;
             case 'application/vnd.transitive.head+xml':
-                return $this->getHead()->asXML('head');
+                return $this->route->getHead()->asXML('head');
             break;
             case 'application/vnd.transitive.head+yaml':
-                return $this->getHead()->asYAML();
+                return $this->route->getHead()->asYAML();
             break;
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
-                return $this->getContent();
+                return $this->route->getContent();
             break;
             case 'application/vnd.transitive.content+json':
-                return $this->getContent()->asJson();
+                return $this->route->getContent()->asJson();
             break;
             case 'application/vnd.transitive.content+xml':
-                return $this->getContent()->asXML('content');
+                return $this->route->getContent()->asXML('content');
             break;
             case 'application/vnd.transitive.content+yaml':
-                return $this->getContent()->asYAML();
+                return $this->route->getContent()->asYAML();
             break;
 
             case 'text/plain':
-                return $this->getContent()->asString();
+                return $this->layout->getContent()->asString();
             break;
 /*
             case 'application/json':
