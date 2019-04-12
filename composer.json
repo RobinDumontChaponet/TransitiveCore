@@ -2,6 +2,7 @@
 	"name": "transitive/core",
 	"description": "Core classes of Transitive MVP framework",
 	"keywords": ["framework","mvp","model","view","presenter"],
+	"type": "library",
 	"license": "MIT",
 	"authors": [
 		{
