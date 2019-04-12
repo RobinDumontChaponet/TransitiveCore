@@ -220,16 +220,28 @@ class Front implements Routing\FrontController
             case 'text/plain':
                 return $this->layout->getContent()->asString();
             break;
-/*
+
             case 'application/json':
-                if($this->hasContent('api'))
-                    return $this->getContent('api')->asJson();
+                if($this->route->hasContent('application/json', $contentKey))
+                    return $this->route->getContentByType('application/json', $contentKey)->asJson();
+                elseif(404 != http_response_code()) {
+                    http_response_code(404);
+                    $_SERVER['REDIRECT_STATUS'] = 404;
+
+                    return '';
+                }
             break;
             case 'application/xml':
-                if($this->hasContent('api'))
-                    return $this->getContent('api')->asXML();
+                if($this->route->hasContent('application/xml', $contentKey))
+                    return $this->route->getContent('application/xml', $contentKey)->asJson();
+                elseif(404 != http_response_code()) {
+                    http_response_code(404);
+                    $_SERVER['REDIRECT_STATUS'] = 404;
+
+                    return '';
+                }
+
             break;
-*/
 
             default:
                 return $this->layout->getView();
