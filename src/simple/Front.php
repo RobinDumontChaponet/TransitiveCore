@@ -83,7 +83,7 @@ class Front implements Routing\FrontController
     protected function _getRoute(string $query, string $defaultViewClassName = null): ?Routing\Route
     {
         if(!isset($this->routers))
-            throw new Routing\RoutingException('No routeR.', 404);
+            throw new Routing\RoutingException('No routeR.', 404, $query);
         else {
             foreach($this->routers as $router) {
                 if(!$router->hasDefaultViewClassName())
@@ -92,7 +92,7 @@ class Front implements Routing\FrontController
                     return $testRoute;
             }
 
-            throw new Routing\RoutingException('No route.', 404);
+            throw new Routing\RoutingException('No route.', 404, $query);
         }
     }
 
