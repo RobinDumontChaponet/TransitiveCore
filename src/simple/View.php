@@ -178,15 +178,18 @@ class View implements Core\View
         if(empty($contentType))
             return new Core\ViewResource();
 
-        return new Core\ViewResource(
-            array_map(
-                function ($key, $value) {
-                    return [
-                        $key => $this->_getContent($value),
-                    ];
-                }, array_keys($this->content[$contentType]), $this->content[$contentType]
-            )
-        );
+		$content = array_merge(...array_map(
+            function ($key, $value) {
+                return [
+                    $key => $this->_getContent($value),
+                ];
+            }, array_keys($this->content[$contentType]), $this->content[$contentType]
+        ));
+
+		if(count($content) == 1 && empty(key($content)))
+			$content = $content[key($content)];
+
+        return new Core\ViewResource($content);
     }
 
     public function addContent($content, ?string $contentType = null, ?string $contentKey = null): void
