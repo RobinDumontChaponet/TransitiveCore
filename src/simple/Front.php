@@ -108,9 +108,7 @@ class Front implements Routing\FrontController
 
         $this->executed = true;
 
-        $content = ['view' => $this->route->getView()];
-
-        $this->layout->getPresenter()->setData($content);
+        $this->layout->getPresenter()->add('view', $this->route->getView());
         $this->layout->execute($this->obClean);
 
         return $this->route;
@@ -305,10 +303,15 @@ class Front implements Routing\FrontController
         return $this->route;
     }
 
-    public function setLayoutContent($content = null): bool
+    public function setLayout(Routing\Route $layout): void
+    {
+        $this->layout = $layout;
+    }
+
+    public function setLayoutContent($content, ?string $contentType = null): bool
     {
         if(isset($this->layout) && $this->layout->hasView()) {
-            $this->layout->getView()->addContent($content);
+            $this->layout->getView()->addContent($content, $contentType);
 
             return true;
         }
