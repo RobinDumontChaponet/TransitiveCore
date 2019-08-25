@@ -178,7 +178,7 @@ class View implements Core\View
         if(empty($contentType))
             return new Core\ViewResource();
 
-		$content = array_merge(...array_map(
+        $content = array_merge(...array_map(
             function ($key, $value) {
                 return [
                     $key => $this->_getContent($value),
@@ -186,8 +186,8 @@ class View implements Core\View
             }, array_keys($this->content[$contentType]), $this->content[$contentType]
         ));
 
-		if(count($content) == 1 && empty(key($content)))
-			$content = $content[key($content)];
+        if(1 == count($content) && empty(key($content)))
+            $content = $content[key($content)];
 
         return new Core\ViewResource($content);
     }
