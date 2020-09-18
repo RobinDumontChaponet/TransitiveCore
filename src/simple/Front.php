@@ -72,8 +72,6 @@ class Front implements Routing\FrontController
 
     /**
      * Get presenter & view buffer (if obClean is enabled).
-     *
-     * @return string
      */
     public function getObContent(): string
     {
@@ -121,7 +119,7 @@ class Front implements Routing\FrontController
 
         $savedCount = 0;
 
-        $routes = array();
+        $routes = [];
         foreach($this->routers as $router)
             $routes += $router->getRoutes();
 
@@ -172,8 +170,6 @@ class Front implements Routing\FrontController
 
     /**
      * Return processed content from current route.
-     *
-     * @return string
      *
      * @param string $contentType = null
      */
@@ -248,8 +244,6 @@ class Front implements Routing\FrontController
 
     /**
      * Get all routers.
-     *
-     * @return array
      */
     public function getRouters(): array
     {
@@ -258,8 +252,6 @@ class Front implements Routing\FrontController
 
     /**
      * Set routers list, replacing any previously set router.
-     *
-     * @param array $routers
      */
     public function setRouters(array $routers): void
     {
@@ -279,10 +271,6 @@ class Front implements Routing\FrontController
     /**
      * Remove specified router
      * return true at success and false otherwise.
-     *
-     * @return bool
-     *
-     * @param Routing\Router $router
      *
      * @todo implement this
      */

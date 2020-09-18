@@ -29,10 +29,6 @@ class View implements Core\View
 
     /**
      * cacheBust function.
-     *
-     * @param string $src
-     *
-     * @return string
      */
     public static function cacheBust(string $src): string
     {
@@ -69,29 +65,29 @@ class View implements Core\View
      */
     public function getTitleValue(): ?string
     {
-		$title = $this->title;
+        $title = $this->title;
 
         switch(gettype($title)) {
-			case 'string':
-				return $title;
-			break;
-			case 'object':
-				if('Closure' == get_class($title)) {
-					ob_start();
-					ob_clean();
-					$returned = $title($this->data);
-					$output = ob_get_clean();
-					if(isset($returned))
-						return $returned;
-					else
-						return $output;
-				}
-			break;
-			default:
-				throw new \InvalidArgumentException('wrong title content type : '.gettype($title));
-		}
+            case 'string': case 'string': case 'integer': case 'double': case 'float':
+                return $title;
+            break;
+            case 'object':
+                if('Closure' == get_class($title)) {
+                    ob_start();
+                    ob_clean();
+                    $returned = $title($this->data);
+                    $output = ob_get_clean();
+                    if(isset($returned))
+                        return $returned;
+                    else
+                        return $output;
+                }
+            break;
+            default:
+                throw new \InvalidArgumentException('wrong title content type : '.gettype($title));
+        }
 
-		return null;
+        return null;
     }
 
     /**
@@ -112,16 +108,14 @@ class View implements Core\View
      */
     public function setTitle($title = null): void
     {
-		if(gettype($title) == 'string' || empty($title) || gettype($title) == 'object' && 'Closure' == get_class($title))
-			$this->title = $title;
-		else
-			throw new \InvalidArgumentException('wrong view content type : '.gettype($content));
+        if(in_array(gettype($title), ['string', 'integer', 'double', 'float']) || empty($title) || 'object' == gettype($title) && 'Closure' == get_class($title))
+            $this->title = $title;
+        else
+            throw new \InvalidArgumentException('wrong view content type : '.gettype($title));
     }
 
     /**
      * @param string $key = null
-     *
-     * @return bool
      */
     public function hasContent(?string $contentType = null, ?string $contentKey = null): bool
     {
@@ -170,17 +164,12 @@ class View implements Core\View
     /**
      * @param string $key         = null
      * @param string $contentType = null
-     *
-     * @return Core\ViewResource
      */
     public function getContent(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
         return new Core\ViewResource($this->_getContent(@$this->content[$contentType][$contentKey]));
     }
 
-    /**
-     * @return Core\ViewResource
-     */
     public function getAllContent(): Core\ViewResource
     {
         return new Core\ViewResource(array_map(
@@ -242,9 +231,9 @@ class View implements Core\View
      */
     public function getHead(): Core\ViewResource
     {
-        return new Core\ViewResource(array(
+        return new Core\ViewResource([
             'title' => $this->getTitleValue(),
-        ), 'asArray');
+        ], 'asArray');
     }
 
     /*
@@ -262,10 +251,10 @@ class View implements Core\View
      */
     public function getDocument(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
-        return new Core\ViewResource(array(
+        return new Core\ViewResource([
             'head' => $this->getHead()->asArray,
             'content' => $this->getContent($contentKey, $contentType)->asArray,
-        ), 'asJSON');
+        ], 'asJSON');
     }
 
     /*
@@ -274,10 +263,10 @@ class View implements Core\View
      */
     public function getAllDocument(): Core\ViewResource
     {
-        return new Core\ViewResource(array(
+        return new Core\ViewResource([
             'head' => $this->getHead()->asArray,
             'content' => $this->getAllContent()->asArray,
-        ), 'asJSON');
+        ], 'asJSON');
     }
 
     /*
@@ -293,11 +282,11 @@ class View implements Core\View
      */
     public function __debugInfo()
     {
-        return array(
+        return [
             'title' => $this->getTitle(),
             'content' => $this->getContent(),
             'data' => $this->getData(),
-        );
+        ];
     }
 
     /**
@@ -315,8 +304,6 @@ class View implements Core\View
 
     /**
      * @param string $key = null
-     *
-     * @return array
      */
     public function &getData(string $key = null): array
     {

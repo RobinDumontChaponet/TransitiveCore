@@ -123,7 +123,7 @@ final class ViewResourceTest extends PHPUnit\Framework\TestCase
         $instance = new ViewResource($value);
 
         $this->assertEquals(
-            yaml_emit(array($value)),
+            yaml_emit([$value]),
             $instance->asYAML()
         );
     }

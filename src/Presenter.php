@@ -11,7 +11,7 @@ class Presenter
 
     public function __construct()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
     /*
@@ -36,8 +36,6 @@ class Presenter
 
     /**
      * Return true if data array is not empty, false otherwise.
-     *
-     * @return bool
      */
     public function hasData(): bool
     {
