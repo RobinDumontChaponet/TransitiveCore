@@ -5,7 +5,6 @@ Should be useable standalone.
 
 [![Latest Stable Version](https://poser.pugx.org/transitive/core/v/stable?format=flat-square)](https://packagist.org/packages/transitive/core)
 [![License](https://poser.pugx.org/transitive/core/license?format=flat-square)](https://packagist.org/packages/transitive/core)
-[![Build Status](https://travis-ci.org/RobinDumontChaponet/TransitiveCore.svg?branch=master)](https://travis-ci.org/RobinDumontChaponet/TransitiveCore)
 [![Coverage Status](https://coveralls.io/repos/github/RobinDumontChaponet/TransitiveCore/badge.svg)](https://coveralls.io/github/RobinDumontChaponet/TransitiveCore)
 
 ## License
