@@ -69,7 +69,29 @@ class View implements Core\View
      */
     public function getTitleValue(): ?string
     {
-        return $this->title;
+		$title = $this->title;
+
+        switch(gettype($title)) {
+			case 'string':
+				return $title;
+			break;
+			case 'object':
+				if('Closure' == get_class($title)) {
+					ob_start();
+					ob_clean();
+					$returned = $title($this->data);
+					$output = ob_get_clean();
+					if(isset($returned))
+						return $returned;
+					else
+						return $output;
+				}
+			break;
+			default:
+				throw new \InvalidArgumentException('wrong title content type : '.gettype($title));
+		}
+
+		return null;
     }
 
     /**
@@ -88,9 +110,12 @@ class View implements Core\View
      *
      * @param string $title
      */
-    public function setTitle(string $title = null): void
+    public function setTitle($title = null): void
     {
-        $this->title = $title;
+		if(gettype($title) == 'string' || empty($title) || gettype($title) == 'object' && 'Closure' == get_class($title))
+			$this->title = $title;
+		else
+			throw new \InvalidArgumentException('wrong view content type : '.gettype($content));
     }
 
     /**
