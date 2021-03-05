@@ -116,7 +116,7 @@ class ViewResource
             $str .= $value.$glue;
         });
 
-        if(strlen($glue))
+        if(strlen($str) && strlen($glue))
             $str = substr($str, 0, 0 - strlen($glue));
 
         return $str;
