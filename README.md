@@ -1,5 +1,7 @@
 # Transitive\Core
 
+$$ {\displaystyle \forall a,b,c\in X:(aRb\wedge bRc)\Rightarrow aRc} $$
+
 Provides presenter, view and viewRessource classes.
 Should be useable standalone.
 
