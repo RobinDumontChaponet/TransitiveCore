@@ -238,7 +238,7 @@ class Front implements Routing\FrontController
             break;
 
             default:
-                return $this->layout->getView();
+                return $this->layout->getContent();
         }
     }
 
