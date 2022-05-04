@@ -16,51 +16,38 @@ class Front implements Routing\FrontController
 
     /**
      * Layout route.
-     *
-     * @var Route
      */
-    protected $layout;
+    protected ?Routing\Route $layout;
 
     /**
      * List of Routing\Router.
-     *
-     * @var array Routing\Router
      */
-    protected $routers;
+    protected array $routers;
 
     /**
      * Current route.
      *
      * @todo remove this ?
-     *
-     * @var Route
      */
-    protected $route;
+    protected ?Routing\Route $route;
 
     /**
      * Should presenter & view 's buffer be cleaned ?
-     *
-     * @var bool
      */
-    public $obClean;
+    public bool $obClean = true;
 
     /**
      * content presenter & view 's buffer if obClean is set to true.
-     *
-     * @var string
      */
-    protected $obContent;
+    protected string $obContent = '';
 
     /**
-     * did execute run successfuly ?
-     *
-     * @var bool
+     * did execute run successfully ?
      */
-    protected $executed = false;
+    protected bool $executed = false;
 
     public function __construct()
     {
-        $this->obClean = true;
         $this->obContent = '';
 
         $this->layout = new Routing\Route(new Core\Presenter(), new View());
@@ -170,8 +157,6 @@ class Front implements Routing\FrontController
 
     /**
      * Return processed content from current route.
-     *
-     * @param string $contentType = null
      */
     public function getContent(string $contentType = null): string
     {
@@ -260,8 +245,6 @@ class Front implements Routing\FrontController
 
     /**
      * Add specified router.
-     *
-     * @param Router $router
      */
     public function addRouter(Routing\Router $router): void
     {
@@ -283,8 +266,6 @@ class Front implements Routing\FrontController
      * Return current Route.
      *
      * @todo remove this ?
-     *
-     * @return Route
      */
     public function getRoute(): ?Routing\Route
     {

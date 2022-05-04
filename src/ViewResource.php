@@ -4,30 +4,28 @@ namespace Transitive\Core;
 
 class ViewResource
 {
-    /**
-     * @var mixed
-     */
-    public $value;
-    private $defaultTransformer;
+	private string $defaultTransformer;
 
-    private static function _arrayToXML(array $data, \SimpleXMLElement &$xmlData): void
-    {
-        foreach($data as $key => $value) {
-            if(is_numeric($key))
-                $key = 'item'.$key;
-            if(is_array($value)) {
-                $subnode = $xmlData->addChild($key);
-                self::_arrayToXML($value, $subnode);
-            } else
-                $xmlData->addChild($key, htmlspecialchars($value));
-        }
-    }
 
-    public function __construct($value = null, string $defaultTransformer = 'getValue')
-    {
-        $this->setValue($value);
+    public function __construct(
+		public mixed $value = null,
+		string $defaultTransformer = 'getValue',
+    ) {
         $this->setDefault($defaultTransformer);
     }
+
+	private static function _arrayToXML(array $data, \SimpleXMLElement &$xmlData): void
+	{
+		foreach($data as $key => $value) {
+			if(is_numeric($key))
+				$key = 'item'.$key;
+			if(is_array($value)) {
+				$subnode = $xmlData->addChild($key);
+				self::_arrayToXML($value, $subnode);
+			} else
+				$xmlData->addChild($key, htmlspecialchars($value));
+		}
+	}
 
     private function getValue()
     {

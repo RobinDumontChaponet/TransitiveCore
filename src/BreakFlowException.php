@@ -7,11 +7,9 @@ namespace Transitive\Core;
  */
 class BreakFlowException extends \RuntimeException
 {
-    private $queryURL;
-
-    public function __construct(string $queryURL = null) {
-        $this->queryURL = $queryURL;
-
+    public function __construct(
+		private ?string $queryURL = null,
+	) {
         parent::__construct();
     }
 

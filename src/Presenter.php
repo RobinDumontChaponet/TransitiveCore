@@ -4,19 +4,13 @@ namespace Transitive\Core;
 
 class Presenter
 {
-    /**
-     * @var array
-     */
-    public $data;
+    public array $data = [];
 
     public function __construct()
-    {
-        $this->data = [];
-    }
+    {}
 
     /*
-     * @param string $queryURL = null
-     * @return void
+     * Change route
      */
     public function redirect(string $queryURL = null): void
     {
@@ -54,23 +48,17 @@ class Presenter
 
     /**
      * Add data as key/value pair.
-     *
-     * @param mixed $key
-     * @param mixed $value = null
      */
-    public function addData($key, $value = null): void
+    public function addData(mixed $key, mixed $value = null): void
     {
         $this->data[$key] = $value;
     }
 
     /**
      * Add data as key/value pair.
-     *
-     * @param mixed $key
-     * @param mixed $value = null
      * @codeCoverageIgnore
      */
-    public function add($key, $value = null): void
+    public function add(mixed $key, mixed $value = null): void
     {
         $this->addData($key, $value);
     }

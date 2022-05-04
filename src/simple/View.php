@@ -7,61 +7,49 @@ use Transitive\Core;
 class View implements Core\View
 {
     /**
-     * The view's title.
-     *
-     * @var string
-     */
-    public $title;
-
-    /**
-     * Array of content (string or scalar).
-     *
-     * @var array
-     */
-    private $content;
-
-    /**
      * data pushed from the presenter.
-     *
-     * @var array
      */
-    public $data = [];
+    public array $data = [];
+
+    public function __construct(
+		/**
+		 * The view's title.
+		 */
+		public mixed $title = '',
+		/**
+		 * Array of content (string or scalar).
+		 */
+		private array $content = [],
+	)
+    {}
+
+	/**
+	 * Add timestamp to path
+	 */
+	public static function cacheBust(string $src): string
+	{
+		if(!file_exists($src))
+			return $src;
+
+		$path = pathinfo($src);
+
+		return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
+	}
+
+	/*
+	 * @param string $include path
+	 * @return string buffer output
+	 */
+	protected static function _getIncludeContents(string $include): string
+	{
+		ob_start();
+		include $include;
+
+		return ob_get_clean();
+	}
 
     /**
-     * cacheBust function.
-     */
-    public static function cacheBust(string $src): string
-    {
-        if(!file_exists($src))
-            return $src;
-
-        $path = pathinfo($src);
-
-        return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
-    }
-
-    /*
-     * @param string $include
-     * @return string
-     */
-    protected static function _getIncludeContents(string $include): string
-    {
-        ob_start();
-        include $include;
-
-        return ob_get_clean();
-    }
-
-    public function __construct()
-    {
-        $this->title = '';
-        $this->content = [];
-    }
-
-    /**
-     * Get the view's title.
-     *
-     * @return string
+     * Get the view's title value.
      */
     public function getTitleValue(): ?string
     {
@@ -106,7 +94,7 @@ class View implements Core\View
      *
      * @param string $title
      */
-    public function setTitle($title = null): void
+    public function setTitle(mixed $title = null): void
     {
         if(in_array(gettype($title), ['string', 'integer', 'double', 'float']) || empty($title) || 'object' == gettype($title) && 'Closure' == get_class($title))
             $this->title = $title;
@@ -115,7 +103,7 @@ class View implements Core\View
     }
 
     /**
-     * @param string $key = null
+	 * return true if content with key exists
      */
     public function hasContent(?string $contentType = null, ?string $contentKey = null): bool
     {
@@ -123,14 +111,12 @@ class View implements Core\View
     }
 
     /**
-     * @param mixed content
      *
-     * @return mixed
      */
-    protected function _getContent($content)
+    protected function _getContent(mixed $content): mixed
     {
         if(!isset($content))
-            return;
+            return null;
 
         if(is_array($content))
             return array_map(
@@ -162,8 +148,7 @@ class View implements Core\View
     }
 
     /**
-     * @param string $key         = null
-     * @param string $contentType = null
+
      */
     public function getContent(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
@@ -227,7 +212,6 @@ class View implements Core\View
     }
 
     /*
-     * @return Core\ViewResource
      */
     public function getHead(): Core\ViewResource
     {
@@ -237,7 +221,6 @@ class View implements Core\View
     }
 
     /*
-     * @return string
      */
     public function getHeadValue(): string
     {
@@ -245,9 +228,6 @@ class View implements Core\View
     }
 
     /*
-     * @param string $content = null
-     * @param string $contentType = null
-     * @return Core\ViewResource
      */
     public function getDocument(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
     {
@@ -258,8 +238,6 @@ class View implements Core\View
     }
 
     /*
-     * @param string $content = null
-     * @return Core\ViewResource
      */
     public function getAllDocument(): Core\ViewResource
     {
@@ -270,7 +248,6 @@ class View implements Core\View
     }
 
     /*
-     * @return string
     */
     public function getDocumentValue(): string
     {
@@ -303,7 +280,6 @@ class View implements Core\View
     }
 
     /**
-     * @param string $key = null
      */
     public function &getData(string $key = null): array
     {
