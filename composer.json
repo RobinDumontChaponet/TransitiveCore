@@ -24,7 +24,7 @@
 		"twig/twig": "The flexible, fast and secure template engine for PHP"
     },
 	"provide": {
-		"Transitive\\Simple": "*"
+		"transitive/simple": "*"
 	},
 	"autoload": {
 		"psr-4": {
