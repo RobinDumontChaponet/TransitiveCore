@@ -27,12 +27,12 @@ class ViewResource
 		}
 	}
 
-    private function getValue()
+    private function getValue(): mixed
     {
         return $this->value;
     }
 
-    private function setValue($value): void
+    private function setValue(mixed $value): void
     {
         $this->value = $value;
     }
@@ -49,15 +49,11 @@ class ViewResource
      */
     public function __toString()
     {
-        $result = null;
+		$result = $this->{$this->defaultTransformer}();
+		if(!is_string($result))
+			$result = var_export($result, true);
 
-        if(isset($this->defaultTransformer)) {
-            $result = $this->{$this->defaultTransformer}();
-            if(!is_string($result))
-                $result = var_export($result, true);
-        }
-
-        return $result ?? '';
+        return $result;
     }
 
     /**
@@ -79,7 +75,8 @@ class ViewResource
 
     public function asObject(): \stdClass
     {
-        return (object) $this->getValue();
+		/** @var \stdClass */
+        return (object)(array) $this->getValue();
     }
 
     public function asJSON(): string
@@ -110,7 +107,7 @@ class ViewResource
         $value = $this->asArray();
         $str = '';
 
-        array_walk_recursive($value, function ($value, $key) use (&$str, $glue) {
+        array_walk_recursive($value, function (mixed $value) use (&$str, $glue) {
             $str .= $value.$glue;
         });
 

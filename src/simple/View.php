@@ -18,6 +18,8 @@ class View implements Core\View
 		public mixed $title = '',
 		/**
 		 * Array of content (string or scalar).
+		 * $this->content[$contentType][$contentKey]
+		 * @var array<array-key, array<array-key, mixed>>
 		 */
 		private array $content = [],
 	)
@@ -33,7 +35,7 @@ class View implements Core\View
 
 		$path = pathinfo($src);
 
-		return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
+		return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.($path['extension'] ?? '');
 	}
 
 	/*
@@ -43,6 +45,7 @@ class View implements Core\View
 	protected static function _getIncludeContents(string $include): string
 	{
 		ob_start();
+		/** @psalm-suppress UnresolvableInclude */
 		include $include;
 
 		return ob_get_clean();
@@ -56,11 +59,11 @@ class View implements Core\View
         $title = $this->title;
 
         switch(gettype($title)) {
-            case 'string': case 'string': case 'integer': case 'double': case 'float':
-                return $title;
+            case 'string': case 'integer': case 'double':
+                return (string) $title;
             break;
             case 'object':
-                if('Closure' == get_class($title)) {
+                if($title instanceof \Closure) {
                     ob_start();
                     ob_clean();
                     $returned = $title($this->data);
@@ -86,17 +89,15 @@ class View implements Core\View
         if(empty($this->getTitleValue()))
             $separator = '';
 
-        return $prefix.$separator.$this->getTitleValue().$sufix;
+        return $prefix.$separator.($this->getTitleValue() ?? '').$sufix;
     }
 
     /**
      * Set the view's title.
-     *
-     * @param string $title
      */
     public function setTitle(mixed $title = null): void
     {
-        if(in_array(gettype($title), ['string', 'integer', 'double', 'float']) || empty($title) || 'object' == gettype($title) && 'Closure' == get_class($title))
+        if(in_array(gettype($title), ['string', 'integer', 'double', 'float']) || empty($title) || 'object' == gettype($title) && $title instanceof \Closure)
             $this->title = $title;
         else
             throw new \InvalidArgumentException('wrong view content type : '.gettype($title));
@@ -105,7 +106,7 @@ class View implements Core\View
     /**
 	 * return true if content with key exists
      */
-    public function hasContent(?string $contentType = null, ?string $contentKey = null): bool
+    public function hasContent(string $contentType = '', string $contentKey = ''): bool
     {
         return isset($this->content[$contentType][$contentKey]);
     }
@@ -120,17 +121,17 @@ class View implements Core\View
 
         if(is_array($content))
             return array_map(
-                function ($value) {
+                function ($value): mixed {
                     return $this->_getContent($value);
                 }, $content
             );
 
         switch(gettype($content)) {
-            case 'string': case 'integer': case 'double': case 'float':
+            case 'string': case 'integer': case 'double':
                 return $content;
             break;
             case 'object':
-                if('Closure' == get_class($content)) {
+                if($content instanceof \Closure) {
                     ob_start();
                     ob_clean();
                     $returned = $content($this->data);
@@ -145,14 +146,16 @@ class View implements Core\View
             default:
                 throw new \InvalidArgumentException('wrong view content type : '.gettype($content));
         }
+
+		return null;
     }
 
     /**
 
      */
-    public function getContent(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
+    public function getContent(string $contentType = '', string $contentKey = ''): Core\ViewResource
     {
-        return new Core\ViewResource($this->_getContent(@$this->content[$contentType][$contentKey]));
+        return new Core\ViewResource($this->_getContent($this->content[$contentType][$contentKey] ?? null));
     }
 
     public function getAllContent(): Core\ViewResource
@@ -161,7 +164,7 @@ class View implements Core\View
             function ($type, $value) {
                 return [
                     $type => array_map(
-                        function ($key, $value) {
+                        function ($key, mixed $value) {
                             return [
                                 $key => $this->_getContent($value),
                             ];
@@ -172,13 +175,13 @@ class View implements Core\View
         ));
     }
 
-    public function getContentByType(string $contentType = null): Core\ViewResource
+    public function getContentByType(string $contentType = ''): Core\ViewResource
     {
         if(empty($contentType))
             return new Core\ViewResource();
 
         $content = array_merge(...array_map(
-            function ($key, $value) {
+            function ($key, mixed $value) {
                 return [
                     $key => $this->_getContent($value),
                 ];
@@ -191,7 +194,7 @@ class View implements Core\View
         return new Core\ViewResource($content);
     }
 
-    public function addContent($content, ?string $contentType = null, ?string $contentKey = null): void
+    public function addContent(mixed $content, string $contentType = '', string $contentKey = ''): void
     {
         if(is_array($content)) {
             if(isset($content['content'])) {
@@ -229,7 +232,7 @@ class View implements Core\View
 
     /*
      */
-    public function getDocument(?string $contentType = null, ?string $contentKey = null): Core\ViewResource
+    public function getDocument(string $contentType = '', string $contentKey = ''): Core\ViewResource
     {
         return new Core\ViewResource([
             'head' => $this->getHead()->asArray,
@@ -279,8 +282,6 @@ class View implements Core\View
         return '';
     }
 
-    /**
-     */
     public function &getData(string $key = null): array
     {
         if(isset($key))
@@ -289,9 +290,6 @@ class View implements Core\View
             return $this->data;
     }
 
-    /**
-     * @param array &$data
-     */
     public function setData(array &$data): void
     {
         $this->data = $data;

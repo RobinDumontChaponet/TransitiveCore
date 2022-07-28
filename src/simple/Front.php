@@ -7,8 +7,6 @@ use Transitive\Routing;
 
 /**
  * SimpleFront.
- *
- * @implements Routing\FrontController
  */
 class Front implements Routing\FrontController
 {
@@ -22,14 +20,14 @@ class Front implements Routing\FrontController
     /**
      * List of Routing\Router.
      */
-    protected array $routers;
+    protected array $routers = [];
 
     /**
      * Current route.
      *
      * @todo remove this ?
      */
-    protected ?Routing\Route $route;
+    protected ?Routing\Route $route = null;
 
     /**
      * Should presenter & view 's buffer be cleaned ?
@@ -52,7 +50,7 @@ class Front implements Routing\FrontController
 
         $this->layout = new Routing\Route(new Core\Presenter(), new View());
 
-        $this->setLayoutContent(function ($data) {
+        $this->setLayoutContent(function (array $data) {
             echo $data['view'];
         });
     }
@@ -67,7 +65,7 @@ class Front implements Routing\FrontController
 
     protected function _getRoute(string $query, string $defaultViewClassName = null): ?Routing\Route
     {
-        if(!isset($this->routers))
+        if(empty($this->routers))
             throw new Routing\RoutingException('No routeR.', 404, $query);
         else {
             foreach($this->routers as $router) {
@@ -81,7 +79,7 @@ class Front implements Routing\FrontController
         }
     }
 
-    public function execute(string $queryURL = null): ?Routing\Route
+    public function execute(string $queryURL = ''): ?Routing\Route
     {
         $this->route = $this->_getRoute($queryURL, self::defaultViewClassName);
         if(isset($this->route))
@@ -93,8 +91,14 @@ class Front implements Routing\FrontController
 
         $this->executed = true;
 
-        $this->layout->getPresenter()->add('view', $this->route->getView());
-        $this->layout->execute($this->obClean);
+        $layout = $this->layout;
+		if(isset($layout)) {
+			$presenter = $layout->getPresenter();
+			if($presenter instanceof Core\Presenter) {
+				$presenter->add('view', $this->route?->getView());
+			}
+        	$layout->execute($this->obClean);
+		}
 
         return $this->route;
     }
@@ -113,17 +117,17 @@ class Front implements Routing\FrontController
         $requests = array_keys($routes);
 
         foreach($requests as $request) {
-            $route = $this->execute($request, false);
+            $route = $this->execute($request);
 
             if($route) {
 // 				echo $request, ' [done]';
 
-                if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getAllDocument()->asJSON)) {
+                if(false !== file_put_contents($path.'/json/'.urlencode($request).'.json', $route->getAllDocument()?->asJSON ?? '')) {
                     ++$savedCount;
 // 					echo $request, ' [saved json]';
                 }
 
-                if(false !== file_put_contents($path.'/html/'.urlencode($request).'.html', $this)) {
+                if(false !== file_put_contents($path.'/html/'.urlencode($request).'.html', $this->getContent())) {
                     ++$savedCount;
 // 					echo $request, ' [saved html]';
                 }
@@ -158,72 +162,77 @@ class Front implements Routing\FrontController
     /**
      * Return processed content from current route.
      */
-    public function getContent(string $contentType = null): string
+    public function getContent(string $contentType = ''): string
     {
 /*
         if(null == $contentType)
             $contentType = $this->contentType;
 */
+// 		if(empty($this->route)) {
+// 			http_response_code(404);
+// 			$_SERVER['REDIRECT_STATUS'] = 404;
+//
+// 			return '';
+// 		}
+
         switch($contentType) {
             case 'application/vnd.transitive.document+json':
-                return $this->route->getDocument();
+                return (string) $this->route?->getDocument();
             break;
             case 'application/vnd.transitive.document+xml':
-                return $this->route->getDocument()->asXML('document');
+                return $this->route?->getDocument()->asXML('document');
             break;
             case 'application/vnd.transitive.document+yaml':
-                return $this->route->getDocument()->asYAML();
+                return $this->route?->getDocument()->asYAML();
             break;
             case 'application/vnd.transitive.head+json':
-                return $this->route->getHead()->asJson();
+                return $this->route?->getHead()->asJson();
             break;
             case 'application/vnd.transitive.head+xml':
-                return $this->route->getHead()->asXML('head');
+                return $this->route?->getHead()->asXML('head');
             break;
             case 'application/vnd.transitive.head+yaml':
-                return $this->route->getHead()->asYAML();
+                return $this->route?->getHead()->asYAML();
             break;
             case 'application/vnd.transitive.content+xhtml': case 'application/vnd.transitive.content+html':
-                return $this->route->getContent();
+                return (string) $this->route?->getContent();
             break;
             case 'application/vnd.transitive.content+json':
-                return $this->route->getContent()->asJson();
+                return $this->route?->getContent()?->asJson() ?? '';
             break;
             case 'application/vnd.transitive.content+xml':
-                return $this->route->getContent()->asXML('content');
+                return $this->route?->getContent()?->asXML('content') ?? '';
             break;
             case 'application/vnd.transitive.content+yaml':
-                return $this->route->getContent()->asYAML();
+                return $this->route?->getContent()?->asYAML() ?? '';
             break;
 
             case 'text/plain':
-                return $this->layout->getContent()->asString();
+                return $this->layout?->getContent()?->asString() ?? '';
             break;
 
             case 'application/json':
-                if($this->route->hasContent('application/json'))
-                    return $this->route->getContentByType('application/json')->asJson();
+                if($this->route?->hasContent('application/json'))
+                    return $this->route->getContentByType('application/json')?->asJson() ?? '';
                 elseif(404 != http_response_code()) {
                     http_response_code(404);
                     $_SERVER['REDIRECT_STATUS'] = 404;
-
-                    return '';
                 }
+                return '';
             break;
             case 'application/xml':
-                if($this->route->hasContent('application/xml'))
-                    return $this->route->getContentByType('application/xml')->asJson();
+                if($this->route?->hasContent('application/xml'))
+                    return $this->route->getContentByType('application/xml')?->asJson() ?? '';
                 elseif(404 != http_response_code()) {
                     http_response_code(404);
                     $_SERVER['REDIRECT_STATUS'] = 404;
-
-                    return '';
                 }
 
+                return '';
             break;
 
             default:
-                return $this->layout->getContent();
+                return (string) $this->layout?->getContent();
         }
     }
 
@@ -277,10 +286,16 @@ class Front implements Routing\FrontController
         $this->layout = $layout;
     }
 
-    public function setLayoutContent($content, ?string $contentType = null): bool
+    public function setLayoutContent(mixed $content, string $contentType = ''): bool
     {
-        if(isset($this->layout) && $this->layout->hasView()) {
-            $this->layout->getView()->addContent($content, $contentType);
+        if(isset($this->layout)) {
+			if(!empty($content)) {
+				$view = $this->layout->getView();
+
+				if(isset($view) && $view instanceof View) {
+            		$view->addContent($content, $contentType);
+				}
+			}
 
             return true;
         }
