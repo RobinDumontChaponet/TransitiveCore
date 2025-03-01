@@ -63,7 +63,7 @@ class Front implements Routing\FrontController
         return $this->obContent;
     }
 
-    protected function _getRoute(string $query, string $defaultViewClassName = null): ?Routing\Route
+    protected function _getRoute(string $query, ?string $defaultViewClassName = null): ?Routing\Route
     {
         if(empty($this->routers))
             throw new Routing\RoutingException('No routeR.', 404, $query);
@@ -103,7 +103,7 @@ class Front implements Routing\FrontController
         return $this->route;
     }
 
-    public function save(string $path = null): int
+    public function save(?string $path = null): int
     {
         if(empty($path))
             $path = getcwd().'/../compiled';

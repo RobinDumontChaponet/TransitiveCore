@@ -41,7 +41,7 @@ interface View
 	/*
 	 * these are the working data, as presented by the Presenter.
 	 */
-	public function &getData(string $key = null): array;
+	public function &getData(?string $key = null): array;
 
 	/*
 	 * these are the working data, as presented by the Presenter.

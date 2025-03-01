@@ -282,7 +282,7 @@ class View implements Core\View
         return '';
     }
 
-    public function &getData(string $key = null): array
+    public function &getData(?string $key = null): array
     {
         if(isset($key))
             return $this->data[$key];
