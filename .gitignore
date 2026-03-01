@@ -7,3 +7,4 @@ coverage.clover
 .php_cs.cache
 .DS_Store
 .nova
+.psalm

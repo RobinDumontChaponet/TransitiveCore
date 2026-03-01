@@ -61,7 +61,6 @@ class View implements Core\View
         switch(gettype($title)) {
             case 'string': case 'integer': case 'double':
                 return (string) $title;
-            break;
             case 'object':
                 if($title instanceof \Closure) {
                     ob_start();
@@ -84,6 +83,7 @@ class View implements Core\View
     /**
      * Get the view's title.
      */
+    #[\Override]
     public function getTitle(string $prefix = '', string $separator = ' | ', string $sufix = ''): string
     {
         if(empty($this->getTitleValue()))
@@ -95,6 +95,7 @@ class View implements Core\View
     /**
      * Set the view's title.
      */
+    #[\Override]
     public function setTitle(mixed $title = null): void
     {
         if(in_array(gettype($title), ['string', 'integer', 'double', 'float']) || empty($title) || 'object' == gettype($title) && $title instanceof \Closure)
@@ -106,6 +107,7 @@ class View implements Core\View
     /**
 	 * return true if content with key exists
      */
+    #[\Override]
     public function hasContent(string $contentType = '', string $contentKey = ''): bool
     {
         return isset($this->content[$contentType][$contentKey]);
@@ -129,7 +131,6 @@ class View implements Core\View
         switch(gettype($content)) {
             case 'string': case 'integer': case 'double':
                 return $content;
-            break;
             case 'object':
                 if($content instanceof \Closure) {
                     ob_start();
@@ -153,6 +154,7 @@ class View implements Core\View
     /**
 
      */
+    #[\Override]
     public function getContent(string $contentType = '', string $contentKey = ''): Core\ViewResource
     {
         return new Core\ViewResource($this->_getContent($this->content[$contentType][$contentKey] ?? null));
@@ -175,6 +177,7 @@ class View implements Core\View
         ));
     }
 
+    #[\Override]
     public function getContentByType(string $contentType = ''): Core\ViewResource
     {
         if(empty($contentType))
@@ -194,6 +197,7 @@ class View implements Core\View
         return new Core\ViewResource($content);
     }
 
+    #[\Override]
     public function addContent(mixed $content, string $contentType = '', string $contentKey = ''): void
     {
         if(is_array($content)) {
@@ -216,6 +220,7 @@ class View implements Core\View
 
     /*
      */
+    #[\Override]
     public function getHead(): Core\ViewResource
     {
         return new Core\ViewResource([
@@ -232,6 +237,7 @@ class View implements Core\View
 
     /*
      */
+    #[\Override]
     public function getDocument(string $contentType = '', string $contentKey = ''): Core\ViewResource
     {
         return new Core\ViewResource([
@@ -242,6 +248,7 @@ class View implements Core\View
 
     /*
      */
+    #[\Override]
     public function getAllDocument(): Core\ViewResource
     {
         return new Core\ViewResource([
@@ -282,6 +289,7 @@ class View implements Core\View
         return '';
     }
 
+    #[\Override]
     public function &getData(?string $key = null): array
     {
         if(isset($key))
@@ -290,6 +298,7 @@ class View implements Core\View
             return $this->data;
     }
 
+    #[\Override]
     public function setData(array &$data): void
     {
         $this->data = $data;

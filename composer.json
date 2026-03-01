@@ -14,11 +14,11 @@
 	],
 	"require": {
 		"php": ">8.1",
-		"transitive/routing":"^2.4.1"
+		"transitive/routing": "^2.4.2"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.0.0",
-		"vimeo/psalm": "^4.24"
+		"vimeo/psalm": "^6.12"
     },
 	"suggest": {
 		"twig/twig": "The flexible, fast and secure template engine for PHP"
